@@ -19,6 +19,10 @@
 
 package com.izforge.izpack.panels.userinput;
 
+import javax.swing.JComponent;
+
+import com.izforge.izpack.panels.userinput.field.Field;
+
 /**
  * Additional metadata for password elements.
  *
@@ -26,13 +30,14 @@ package com.izforge.izpack.panels.userinput;
  */
 public class PasswordUIElement extends UIElement
 {
+    PasswordGroup passwordGroup;
 
-    public PasswordUIElement()
+    public PasswordUIElement(Field field, JComponent component, Object constraints, PasswordGroup group)
     {
-        super();
+        super(UIElementType.PASSWORD, field, component, constraints, null);
+        setPasswordGroup(group);
     }
 
-    PasswordGroup passwordGroup;
 
     public PasswordGroup getPasswordGroup()
     {

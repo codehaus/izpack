@@ -30,6 +30,8 @@ import org.mockito.Mockito;
 
 import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.installer.data.GUIInstallData;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 import com.izforge.izpack.util.Platforms;
 
 
@@ -50,14 +52,12 @@ public class RuleInputFieldTest
         String layout = "N:3:3 . N:3:3 . N:3:3 . N:3:3"; // IP address format
         String set = "0:192 1:168 2:0 3:1";              // default value
         String separator = null;
-        String validator = null;
-        String processor = null;
         Toolkit toolkit = Mockito.mock(Toolkit.class);
 
         GUIInstallData installData = new GUIInstallData(new DefaultVariables(), Platforms.HP_UX);
+        RuleField model = new RuleField(layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null);
 
-        RuleInputField field = new RuleInputField(layout, set, separator, validator, processor,
-                                                  RuleInputField.DISPLAY_FORMAT, toolkit, installData);
+        RuleInputField field = new RuleInputField(model, toolkit, installData);
 
         assertEquals(4, field.getNumFields());
 

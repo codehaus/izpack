@@ -22,12 +22,15 @@
 package com.izforge.izpack.panels.userinput.processorclient;
 
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
+import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.gui.FlowLayout;
+import com.izforge.izpack.panels.userinput.field.FieldValidator;
+import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.validator.Validator;
 
 /**
@@ -48,9 +51,9 @@ public class TextInputField extends JComponent implements ProcessingClient
     private Map<String, String> validatorParams;
 
     /**
-     * Holds an instance of the <code>Validator</code> if one was specified and available
+     * Holds an instance of the <code>Validator</code> if one was specified.
      */
-    private Validator validationService;
+    private Validator validator;
 
     /**
      * This composite can only contain one component ie JTextField
@@ -58,67 +61,30 @@ public class TextInputField extends JComponent implements ProcessingClient
     private JTextField field;
 
     /**
-     * Do we have parameters for validator?
-     */
-    private boolean hasParams = false;
-
-    /**
      * Constructs a text input field.
      *
-     * @param set             A default value for field.
-     * @param size            The size of the field.
-     * @param validator       A string that specifies a class to perform validation services. The string
-     *                        must completely identify the class, so that it can be instantiated. The class must implement
-     *                        the <code>RuleValidator</code> interface. If an attempt to instantiate this class fails, no
-     *                        validation will be performed.
-     * @param validatorParams validator parameters.
+     * @param model       the field model
+     * @param installData the installation data
      */
-    public TextInputField(String set, int size, String validator, Map<String, String> validatorParams)
+    public TextInputField(TextField model, InstallData installData)
     {
-        this(set, size, validator);
-        this.validatorParams = validatorParams;
-        this.hasParams = true;
-    }
-
-
-    /**
-     * Constructs a text input field.
-     *
-     * @param set       A default value for field.
-     * @param size      The size of the field.
-     * @param validator A string that specifies a class to perform validation services. The string
-     *                  must completely identify the class, so that it can be instantiated. The class must implement
-     *                  the <code>RuleValidator</code> interface. If an attempt to instantiate this class fails, no
-     *                  validation will be performed.
-     */
-    public TextInputField(String set, int size, String validator)
-    {
-        // ----------------------------------------------------
-        // attempt to create an instance of the Validator
-        // ----------------------------------------------------
-        try
+        FieldValidator fieldValidator = model.getValidator();
+        if (fieldValidator != null)
         {
-            if (validator != null)
-            {
-                logger.fine("Making Validator for: " + validator);
-                validationService = (Validator) Class.forName(validator).newInstance();
-            }
-        }
-        catch (Throwable e)
-        {
-            validationService = null;
-            logger.log(Level.WARNING, e.toString(), e);
+            validator = fieldValidator.create();
+            validatorParams = fieldValidator.getParameters();
         }
 
-        com.izforge.izpack.gui.FlowLayout layout = new com.izforge.izpack.gui.FlowLayout();
-        layout.setAlignment(com.izforge.izpack.gui.FlowLayout.LEADING);
+        FlowLayout layout = new FlowLayout();
+        layout.setAlignment(FlowLayout.LEADING);
         layout.setVgap(0);
         setLayout(layout);
 
         // ----------------------------------------------------
         // construct the UI element and add it to the composite
         // ----------------------------------------------------
-        field = new JTextField(set, size);
+        field = new JTextField(model.getInitialValue(installData), model.getSize());
+        field.setName(model.getVariable());
         field.setCaretPosition(0);
         add(field);
     }
@@ -143,7 +109,7 @@ public class TextInputField extends JComponent implements ProcessingClient
     @Override
     public String getText()
     {
-        return (field.getText());
+        return field.getText();
     }
 
     public void setText(String value)
@@ -173,15 +139,15 @@ public class TextInputField extends JComponent implements ProcessingClient
      */
     public boolean validateContents()
     {
-        if (validationService != null)
+        if (validator != null)
         {
             logger.fine("Validating contents");
-            return (validationService.validate(this));
+            return validator.validate(this);
         }
         else
         {
             logger.fine("Not validating contents");
-            return (true);
+            return true;
         }
     }
 
@@ -190,6 +156,6 @@ public class TextInputField extends JComponent implements ProcessingClient
     @Override
     public boolean hasParams()
     {
-        return hasParams;
+        return validatorParams != null && !validatorParams.isEmpty();
     }
 }

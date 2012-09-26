@@ -21,6 +21,8 @@ package com.izforge.izpack.panels.userinput;
 
 import javax.swing.*;
 
+import com.izforge.izpack.panels.userinput.field.Field;
+
 /**
  * Additional metadata for radio buttons.
  *
@@ -29,12 +31,20 @@ import javax.swing.*;
 public class RadioButtonUIElement extends UIElement
 {
 
+    ButtonGroup buttonGroup;
+
     public RadioButtonUIElement()
     {
         super();
     }
 
-    ButtonGroup buttonGroup;
+    public RadioButtonUIElement(Field field, JComponent component, Object constraints, ButtonGroup group,
+                                String trueValue)
+    {
+        super(UIElementType.RADIOBUTTON, field, component, constraints, field.getValidator());
+        setButtonGroup(group);
+        setTrueValue(trueValue);
+    }
 
     public ButtonGroup getButtonGroup()
     {

@@ -102,6 +102,22 @@ public class Console
      */
     public int prompt(String prompt, int min, int max, int eof)
     {
+        return prompt(prompt, min, max, min - 1, eof);
+    }
+
+    /**
+     * Displays a prompt and waits for numeric input.
+     *
+     * @param prompt       the prompt to display
+     * @param min          the minimum allowed value
+     * @param max          the maximum allowed value
+     * @param defaultValue the default value to use, if no input is entered. Use  a value {@code < min} if there is no
+     *                     default
+     * @param eof          the value to return if end of stream is reached
+     * @return a value in the range of <tt>from..to</tt>, or <tt>eof</tt> if the end of stream is reached
+     */
+    public int prompt(String prompt, int min, int max, int defaultValue, int eof)
+    {
         int result = 0;
         try
         {
@@ -111,6 +127,12 @@ public class Console
                 String value = readLine();
                 if (value != null)
                 {
+                    value = value.trim();
+                    if (value.equals("") && defaultValue >= min) {
+                        // use the default value
+                        result = defaultValue;
+                        break;
+                    }
                     try
                     {
                         result = Integer.valueOf(value);

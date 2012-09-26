@@ -48,6 +48,7 @@ import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
+import com.izforge.izpack.panels.userinput.field.file.MultipleFileField;
 import com.izforge.izpack.panels.userinput.processorclient.StringInputProcessingClient;
 import com.izforge.izpack.panels.userinput.validator.ValidatorContainer;
 
@@ -83,24 +84,26 @@ public class MultipleFileInputField extends JPanel implements ActionListener, Fo
 
     String labeltext;
 
-    public MultipleFileInputField(InstallerFrame parent, GUIInstallData data, boolean directory, String set, int size,
-                                  List<ValidatorContainer> validatorConfig, String fileExt, String fileExtDesc,
-                                  boolean createMultipleVariables, int visibleRows, int preferredXSize,
-                                  int preferredYSize, String labelText)
+    public MultipleFileInputField(MultipleFileField field, InstallerFrame parent, GUIInstallData data,
+                                  boolean directory, List<ValidatorContainer> validatorConfig)
     {
         this.parentFrame = parent;
         this.data = data;
         this.validators = validatorConfig;
-        this.set = set;
-        this.size = size;
-        this.fileExtension = fileExt;
-        this.fileExtensionDescription = fileExtDesc;
+        this.set = field.getDefaultValue();
+        this.size = field.getSize();
+        if (size < 1) {
+            size = 1;
+        }
+        this.fileExtension = field.getFileExtension();
+        this.fileExtensionDescription = field.getFileExtensionDescription();
         this.isDirectory = directory;
-        this.createMultipleVariables = createMultipleVariables;
-        this.visibleRows = visibleRows;
-        this.preferredX = preferredXSize;
-        this.preferredY = preferredYSize;
-        this.labeltext = labelText;
+        this.createMultipleVariables = field.getCreateMultipleVariables();
+        this.visibleRows = field.getVisibleRows() > 0 ? field.getVisibleRows() : 10;
+        this.preferredX = field.getPreferredWidth() > 0 ? field.getPreferredWidth() : 200;
+        this.preferredY = field.getPreferredHeight() > 0 ? field.getPreferredHeight() : 200;
+        this.labeltext = field.getLabel();
+        this.allowEmpty = field.getAllowEmptyValue();
         this.initialize();
     }
 
@@ -302,16 +305,6 @@ public class MultipleFileInputField extends JPanel implements ActionListener, Fo
 
     }
 
-    public boolean isAllowEmptyInput()
-    {
-        return allowEmpty;
-    }
-
-    public void setAllowEmptyInput(boolean allowEmpty)
-    {
-        this.allowEmpty = allowEmpty;
-    }
-
     @Override
     public void focusGained(FocusEvent e)
     {
@@ -327,9 +320,4 @@ public class MultipleFileInputField extends JPanel implements ActionListener, Fo
         return createMultipleVariables;
     }
 
-
-    public void setCreateMultipleVariables(boolean createMultipleVariables)
-    {
-        this.createMultipleVariables = createMultipleVariables;
-    }
 }

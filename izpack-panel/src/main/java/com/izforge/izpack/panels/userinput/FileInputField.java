@@ -79,7 +79,8 @@ public class FileInputField extends JPanel implements ActionListener
         this(parent, installDataGUI, directory, set, size, validatorConfig, null, null);
     }
 
-    public FileInputField(IzPanel parent, GUIInstallData installDataGUI, boolean directory, String set,
+    public FileInputField(IzPanel parent, GUIInstallData installDataGUI, boolean directory,
+                          String set,
                           int size, List<ValidatorContainer> validatorConfig, String fileExt, String fileExtDesc)
     {
         this.parent = parent;

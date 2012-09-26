@@ -12,28 +12,14 @@ public class ValidatorContainer
     private boolean hasParams = false;
     private Map<String, String> validatorParams = null;
 
-    public ValidatorContainer(String validator, String message, Map<String, String> validatorParams)
+    public ValidatorContainer(Validator validator, String message, Map<String, String> validatorParams)
     {
-        try
+        this.validator = validator;
+        this.message = message;
+        this.validatorParams = validatorParams;
+        if (validatorParams != null && !validatorParams.isEmpty())
         {
-            this.validator = (Validator) Class.forName(validator).newInstance();
-            this.message = message;
-            this.validatorParams = validatorParams;
-            if (validatorParams != null)
-            {
-                if (validatorParams.size() > 0)
-                {
-                    hasParams = true;
-                }
-            }
-        }
-        catch (Throwable e)
-        {
-            System.out.println("ValidatorContainer Constructor Failed: " + e);
-            this.validator = null;
-            this.message = null;
-            hasParams = false;
-            validatorParams = null;
+            hasParams = true;
         }
     }
 

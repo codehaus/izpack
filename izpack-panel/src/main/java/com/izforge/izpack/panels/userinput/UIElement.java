@@ -19,10 +19,13 @@
 
 package com.izforge.izpack.panels.userinput;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-
-import javax.swing.*;
 import java.util.List;
+
+import javax.swing.JComponent;
+
+import com.izforge.izpack.api.data.binding.OsModel;
+import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.FieldValidator;
 
 /**
  * Metadata for elements shown in the dialog.
@@ -42,9 +45,9 @@ public class UIElement
 
     Object constraints;
 
-    List<IXMLElement> forPacks;
+    List<String> forPacks;
 
-    List<IXMLElement> forOs;
+    List<OsModel> forOs;
 
     String trueValue;
 
@@ -56,6 +59,34 @@ public class UIElement
     {
 
     }
+
+    public UIElement(UIElementType type, Field field, JComponent component, Object constraints)
+    {
+        this(type, field, component, constraints, null);
+    }
+
+    public UIElement(UIElementType type, Field field, JComponent component, Object constraints,
+                     FieldValidator validator)
+    {
+        this(type, component, field.getPacks(), field.getOsModels(), constraints);
+        setType(type);
+        setAssociatedVariable(field.getVariable());
+        if (validator != null)
+        {
+            setMessage(validator.getMessage());
+        }
+    }
+
+    public UIElement(UIElementType type, JComponent component, List<String> packs, List<OsModel> os,
+                     Object constraints)
+    {
+        setType(type);
+        setComponent(component);
+        setForPacks(packs);
+        setForOs(os);
+        setConstraints(constraints);
+    }
+
 
     public boolean hasVariableAssignment()
     {
@@ -112,22 +143,22 @@ public class UIElement
         this.constraints = constraints;
     }
 
-    public List<IXMLElement> getForPacks()
+    public List<String> getForPacks()
     {
         return forPacks;
     }
 
-    public void setForPacks(List<IXMLElement> forPacks)
+    public void setForPacks(List<String> forPacks)
     {
         this.forPacks = forPacks;
     }
 
-    public List<IXMLElement> getForOs()
+    public List<OsModel> getForOs()
     {
         return forOs;
     }
 
-    public void setForOs(List<IXMLElement> forOs)
+    public void setForOs(List<OsModel> forOs)
     {
         this.forOs = forOs;
     }

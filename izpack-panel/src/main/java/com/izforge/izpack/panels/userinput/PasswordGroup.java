@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPasswordField;
 
-import com.izforge.izpack.installer.data.GUIInstallData;
+import com.izforge.izpack.panels.userinput.field.FieldProcessor;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.panels.userinput.processorclient.ProcessingClient;
 import com.izforge.izpack.panels.userinput.validator.Validator;
@@ -58,52 +58,20 @@ public class PasswordGroup implements ProcessingClient
     private String modifiedPassword = null;
     private int currentValidator = 0;
 
-    private GUIInstallData idata;
-
     /**
      * Creates a password group to manage one or more password fields.
      *
-     * @param idata               the installation installDataGUI
      * @param validatorContainers the validator containers
-     * @param processor           the processor
+     * @param processor           the processor. May be {@code null}
      */
-    public PasswordGroup(GUIInstallData idata, List<ValidatorContainer> validatorContainers, String processor)
+    public PasswordGroup(List<ValidatorContainer> validatorContainers, FieldProcessor processor)
     {
-        // ----------------------------------------------------
-        // attempt to create an instance of the Validator
-        // ----------------------------------------------------
-        try
-        {
-            this.idata = idata;
-            this.validatorContainers = validatorContainers;
-        }
-        catch (Throwable t)
-        {
-            logger.log(Level.WARNING,
-                    "Failed in constructor: " + t,
-                    t);
-            this.validatorContainers = null;
-        }
+        this.validatorContainers = validatorContainers;
 
-        // ----------------------------------------------------
-        // attempt to create an instance of the Processor
-        // ----------------------------------------------------
-        try
+        if (processor != null)
         {
-            this.processor = (Processor) Class.forName(processor).newInstance();
+            this.processor = processor.create();
         }
-        catch (Throwable t)
-        {
-            logger.log(Level.WARNING,
-                    "Failed in constructor creating processor instance: " + t,
-                    t);
-            this.processor = null;
-        }
-    }
-
-    public GUIInstallData getIdata()
-    {
-        return idata;
     }
 
     /**
@@ -172,8 +140,8 @@ public class PasswordGroup implements ProcessingClient
         catch (Exception e)
         {
             logger.log(Level.WARNING,
-                    "Failed validating contents: " + e,
-                    e);
+                       "Failed validating contents: " + e,
+                       e);
             // just return true
         }
         return returnValue;
@@ -193,8 +161,8 @@ public class PasswordGroup implements ProcessingClient
         catch (Exception e)
         {
             logger.log(Level.WARNING,
-                    "Failed getting validator message: " + e,
-                    e);
+                       "Failed getting validator message: " + e,
+                       e);
             // just return true
         }
         return returnValue;
@@ -210,23 +178,9 @@ public class PasswordGroup implements ProcessingClient
         return size;
     }
 
-    public ValidatorContainer getValidatorContainer()
-    {
-        return getValidatorContainer(currentValidator);
-    }
-
     public ValidatorContainer getValidatorContainer(int i)
     {
-        ValidatorContainer container = null;
-        try
-        {
-            container = validatorContainers.get(i);
-        }
-        catch (Exception e)
-        {
-            container = null;
-        }
-        return container;
+        return validatorContainers.get(i);
     }
 
     @Override
@@ -249,8 +203,8 @@ public class PasswordGroup implements ProcessingClient
         catch (Exception e)
         {
             logger.log(Level.WARNING,
-                    "Failed checking for validator parameters: " + e,
-                    e);
+                       "Failed checking for validator parameters: " + e,
+                       e);
             // just return true
         }
         return returnValue;
@@ -276,8 +230,8 @@ public class PasswordGroup implements ProcessingClient
         catch (Exception e)
         {
             logger.log(Level.WARNING,
-                    "Failed gettinig validator parameters: " + e,
-                    e);
+                       "Failed gettinig validator parameters: " + e,
+                       e);
             // just return true
         }
         return returnValue;

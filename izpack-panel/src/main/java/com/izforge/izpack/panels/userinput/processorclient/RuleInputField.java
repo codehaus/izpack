@@ -27,6 +27,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -43,8 +45,13 @@ import org.apache.regexp.RE;
 
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
+import com.izforge.izpack.gui.FlowLayout;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.panels.userinput.RuleTextField;
+import com.izforge.izpack.panels.userinput.field.FieldProcessor;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.FieldValidator;
+import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.panels.userinput.validator.Validator;
 
@@ -91,46 +98,18 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
 
     /**
      * Used to specify the retsult format. This constant specifies to return the contents of all
-     * fields concatenated into one long string, with separation between each component.
-     */
-    public static final int PLAIN_STRING = 1;
-
-    /**
-     * Used to specify the retsult format. This constant specifies to return the contents of all
      * fields together with all separators as specified in the field format concatenated into one
      * long string. In this case the resulting string looks just like the user saw it during installDataGUI
      * entry
      */
     public static final int DISPLAY_FORMAT = 2;
 
-    /**
-     * Used to specify the retsult format. This constant specifies to return the contents of all
-     * fields concatenated into one long string, with a special separator string inserted in between
-     * the individual components.
-     */
-    public static final int SPECIAL_SEPARATOR = 3;
-
-    /**
-     * Used to specify the retsult format. This constant specifies to return the contents of all
-     * fields in a somehow modified way. How the content is modified depends on the operation
-     * performed by a encryption service class. The class must be provided at object instatiation.
-     */
-    public static final int ENCRYPTED = 4;
-
-    /**
-     * Used internally to identify the default setting for the return format.
-     */
-    private static int DEFAULT = DISPLAY_FORMAT;
-
     private Vector<Serializable> items = new Vector<Serializable>();
 
     /**
-     * This <code>Vector</code> holds a reference to each input field, in the order in which they
-     * appear on the screen.
+     * The input fields, in the order in which they appear on the screen.
      */
-    private Vector<JTextField> inputFields = new Vector<JTextField>();
-
-    private boolean hasParams = false;
+    private List<JTextField> inputFields = new ArrayList<JTextField>();
 
     private Map<String, String> validatorParams;
 
@@ -142,7 +121,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
 
     private String separator;
 
-    private int resultFormat = DEFAULT;
+    private RuleFormat resultFormat;
 
     /**
      * Holds an instance of the <code>Validator</code> if one was specified and available
@@ -158,122 +137,48 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
     @Override
     public boolean hasParams()
     {
-        return hasParams;
+        return validatorParams != null && !validatorParams.isEmpty();
     }
 
     /**
-     * Constructs a rule input field.
+     * Constructs a {@code RuleInputField}.
      *
-     * @param format          a string that specifies the formatting and to a limited degree the behavior of
-     *                        this field.
-     * @param preset          a string that specifies preset values for specific sub-fields.
-     * @param separator       a string to be used for separating the contents of individual fields in the
-     *                        string returned by <code>getText()</code>
-     * @param validator       A string that specifies a class to perform validation services. The string
-     *                        must completely identify the class, so that it can be instantiated. The class must implement
-     *                        the <code>RuleValidator</code> interface. If an attempt to instantiate this class fails, no
-     *                        validation will be performed.
-     * @param validatorParams A <code>java.util.Map</code> containing name/ value pairs, which
-     *                        will be forwarded to the validator.
-     * @param processor       A string that specifies a class to perform processing services. The string
-     *                        must completely identify the class, so that it can be instantiated. The class must implement
-     *                        the <code>Processor</code> interface. If an attempt to instantiate this class fails, no
-     *                        processing will be performed. Instead, the text is returned in the default formatting.
-     * @param resultFormat    specifies in which format the resulting text should be returned, wehn
-     *                        <code>getText()</code> is called. The following values are legal:<br>
-     *                        <ul>
-     *                        <li>PLAIN_STRING
-     *                        <li>DISPLAY_FORMAT
-     *                        <li>SPECIAL_SEPARATOR
-     *                        <li>ENCRYPTED
-     *                        </ul>
-     * @param toolkit         needed to gain access to <code>beep()</code>
+     * @param toolkit needed to gain access to {@code beep()}
      */
-    public RuleInputField(String format, String preset, String separator, String validator,
-                          Map<String, String> validatorParams, String processor, int resultFormat, Toolkit toolkit,
-                          GUIInstallData idata)
-    {
-        this(format, preset, separator, validator, processor, resultFormat, toolkit, idata);
-        this.validatorParams = validatorParams;
-        this.hasParams = true;
-    }
-
-    /**
-     * Constructs a rule input field.
-     *
-     * @param format       a string that specifies the formatting and to a limited degree the behavior of
-     *                     this field.
-     * @param preset       a string that specifies preset values for specific sub-fields.
-     * @param separator    a string to be used for separating the contents of individual fields in the
-     *                     string returned by <code>getText()</code>
-     * @param validator    A string that specifies a class to perform validation services. The string
-     *                     must completely identify the class, so that it can be instantiated. The class must implement
-     *                     the <code>RuleValidator</code> interface. If an attempt to instantiate this class fails, no
-     *                     validation will be performed.
-     * @param processor    A string that specifies a class to perform processing services. The string
-     *                     must completely identify the class, so that it can be instantiated. The class must implement
-     *                     the <code>Processor</code> interface. If an attempt to instantiate this class fails, no
-     *                     processing will be performed. Instead, the text is returned in the default formatting.
-     * @param resultFormat specifies in which format the resulting text should be returned, wehn
-     *                     <code>getText()</code> is called. The following values are legal:<br>
-     *                     <ul>
-     *                     <li>PLAIN_STRING
-     *                     <li>DISPLAY_FORMAT
-     *                     <li>SPECIAL_SEPARATOR
-     *                     <li>ENCRYPTED
-     *                     </ul>
-     * @param toolkit      needed to gain access to <code>beep()</code>
-     */
-    public RuleInputField(String format, String preset, String separator, String validator,
-                          String processor, int resultFormat, Toolkit toolkit, GUIInstallData idata)
+    public RuleInputField(RuleField model, Toolkit toolkit, GUIInstallData installData)
     {
         this.toolkit = toolkit;
-        this.separator = separator;
-        this.resultFormat = resultFormat;
-        variableSubstitutor = new VariableSubstitutorImpl(idata.getVariables());
+        this.separator = model.getSeparator();
+        this.resultFormat = model.getFormat();
+        variableSubstitutor = new VariableSubstitutorImpl(installData.getVariables());
 
-        com.izforge.izpack.gui.FlowLayout layout = new com.izforge.izpack.gui.FlowLayout();
+        FlowLayout layout = new FlowLayout();
         layout.setAlignment(com.izforge.izpack.gui.FlowLayout.LEFT);
         setLayout(layout);
 
         // ----------------------------------------------------
         // attempt to create an instance of the Validator
         // ----------------------------------------------------
-        try
+        FieldValidator fieldValidator = model.getValidator();
+        if (fieldValidator != null)
         {
-            if (validator != null)
-            {
-                validationService = (Validator) Class.forName(validator).newInstance();
-            }
-        }
-        catch (Throwable t)
-        {
-            validationService = null;
-            logger.log(Level.WARNING, t.toString(), t);
+            validationService = fieldValidator.create();
+            validatorParams = fieldValidator.getParameters();
         }
 
-        // ----------------------------------------------------
-        // attempt to create an instance of the Processor
-        // ----------------------------------------------------
-        try
+        FieldProcessor fieldProcessor = model.getProcessor();
+        if (fieldProcessor != null)
         {
-            if (processor != null)
-            {
-                encryptionService = (Processor) Class.forName(processor).newInstance();
-            }
-        }
-        catch (Throwable t)
-        {
-            encryptionService = null;
-            logger.log(Level.WARNING, t.toString(), t);
+            encryptionService = fieldProcessor.create();
         }
 
         // ----------------------------------------------------
         // create the fields and field separators
         // ----------------------------------------------------
-        createItems(format);
+        createItems(model.getLayout());
 
-        if ((preset != null) && (preset.length() > 0))
+        String preset = model.getDefaultValue();
+        if (preset != null && preset.length() > 0)
         {
             setFields(preset);
         }
@@ -281,7 +186,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // ----------------------------------------------------
         // set the focus to the first field
         // ----------------------------------------------------
-        activeField = (RuleTextField) inputFields.elementAt(0);
+        activeField = (RuleTextField) inputFields.get(0);
         activeField.grabFocus();
     }
 
@@ -296,6 +201,10 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         return (inputFields.size());
     }
 
+    public List<JTextField> getInputFields()
+    {
+        return inputFields;
+    }
 
     /**
      * Returns the contents of the field indicated by <code>index</code>.
@@ -312,7 +221,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
             throw (new IndexOutOfBoundsException());
         }
 
-        return inputFields.elementAt(index).getText();
+        return inputFields.get(index).getText();
     }
 
     @Override
@@ -339,7 +248,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // of this class available set the formatting
         // instruction to the default setting.
         // ----------------------------------------------------
-        if (resultFormat == ENCRYPTED)
+        if (resultFormat == RuleFormat.PROCESSED)
         {
             if (encryptionService != null)
             {
@@ -347,7 +256,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
             }
             else
             {
-                resultFormat = DEFAULT;
+                resultFormat = RuleFormat.DISPLAY_FORMAT;
             }
         }
 
@@ -355,11 +264,11 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // concatentate the field contents, with no separators
         // in between.
         // ----------------------------------------------------
-        else if (resultFormat == PLAIN_STRING)
+        else if (resultFormat == RuleFormat.PLAIN_STRING)
         {
-            for (int i = 0; i < inputFields.size(); i++)
+            for (JTextField inputField : inputFields)
             {
-                buffer.append(inputFields.elementAt(i).getText());
+                buffer.append(inputField.getText());
             }
         }
 
@@ -367,7 +276,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // concatenate the field contents and setarators, as
         // specified for the display of the field.
         // ----------------------------------------------------
-        else if (resultFormat == DISPLAY_FORMAT)
+        else if (resultFormat == RuleFormat.DISPLAY_FORMAT)
         {
             for (int i = 0; i < items.size(); i++)
             {
@@ -387,11 +296,11 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // concatenate the field contents and insert the
         // separator string in between.
         // ----------------------------------------------------
-        else if (resultFormat == SPECIAL_SEPARATOR)
+        else if (resultFormat == RuleFormat.SPECIAL_SEPARATOR)
         {
             for (int i = 0; i < size; i++)
             {
-                buffer.append((inputFields.elementAt(i)).getText());
+                buffer.append((inputFields.get(i)).getText());
 
                 if (i < (size - 1))
                 {
@@ -554,7 +463,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
                         process = true;
                     }
                     val = variableSubstitutor.substitute(val);
-                    inputFields.elementAt(index).setText(val);
+                    inputFields.get(index).setText(val);
                 }
             }
             catch (Throwable exception)
@@ -590,7 +499,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
                             presult = processor.process(this);
                         }
                         String[] td = new RE("\\*").split(presult);
-                        inputFields.elementAt(index).setText(td[index]);
+                        inputFields.get(index).setText(td[index]);
                     }
                 }
                 catch (Throwable exception)
@@ -659,7 +568,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
                 {
                     activeIndex--;
                     backstep = true;
-                    activeField = (RuleTextField) inputFields.elementAt(activeIndex);
+                    activeField = (RuleTextField) inputFields.get(activeIndex);
                     activeField.grabFocus();
                 }
             }
@@ -740,7 +649,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
             int caretPosition = activeField.getCaretPosition();
             int selection = activeField.getSelectionEnd() - activeField.getSelectionStart();
 
-            if ((!inputFields.lastElement().equals(activeField)) && (!activeField.unlimitedEdit()))
+            if ((!inputFields.get(inputFields.size() - 1).equals(activeField)) && (!activeField.unlimitedEdit()))
             {
                 if ((text.length() == fieldSize) && (selection == 0)
                         && (caretPosition == fieldSize) && !backstep)

@@ -21,30 +21,27 @@
 
 package com.izforge.izpack.panels.userinput;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.api.data.Panel;
+import com.izforge.izpack.api.factory.ObjectFactory;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
-import com.izforge.izpack.installer.console.ConsolePanels;
 import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
+import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.util.Console;
 import com.izforge.izpack.util.OsVersion;
-import com.izforge.izpack.util.helper.SpecHelper;
 
 /**
  * The user input panel console helper class.
@@ -54,18 +51,6 @@ import com.izforge.izpack.util.helper.SpecHelper;
 public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
 {
     private static final Logger logger = Logger.getLogger(UserInputPanelConsoleHelper.class.getName());
-
-    protected int instanceNumber = 0;
-
-    private static int instanceCount = 0;
-
-    private static final String SPEC_FILE_NAME = "userInputSpec.xml";
-
-    private static final String NODE_ID = "panel";
-
-    private static final String INSTANCE_IDENTIFIER = "order";
-
-    protected static final String PANEL_IDENTIFIER = "id";
 
     private static final String FIELD_NODE_ID = "field";
 
@@ -141,33 +126,38 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
     public List<Input> listInputs;
 
     /**
+     * The panel meta-data.
+     */
+    private Panel panel;
+
+    /**
      * The resources.
      */
     private final Resources resources;
 
     /**
-     * The panels.
+     * The factory for creating field validators.
      */
-    private final ConsolePanels panels;
+    private final ObjectFactory factory;
 
     /**
      * Constructs an <tt>UserInputPanelConsoleHelper</tt>.
      *
+     * @param panel     the panel meta-data
      * @param resources the resources
-     * @param panels    the panels
+     * @param factory   the object factory
      */
-    public UserInputPanelConsoleHelper(Resources resources, ConsolePanels panels)
+    public UserInputPanelConsoleHelper(Panel panel, Resources resources, ObjectFactory factory)
     {
-        instanceNumber = instanceCount++;
-        listInputs = new ArrayList<Input>();
+        this.panel = panel;
         this.resources = resources;
-        this.panels = panels;
+        this.factory = factory;
+        listInputs = new ArrayList<Input>();
     }
 
     @Override
     public boolean runConsoleFromProperties(InstallData installData, Properties properties)
     {
-
         collectInputs(installData);
         for (Input listInput : listInputs)
         {
@@ -188,7 +178,6 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
     public boolean runGeneratePropertiesFile(InstallData installData,
                                              PrintWriter printWriter)
     {
-
         collectInputs(installData);
         for (Input input : listInputs)
         {
@@ -223,74 +212,48 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                     || RULE_FIELD.equals(field.strFieldType)
                     || DIR.equals(field.strFieldType))
             {
-                status = status && processTextField(field, installData);
+                status = status && processTextField(field, installData, console);
             }
             else if (COMBO_FIELD.equals(field.strFieldType)
                     || RADIO_FIELD.equals(field.strFieldType))
             {
-                status = status && processComboRadioField(field, installData);
+                status = status && processComboRadioField(field, installData, console);
             }
             else if (CHECK_FIELD.equals(field.strFieldType))
             {
-                status = status && processCheckField(field, installData);
+                status = status && processCheckField(field, installData, console);
             }
             else if (STATIC_TEXT.equals(field.strFieldType)
                     || TITLE_FIELD.equals(field.strFieldType)
                     || DIVIDER.equals(field.strFieldType)
                     || SPACE.equals(field.strFieldType))
             {
-                status = status && processSimpleField(field, installData);
+                status = status && processSimpleField(field, installData, console);
             }
             else if (PASSWORD.equals(field.strFieldType))
             {
-                status = status && processPasswordField(field, installData);
+                status = status && processPasswordField((Password) field, installData, console);
             }
         }
 
         return promptEndPanel(installData, console);
     }
 
-    public boolean collectInputs(InstallData installData)
+    private boolean collectInputs(InstallData installData)
     {
 
         listInputs.clear();
         IXMLElement spec = null;
-        List<IXMLElement> specElements;
-        String attribute;
-        String dataID;
-        String panelid = panels.getPanel().getPanelId();
-        String instance = Integer.toString(instanceNumber);
 
-        SpecHelper specHelper = new SpecHelper(resources);
-        try
+        UserInputPanelSpec model = new UserInputPanelSpec(resources, installData, factory);
+        IXMLElement data = model.getPanelSpec(panel);
+
+        List<IXMLElement> forPacks = data.getChildrenNamed(SELECTEDPACKS);
+        List<IXMLElement> forOs = data.getChildrenNamed(OS);
+
+        if (itemRequiredFor(forPacks, installData) && itemRequiredForOs(forOs))
         {
-            specHelper.readSpec(specHelper.getResource(SPEC_FILE_NAME));
-        }
-        catch (Exception e1)
-        {
-
-            e1.printStackTrace();
-            return false;
-        }
-
-        specElements = specHelper.getSpec().getChildrenNamed(NODE_ID);
-        for (IXMLElement data : specElements)
-        {
-            attribute = data.getAttribute(INSTANCE_IDENTIFIER);
-            dataID = data.getAttribute(PANEL_IDENTIFIER);
-            if (((attribute != null) && instance.equals(attribute))
-                    || ((dataID != null) && (panelid != null) && (panelid.equals(dataID))))
-            {
-
-                List<IXMLElement> forPacks = data.getChildrenNamed(SELECTEDPACKS);
-                List<IXMLElement> forOs = data.getChildrenNamed(OS);
-
-                if (itemRequiredFor(forPacks, installData) && itemRequiredForOs(forOs))
-                {
-                    spec = data;
-                    break;
-                }
-            }
+            spec = data;
         }
 
         if (spec == null)
@@ -300,8 +263,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
         List<IXMLElement> fields = spec.getChildrenNamed(FIELD_NODE_ID);
         for (IXMLElement field : fields)
         {
-            List<IXMLElement> forPacks = field.getChildrenNamed(SELECTEDPACKS);
-            List<IXMLElement> forOs = field.getChildrenNamed(OS);
+            forPacks = field.getChildrenNamed(SELECTEDPACKS);
+            forOs = field.getChildrenNamed(OS);
 
             if (itemRequiredFor(forPacks, installData) && itemRequiredForOs(forOs))
             {
@@ -325,40 +288,29 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
         return true;
     }
 
-    boolean processSimpleField(Input input, InstallData idata)
+    private boolean processSimpleField(Input input, InstallData installData, Console console)
     {
-        VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(idata.getVariables());
-        try
-        {
-            System.out.println(variableSubstitutor.substitute(input.strText));
-        }
-        catch (Exception e)
-        {
-            System.out.println(input.strText);
-        }
+        console.println(installData.getVariables().replace(input.strText));
         return true;
     }
 
-    boolean processPasswordField(Input input, InstallData idata)
+    private boolean processPasswordField(Password password, InstallData installData, Console console)
     {
-
-        Password pwd = (Password) input;
-
-        boolean rtn = false;
-        for (int i = 0; i < pwd.input.length; i++)
+        boolean result = false;
+        for (int i = 0; i < password.input.length; i++)
         {
-            rtn = processTextField(pwd.input[i], idata);
-            if (!rtn)
+            result = processTextField(password.input[i], installData, console);
+            if (!result)
             {
-                return rtn;
+                break;
             }
         }
 
-        return rtn;
+        return result;
 
     }
 
-    boolean processTextField(Input input, InstallData idata)
+    boolean processTextField(Input input, InstallData installData, Console console)
     {
         String variable = input.strVariableName;
         String set;
@@ -374,7 +326,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
             return false;
         }
 
-        set = idata.getVariable(variable);
+        set = installData.getVariable(variable);
         if (set == null)
         {
             set = input.strDefaultValue;
@@ -386,49 +338,33 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
 
         if (!"".equals(set))
         {
-            VariableSubstitutor vs = new VariableSubstitutorImpl(idata.getVariables());
-            try
-            {
-                set = vs.substitute(set);
-            }
-            catch (Exception e)
-            {
-                logger.log(Level.WARNING, e.toString(), e);
-                // ignore
-            }
+            set = installData.getVariables().replace(set);
         }
 
         fieldText = input.listChoices.get(0).strText;
-        System.out.println(fieldText + " [" + set + "] ");
-        try
+        String value = console.prompt(fieldText + " [" + set + "] ", null);
+        if (value == null)
         {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            String strIn = br.readLine();
-            if (!strIn.trim().equals(""))
-            {
-                idata.setVariable(variable, strIn);
-            }
-            else
-            {
-                idata.setVariable(variable, set);
-            }
+            return false;
         }
-        catch (IOException e)
+        value = value.trim();
+        if ("".equals(value))
         {
-            e.printStackTrace();
+            value = set;
         }
+        installData.setVariable(variable, value);
         return true;
-
     }
 
-    boolean processComboRadioField(Input input, InstallData idata)
-    {// TODO protection if selection not valid and no set value
+    private boolean processComboRadioField(Input input, InstallData installData, Console console)
+    {
+        // TODO protection if selection not valid and no set value
         String variable = input.strVariableName;
         if ((variable == null) || (variable.length() == 0))
         {
             return false;
         }
-        String currentvariablevalue = idata.getVariable(variable);
+        String currentvariablevalue = installData.getVariable(variable);
         //If we dont do this, choice with index=0 will always be displayed, no matter what is selected
         input.iSelectedChoice = -1;
         boolean userinput = false;
@@ -436,7 +372,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
         // display the description for this combo or radio field
         if (input.strText != null)
         {
-            System.out.println(input.strText);
+            console.println(input.strText);
         }
 
         List<Choice> lisChoices = input.listChoices;
@@ -468,82 +404,50 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                 String set = choice.strSet;
                 if (set != null)
                 {
-                    if (set != null && !"".equals(set))
-                    {
-                        VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(idata.getVariables());
-                        set = variableSubstitutor.substitute(set);
-                    }
+                    set = installData.getVariables().replace(set);
                     if (set.equals(TRUE))
                     {
                         input.iSelectedChoice = i;
                     }
                 }
             }
-            System.out.println(i + "  [" + (input.iSelectedChoice == i ? "x" : " ") + "] "
-                                       + (choice.strText != null ? choice.strText : ""));
+            console.println(i + "  [" + (input.iSelectedChoice == i ? "x" : " ") + "] "
+                                    + (choice.strText != null ? choice.strText : ""));
         }
 
-        try
+        int value = console.prompt("input selection:", 0, lisChoices.size(), input.iSelectedChoice, -1);
+        if (value == -1)
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            boolean bKeepAsking = true;
-
-            while (bKeepAsking)
-            {
-                System.out.println("input selection:");
-                String strIn = reader.readLine();
-                // take default value if default value exists and no user input
-                if (strIn.trim().equals("") && input.iSelectedChoice != -1)
-                {
-                    bKeepAsking = false;
-                }
-                int j = -1;
-                try
-                {
-                    j = Integer.valueOf(strIn);
-                }
-                catch (Exception ex)
-                {
-                }
-                // take user input if user input is valid
-                if (j >= 0 && j < lisChoices.size())
-                {
-                    input.iSelectedChoice = j;
-                    bKeepAsking = false;
-                }
-            }
+            return false;
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        idata.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
+        input.iSelectedChoice = value;
+        installData.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
         return true;
 
     }
 
-    boolean processCheckField(Input input, InstallData idata)
+    private boolean processCheckField(Input input, InstallData installData, Console console)
     {
         String variable = input.strVariableName;
         if ((variable == null) || (variable.length() == 0))
         {
             return false;
         }
-        String currentvariablevalue = idata.getVariable(variable);
+        String currentvariablevalue = installData.getVariable(variable);
         if (currentvariablevalue == null)
         {
             currentvariablevalue = "";
         }
-        List<Choice> lisChoices = input.listChoices;
-        if (lisChoices.size() == 0)
+        List<Choice> choices = input.listChoices;
+        if (choices.size() == 0)
         {
             logger.warning("No 'spec' element defined in check field");
             return false;
         }
-        Choice choice = null;
-        for (int i = 0; i < lisChoices.size(); i++)
+        Choice choice;
+        for (int i = 0; i < choices.size(); i++)
         {
-            choice = lisChoices.get(i);
+            choice = choices.get(i);
             String value = choice.strValue;
 
             if ((value != null) && (value.length() > 0) && (currentvariablevalue.equals(value)))
@@ -555,18 +459,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                 String set = input.strDefaultValue;
                 if (set != null)
                 {
-                    if (set != null && !"".equals(set))
-                    {
-                        VariableSubstitutor vs = new VariableSubstitutorImpl(idata.getVariables());
-                        try
-                        {
-                            set = vs.substitute(set);
-                        }
-                        catch (Exception e)
-                        {
-                            // ignore
-                        }
-                    }
+                    set = installData.getVariables().replace(set);
                     if (set.equals(TRUE))
                     {
                         input.iSelectedChoice = 1;
@@ -574,62 +467,34 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                 }
             }
         }
+        choice = choices.get(0);
         System.out.println("  [" + (input.iSelectedChoice == 1 ? "x" : " ") + "] "
                                    + (choice.strText != null ? choice.strText : ""));
-        try
+        int value = console.prompt("input 1 to select, 0 to deselect:", 0, 1, input.iSelectedChoice, -1);
+        if (value == -1)
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            boolean bKeepAsking = true;
+            return false;
+        }
+        input.iSelectedChoice = value;
 
-            while (bKeepAsking)
-            {
-                System.out.println("input 1 to select, 0 to deselect:");
-                String strIn = reader.readLine();
-                // take default value if default value exists and no user input
-                if (strIn.trim().equals(""))
-                {
-                    bKeepAsking = false;
-                }
-                int j = -1;
-                try
-                {
-                    j = Integer.valueOf(strIn);
-                }
-                catch (Exception ex)
-                {
-                }
-                // take user input if user input is valid
-                if ((j == 0) || j == 1)
-                {
-                    input.iSelectedChoice = j;
-                    bKeepAsking = false;
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        idata.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
+        installData.setVariable(variable, input.listChoices.get(input.iSelectedChoice).strValue);
         return true;
 
     }
 
-    public Input getInputFromField(IXMLElement field, InstallData idata)
+    private Input getInputFromField(IXMLElement field, InstallData installData)
     {
         String strVariableName = field.getAttribute(VARIABLE);
         String strFieldType = field.getAttribute(TYPE_ATTRIBUTE);
         if (TITLE_FIELD.equals(strFieldType))
         {
-            String strText = null;
-            strText = field.getAttribute(TEXT);
+            String strText = field.getAttribute(TEXT);
             return new Input(strVariableName, null, null, TITLE_FIELD, strText, 0);
         }
 
         if (STATIC_TEXT.equals(strFieldType))
         {
-            String strText = null;
-            strText = field.getAttribute(TEXT);
+            String strText = field.getAttribute(TEXT);
             return new Input(strVariableName, null, null, STATIC_TEXT, strText, 0);
         }
 
@@ -690,8 +555,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                 }
 
                 int iCounter = 0;
-                StringBuffer buffer = new StringBuffer();
-                String strRusultFormat = spec.getAttribute(RESULT_FORMAT);
+                StringBuilder buffer = new StringBuilder();
+                String format = spec.getAttribute(RESULT_FORMAT);
                 String strSpecialSeparator = spec.getAttribute(SPECIAL_SEPARATOR);
                 while (layoutTokenizer.hasMoreTokens())
                 {
@@ -703,11 +568,11 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                     }
                     else
                     {
-                        if (SPECIAL_SEPARATOR.equals(strRusultFormat))
+                        if (SPECIAL_SEPARATOR.equals(format))
                         {
                             buffer.append(strSpecialSeparator);
                         }
-                        else if (PLAIN_STRING.equals(strRusultFormat))
+                        else if (PLAIN_STRING.equals(format))
                         {
 
                         }
@@ -767,7 +632,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                     }
                     if (set != null && !"".equals(set))
                     {
-                        VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(idata.getVariables());
+                        VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(
+                                installData.getVariables());
                         set = variableSubstitutor.substitute(set);
                     }
 
@@ -800,7 +666,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
                     {
                         if (set != null && !"".equals(set))
                         {
-                            VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(idata
+                            VariableSubstitutor variableSubstitutor = new VariableSubstitutorImpl(installData
                                                                                                           .getVariables());
                             set = variableSubstitutor.substitute(set);
                         }
@@ -833,7 +699,7 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
             List<Choice> choicesList = new ArrayList<Choice>();
             String strFieldText = null;
             String strSet = null;
-            String strText = null;
+            String strText;
             int iSelectedChoice = 0;
             IXMLElement spec = field.getFirstChildNamed(SPEC);
             IXMLElement description = field.getFirstChildNamed(DESCRIPTION);
@@ -881,8 +747,8 @@ public class UserInputPanelConsoleHelper extends PanelConsoleHelper implements P
         {
             List<Choice> choicesList = new ArrayList<Choice>();
             String strFieldText = null;
-            String strSet = null;
-            String strText = null;
+            String strSet;
+            String strText;
 
             IXMLElement spec = field.getFirstChildNamed(SPEC);
             if (spec != null)
