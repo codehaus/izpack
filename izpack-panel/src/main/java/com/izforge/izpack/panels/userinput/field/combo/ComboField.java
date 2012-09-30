@@ -23,9 +23,10 @@ package com.izforge.izpack.panels.userinput.field.combo;
 
 import java.util.List;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.KeyValue;
 
 /**
  * Combo field.
@@ -38,7 +39,7 @@ public class ComboField extends Field
     /**
      * The available choices.
      */
-    private final List<KeyValue> choices;
+    private final List<Choice> choices;
 
     /**
      * The selected index.
@@ -52,9 +53,9 @@ public class ComboField extends Field
      * @param reader the reader to get field information from
      * @throws IzPackException if the field cannot be read
      */
-    public ComboField(ComboFieldReader reader)
+    public ComboField(ComboFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         this.choices = reader.getChoices();
         this.selected = reader.getSelectedIndex();
     }
@@ -64,7 +65,7 @@ public class ComboField extends Field
      *
      * @return the choices. The key is the choice identifier, the value, the display text
      */
-    public List<KeyValue> getChoices()
+    public List<Choice> getChoices()
     {
         return choices;
     }

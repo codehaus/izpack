@@ -19,31 +19,18 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.statictext;
-
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
+package com.izforge.izpack.panels.userinput.gui;
 
 /**
- * Static text field.
+ * Notifies of field updates.
  *
  * @author Tim Anderson
  */
-public class StaticText extends Field
+public interface UpdateListener
 {
 
     /**
-     * Constructs a {@code StaticText}.
-     *
-     * @param reader      the reader to get field information from
-     * @param installData the installation data
-     * @throws IzPackException if the field cannot be read
+     * Notifies when a field updates.
      */
-    public StaticText(SimpleFieldReader reader, InstallData installData)
-    {
-        super(reader, installData);
-    }
-
+    void updated();
 }

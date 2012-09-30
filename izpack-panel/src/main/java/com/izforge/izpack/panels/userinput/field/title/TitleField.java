@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.field.title;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.panels.userinput.field.Alignment;
@@ -64,12 +65,13 @@ public class TitleField extends Field
     /**
      * Constructs a {@code TitleField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public TitleField(TitleFieldReader reader)
+    public TitleField(TitleFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         this.iconId = reader.getIconId();
         this.bold = reader.isBold();
         this.italic = reader.isItalic();

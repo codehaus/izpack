@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.field.space;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
@@ -36,11 +37,12 @@ public class Spacer extends Field
     /**
      * Constructs a {@code SpaceField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public Spacer(SimpleFieldReader reader)
+    public Spacer(SimpleFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
     }
 }

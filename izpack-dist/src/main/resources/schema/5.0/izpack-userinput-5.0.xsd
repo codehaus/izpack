@@ -259,18 +259,20 @@
     <!--                                                                                                        -->
     <xs:simpleType name="typeType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="rule"/>
-            <xs:enumeration value="text"/>
+            <xs:enumeration value="check"/>
             <xs:enumeration value="combo"/>
-            <xs:enumeration value="radio"/>
-            <xs:enumeration value="staticText"/>
+            <xs:enumeration value="dir"/>
             <xs:enumeration value="divider"/>
             <xs:enumeration value="file"/>
+            <xs:enumeration value="multiFile"/>
             <xs:enumeration value="password"/>
+            <xs:enumeration value="radio"/>
+            <xs:enumeration value="rule"/>
             <xs:enumeration value="search"/>
             <xs:enumeration value="space"/>
+            <xs:enumeration value="staticText"/>
+            <xs:enumeration value="text"/>
             <xs:enumeration value="title"/>
-            <xs:enumeration value="check"/>
         </xs:restriction>
     </xs:simpleType>
 

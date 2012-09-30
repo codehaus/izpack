@@ -20,20 +20,24 @@
 package com.izforge.izpack.panels.userinput;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+
 import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
 
 import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JComboBoxFixture;
+import org.fest.swing.fixture.JFileChooserFixture;
 import org.fest.swing.fixture.JRadioButtonFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
 import org.fest.swing.timing.Timeout;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.data.InstallData;
@@ -47,7 +51,7 @@ import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.panels.simplefinish.SimpleFinishPanel;
 import com.izforge.izpack.panels.test.AbstractPanelTest;
 import com.izforge.izpack.panels.test.TestGUIPanelContainer;
-import com.izforge.izpack.panels.userinput.field.KeyValue;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.test.Container;
 
 
@@ -59,6 +63,12 @@ import com.izforge.izpack.test.Container;
 @Container(TestGUIPanelContainer.class)
 public class UserInputPanelTest extends AbstractPanelTest
 {
+
+    /**
+     * Temporary folder for 'file', 'dir' and 'search' field tests.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     /**
      * Constructs an {@code UserInputPanelTest}.
@@ -165,27 +175,20 @@ public class UserInputPanelTest extends AbstractPanelTest
         FrameFixture frame = showUserInputPanel();
 
         // for combo1, the initial selection is determined by the 'set' attribute
-        JComboBoxFixture combo1 = frame.comboBox("combo1");
-        KeyValue item1 = (KeyValue) combo1.component().getSelectedItem();
-        assertEquals("value2", item1.getKey());
+        checkCombo("combo1", "value2", frame);
 
         // for combo2, the initial selection is determined by the "combo2" variable
-        JComboBoxFixture combo2 = frame.comboBox("combo2");
-        KeyValue item2 = (KeyValue) combo2.component().getSelectedItem();
-        assertEquals("value3", item2.getKey());
+        checkCombo("combo2", "value3", frame);
 
         // for combo3, there is no initial selection
-        JComboBoxFixture combo3 = frame.comboBox("combo3");
-        assertNull(combo3.component().getSelectedItem());
+        checkCombo("combo3", null, frame);
 
         // for combo4, the initial selection is determined by the 'set' attribute
-        JComboBoxFixture combo4 = frame.comboBox("combo4");
-        KeyValue item4 = (KeyValue) combo4.component().getSelectedItem();
-        assertEquals("value4", item4.getKey());
+        checkCombo("combo4", "value4", frame);
 
-        combo1.component().setSelectedIndex(0);
-        combo2.clearSelection();
-        combo3.component().setSelectedIndex(1);
+        frame.comboBox("combo1").component().setSelectedIndex(0);
+        frame.comboBox("combo2").clearSelection();
+        frame.comboBox("combo3").component().setSelectedIndex(1);
 
         checkNavigateNext(frame);
 
@@ -212,31 +215,22 @@ public class UserInputPanelTest extends AbstractPanelTest
         FrameFixture frame = showUserInputPanel();
 
         // for radioA, the initial selection is determined by the 'set' attribute
-        JRadioButtonFixture radioA1 = frame.radioButton("radioA.1");
-        JRadioButtonFixture radioA2 = frame.radioButton("radioA.2");
-        JRadioButtonFixture radioA3 = frame.radioButton("radioA.3");
-        assertFalse(radioA1.component().isSelected());
-        assertTrue(radioA2.component().isSelected());
-        assertFalse(radioA3.component().isSelected());
+        checkRadioButton("radioA.1", false, frame);
+        checkRadioButton("radioA.2", true, frame);
+        checkRadioButton("radioA.3", false, frame);
 
         // for radioB, there is no initial selection
-        JRadioButtonFixture radioB1 = frame.radioButton("radioB.1");
-        JRadioButtonFixture radioB2 = frame.radioButton("radioB.2");
-        JRadioButtonFixture radioB3 = frame.radioButton("radioB.3");
-        assertFalse(radioB1.component().isSelected());
-        assertFalse(radioB2.component().isSelected());
-        assertFalse(radioB3.component().isSelected());
+        checkRadioButton("radioB.1", false, frame);
+        checkRadioButton("radioB.2", false, frame);
+        checkRadioButton("radioB.3", false, frame);
 
         // for radioC, the initial selection is determined by the 'set' attribute
-        JRadioButtonFixture radioC1 = frame.radioButton("radioC.1");
-        JRadioButtonFixture radioC2 = frame.radioButton("radioC.2");
-        JRadioButtonFixture radioC3 = frame.radioButton("radioC.3");
-        assertFalse(radioC1.component().isSelected());
-        assertFalse(radioC2.component().isSelected());
-        assertTrue(radioC3.component().isSelected());
+        JRadioButton radioC1 = checkRadioButton("radioC.1", false, frame);
+        checkRadioButton("radioC.2", false, frame);
+        checkRadioButton("radioC.3", true, frame);
 
         // select the first value of C
-        radioC1.check();
+        radioC1.setSelected(true);
 
         checkNavigateNext(frame);
 
@@ -328,8 +322,8 @@ public class UserInputPanelTest extends AbstractPanelTest
         // move to the next panel and verify the variables have updated
         checkNavigateNext(frame);
 
-        assertEquals("", installData.getVariable("check1"));
-        assertEquals("", installData.getVariable("check2"));
+        assertNull(installData.getVariable("check1"));
+        assertNull(installData.getVariable("check2"));
 
         assertEquals("check3set", installData.getVariable("check3"));
         assertEquals("check4unset", installData.getVariable("check4"));
@@ -342,27 +336,135 @@ public class UserInputPanelTest extends AbstractPanelTest
      *
      * @throws Exception for any error
      */
-    @Ignore
     @Test
-    public void testSearch() throws Exception {
+    public void testSearch() throws Exception
+    {
         // Set the base path in order to pick up com/izforge/izpack/panels/userinput/search/userInputSpec.xml
         getResourceManager().setResourceBasePath("/com/izforge/izpack/panels/userinput/search/");
 
         InstallData installData = getInstallData();
+        String path = temporaryFolder.getRoot().getPath();
+        installData.setVariable("MY_DIR", path);
+        assertTrue(new File(path, "dir1").mkdir());
+        assertTrue(new File(path, "dir2").mkdir());
 
         // show the panel
         FrameFixture frame = showUserInputPanel();
 
         JComboBoxFixture search1 = frame.comboBox("search1");
         assertEquals(-1, search1.component().getSelectedIndex());
-        search1.selectItem(0);
-        assertEquals(0, search1.component().getSelectedIndex());
+        search1.selectItem(1);
+        assertEquals(1, search1.component().getSelectedIndex());
 
-        Thread.sleep(10000000);
         // move to the next panel and verify the variables have updated
         checkNavigateNext(frame);
 
-        assertEquals("$USER_HOME", installData.getVariable("search1"));
+        assertEquals(path + File.separator + "dir2", installData.getVariable("search1"));
+    }
+
+    /**
+     * Tests file fields.
+     *
+     * @throws Exception for any error
+     */
+    @Test
+    public void testFile() throws Exception
+    {
+        // Set the base path in order to pick up com/izforge/izpack/panels/userinput/file/userInputSpec.xml
+        getResourceManager().setResourceBasePath("/com/izforge/izpack/panels/userinput/file/");
+
+        InstallData installData = getInstallData();
+        String path = temporaryFolder.getRoot().getPath();
+        installData.setVariable("MY_DIR", path);
+        assertTrue(new File(path, "fileA").createNewFile());
+        assertTrue(new File(path, "fileB").createNewFile());
+
+        // show the panel
+        FrameFixture frame = showUserInputPanel();
+
+        JTextComponentFixture file1 = frame.textBox("file1");
+        String expected = new File(path, "fileB").getPath();
+        file1.setText(expected);
+
+        // move to the next panel and verify the variables have updated
+        checkNavigateNext(frame);
+
+        assertEquals(expected, installData.getVariable("file1"));
+    }
+
+    /**
+     * Tests 'multiFile' fields.
+     *
+     * @throws Exception for any error
+     */
+    @Test
+    public void testMultiFile() throws Exception
+    {
+        // Set the base path in order to pick up com/izforge/izpack/panels/userinput/multifile/userInputSpec.xml
+        getResourceManager().setResourceBasePath("/com/izforge/izpack/panels/userinput/multifile/");
+
+        InstallData installData = getInstallData();
+        String path = temporaryFolder.getRoot().getPath();
+        installData.setVariable("MY_DIR", path);
+        assertTrue(new File(path, "fileA").createNewFile());
+        File fileB = new File(path, "fileB");
+        assertTrue(fileB.createNewFile());
+        File fileC = new File(path, "fileC");
+        assertTrue(fileC.createNewFile());
+
+        // show the panel
+        FrameFixture frame = showUserInputPanel();
+
+        frame.button(GuiId.BUTTON_BROWSE.id).click();
+        DialogFixture dialog = frame.dialog(Timeout.timeout(10000));
+
+        JFileChooserFixture fileBChooser = dialog.fileChooser();
+        fileBChooser.setCurrentDirectory(temporaryFolder.getRoot());
+        fileBChooser.selectFile(fileB);
+        fileBChooser.approveButton().click();
+
+        frame.button(GuiId.BUTTON_BROWSE.id).click();
+        dialog = frame.dialog(Timeout.timeout(10000));
+
+        JFileChooserFixture fileCChooser = dialog.fileChooser();
+        fileCChooser.setCurrentDirectory(temporaryFolder.getRoot());
+        fileCChooser.selectFile(fileC);
+        fileCChooser.approveButton().click();
+
+        // move to the next panel and verify the variables have updated
+        checkNavigateNext(frame);
+
+        assertEquals(fileB.getPath() + ";" + fileC.getPath() + ";", installData.getVariable("multiFile1"));
+    }
+
+    /**
+     * Tests dir fields.
+     *
+     * @throws Exception for any error
+     */
+    @Test
+    public void testDir() throws Exception
+    {
+        // Set the base path in order to pick up com/izforge/izpack/panels/userinput/dir/userInputSpec.xml
+        getResourceManager().setResourceBasePath("/com/izforge/izpack/panels/userinput/dir/");
+
+        InstallData installData = getInstallData();
+        String path = temporaryFolder.getRoot().getPath();
+        installData.setVariable("MY_DIR", path);
+        assertTrue(new File(path, "dirA").mkdir());
+        assertTrue(new File(path, "dirB").mkdir());
+
+        // show the panel
+        FrameFixture frame = showUserInputPanel();
+
+        JTextComponentFixture dir1 = frame.textBox("dir1");
+        String expected = new File(path, "dirB").getPath();
+        dir1.setText(expected);
+
+        // move to the next panel and verify the variables have updated
+        checkNavigateNext(frame);
+
+        assertEquals(expected, installData.getVariable("dir1"));
     }
 
     /**
@@ -408,6 +510,37 @@ public class UserInputPanelTest extends AbstractPanelTest
         assertEquals("myhost", installData.getVariable("dynamicMasterAddress"));
     }
 
+    /**
+     * Verifies that the named combo has the expected value.
+     *
+     * @param name     the combo name
+     * @param expected the expected value
+     * @param frame    the frame
+     * @return the combo
+     */
+    private JComboBoxFixture checkCombo(String name, String expected, FrameFixture frame)
+    {
+        JComboBoxFixture combo = frame.comboBox(name);
+        Choice item = (Choice) combo.component().getSelectedItem();
+        if (item == null)
+        {
+            assertNull(expected);
+        }
+        else
+        {
+            assertEquals(expected, item.getKey());
+        }
+        return combo;
+    }
+
+    /**
+     * Verifies that the named check box has the expected value.
+     *
+     * @param name     the check box name
+     * @param expected the expected value
+     * @param frame    the frame
+     * @return the check box
+     */
     private JCheckBox checkCheckBox(String name, boolean expected, FrameFixture frame)
     {
         JCheckBox check = frame.checkBox(name).component();
@@ -415,10 +548,32 @@ public class UserInputPanelTest extends AbstractPanelTest
         return check;
     }
 
-    private void checkNavigateNext(FrameFixture fixture) throws InterruptedException
+    /**
+     * Verifies a radio button selection matches that expected.
+     *
+     * @param name     the radio button name
+     * @param expected the expected value
+     * @param frame    the frame
+     * @return the radio button
+     */
+    private JRadioButton checkRadioButton(String name, boolean expected, FrameFixture frame)
+    {
+        JRadioButtonFixture fixture = frame.radioButton(name);
+        JRadioButton button = fixture.component();
+        assertEquals(expected, button.isSelected());
+        return button;
+    }
+
+    /**
+     * Verifies that the next panel can be navigated to.
+     *
+     * @param frame the frame
+     * @throws InterruptedException if interrupted waiting for the panel to change
+     */
+    private void checkNavigateNext(FrameFixture frame) throws InterruptedException
     {
         // attempt to navigate to the next panel
-        fixture.button(GuiId.BUTTON_NEXT.id).click();
+        frame.button(GuiId.BUTTON_NEXT.id).click();
         Thread.sleep(2000);
         assertTrue(getPanels().getView() instanceof SimpleFinishPanel);
     }

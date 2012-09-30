@@ -21,14 +21,14 @@
 
 package com.izforge.izpack.panels.userinput.field.radio;
 
-import com.izforge.izpack.panels.userinput.field.KeyValue;
+import com.izforge.izpack.panels.userinput.field.Choice;
 
 /**
  * Radio button choice.
  *
  * @author Tim Anderson
  */
-public class RadioChoice extends KeyValue
+public class RadioChoice extends Choice
 {
 
     /**
@@ -41,13 +41,23 @@ public class RadioChoice extends KeyValue
      * Constructs a {@code RadioChoice}.
      *
      * @param key        the key
-     * @param value      the value
+     * @param value      the display value
      * @param revalidate if {@code true}, choice selection triggers re-validation
      */
     public RadioChoice(String key, String value, boolean revalidate)
     {
         super(key, value);
         this.revalidate = revalidate;
+    }
+
+    /**
+     * Returns the 'true' value.
+     *
+     * @return the 'true' value
+     */
+    public String getTrueValue()
+    {
+        return getKey();
     }
 
     /**

@@ -50,7 +50,7 @@ import com.izforge.izpack.panels.userinput.field.search.SearchType;
  * A search field supports searching directories and files on the target system. This is a
  * helper class to manage all installDataGUI belonging to a search field.
  */
-class SearchInputField implements ActionListener
+public class SearchInputField implements ActionListener
 {
 
     private final String filename;
@@ -144,15 +144,6 @@ class SearchInputField implements ActionListener
         });
 
         autodetect();
-    }
-
-    /**
-     * Check whether the given combobox belongs to this searchfield. This is used when reading
-     * the results.
-     */
-    public boolean belongsTo(JComboBox combobox)
-    {
-        return (pathComboBox == combobox);
     }
 
     /**

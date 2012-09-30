@@ -23,11 +23,11 @@ package com.izforge.izpack.panels.userinput.field;
 
 
 /**
- * A key-value pair.
+ * A pair of values. The key identifies the pair, and the value is used for display purposes.
  *
  * @author Tim Anderson
  */
-public class KeyValue
+public class Choice
 {
 
     /**
@@ -36,17 +36,17 @@ public class KeyValue
     private final String key;
 
     /**
-     * The value.
+     * The display value.
      */
     private final String value;
 
     /**
-     * Constructs a {@code KeyValue}.
+     * Constructs a {@code Choice}.
      *
      * @param key   the key
-     * @param value the value
+     * @param value the display value
      */
-    public KeyValue(String key, String value)
+    public Choice(String key, String value)
     {
         this.key = key;
         this.value = value;
@@ -63,9 +63,9 @@ public class KeyValue
     }
 
     /**
-     * Returns the value.
+     * Returns the display value.
      *
-     * @return the value
+     * @return the display value
      */
     public String getValue()
     {
@@ -73,9 +73,9 @@ public class KeyValue
     }
 
     /**
-     * Returns the value.
+     * Returns the display value.
      *
-     * @return the value
+     * @return the display value
      */
     public String toString()
     {

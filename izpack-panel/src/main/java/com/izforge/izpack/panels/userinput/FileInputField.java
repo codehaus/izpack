@@ -40,6 +40,7 @@ import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
+import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.processorclient.StringInputProcessingClient;
 import com.izforge.izpack.panels.userinput.validator.ValidatorContainer;
 
@@ -48,6 +49,8 @@ public class FileInputField extends JPanel implements ActionListener
     private static final long serialVersionUID = 4673684743657328492L;
 
     private static final transient Logger logger = Logger.getLogger(FileInputField.class.getName());
+
+    private final AbstractFileField field;
 
     InstallerFrame parentFrame;
 
@@ -61,42 +64,30 @@ public class FileInputField extends JPanel implements ActionListener
 
     String set;
 
-    int size;
-
     GUIInstallData installDataGUI;
-
-    String fileExtension;
-
-    String fileExtensionDescription;
 
     boolean allowEmpty;
 
     protected static final int INVALID = 0, EMPTY = 1;
 
-    public FileInputField(IzPanel parent, GUIInstallData installDataGUI, boolean directory, String set,
-                          int size, List<ValidatorContainer> validatorConfig)
+    public FileInputField(AbstractFileField field, IzPanel parent, GUIInstallData installDataGUI,
+                          List<ValidatorContainer> validatorConfig)
     {
-        this(parent, installDataGUI, directory, set, size, validatorConfig, null, null);
-    }
-
-    public FileInputField(IzPanel parent, GUIInstallData installDataGUI, boolean directory,
-                          String set,
-                          int size, List<ValidatorContainer> validatorConfig, String fileExt, String fileExtDesc)
-    {
+        this.field = field;
         this.parent = parent;
         this.parentFrame = parent.getInstallerFrame();
         this.installDataGUI = installDataGUI;
         this.validators = validatorConfig;
-        this.set = set;
-        this.size = size;
-        this.fileExtension = fileExt;
-        this.fileExtensionDescription = fileExtDesc;
+        this.set = field.getDefaultValue();
+        setAllowEmptyInput(field.getAllowEmptyValue());
         this.initialize();
     }
 
     private void initialize()
     {
-        filetxt = new JTextField(set, size);
+        int size = field.getSize() < 0 ? 0 : field.getSize();
+        filetxt = new JTextField(field.getDefaultValue(), size);
+        filetxt.setName(field.getVariable());
         filetxt.setCaretPosition(0);
 
         GridBagLayout layout = new GridBagLayout();
@@ -150,6 +141,8 @@ public class FileInputField extends JPanel implements ActionListener
     protected void prepareFileChooser(JFileChooser filechooser)
     {
         filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        String fileExtension = field.getFileExtension();
+        String fileExtensionDescription = field.getFileExtensionDescription();
         if ((fileExtension != null) && (fileExtensionDescription != null))
         {
             UserInputFileFilter fileFilter = new UserInputFileFilter();
@@ -245,13 +238,13 @@ public class FileInputField extends JPanel implements ActionListener
         return file.isFile();
     }
 
-    public boolean isAllowEmptyInput()
-    {
-        return allowEmpty;
-    }
-
     public void setAllowEmptyInput(boolean allowEmpty)
     {
         this.allowEmpty = allowEmpty;
+    }
+
+    protected AbstractFileField getField()
+    {
+        return field;
     }
 }

@@ -19,31 +19,33 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.statictext;
+package com.izforge.izpack.panels.userinput.gui;
 
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
+import com.izforge.izpack.installer.data.GUIInstallData;
+import com.izforge.izpack.installer.gui.IzPanel;
+import com.izforge.izpack.panels.userinput.DirInputField;
+import com.izforge.izpack.panels.userinput.field.file.DirField;
+
 
 /**
- * Static text field.
+ * Directory field view.
  *
  * @author Tim Anderson
  */
-public class StaticText extends Field
+public class GUIDirFieldView extends AbstractGUIFileFieldView
 {
 
     /**
-     * Constructs a {@code StaticText}.
+     * Constructs a {@code GUIDirFieldView}.
      *
-     * @param reader      the reader to get field information from
+     * @param field       the field
      * @param installData the installation data
-     * @throws IzPackException if the field cannot be read
+     * @param parent      the parent panel
      */
-    public StaticText(SimpleFieldReader reader, InstallData installData)
+    public GUIDirFieldView(DirField field, GUIInstallData installData, IzPanel parent)
     {
-        super(reader, installData);
+        super(field);
+        init(new DirInputField(field, parent, installData, getValidatorContainers()));
     }
 
 }

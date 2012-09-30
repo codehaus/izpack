@@ -21,11 +21,16 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
+import com.izforge.izpack.core.rules.process.ExistsCondition;
 
 /**
  * Describes a user input field.
@@ -91,21 +96,32 @@ public abstract class Field
     private final String condition;
 
     /**
+     * The installation data.
+     */
+    private final InstallData installData;
+
+    /**
+     * The logger.
+     */
+    private static final Logger logger = Logger.getLogger(Field.class.getName());
+
+    /**
      * Constructs a {@code Field}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public Field(FieldReader reader)
+    public Field(FieldReader reader, InstallData installData)
     {
         this(reader.getVariable(), reader.getDefaultValue(), reader.getSize(), reader.getPacks(), reader.getOsModels(),
              reader.getValidators(), reader.getProcessor(), reader.getLabel(), reader.getDescription(),
-             reader.getRevalidate(), reader.getCondition());
+             reader.getRevalidate(), reader.getCondition(), installData);
     }
 
 
     /**
-     * Constructs a {@code Field}
+     * Constructs a {@code Field}.
      *
      * @param variable    the variable associated with the field
      * @param set         the pre-set value for the field
@@ -120,10 +136,11 @@ public abstract class Field
      * @param description the field description. May be {@code null}
      * @param revalidate  determines if field updates trigger re-validation
      * @param condition   condition that determines if the field is displayed or not
+     * @param installData the installation data
      */
     public Field(String variable, String set, int size, List<String> packs, List<OsModel> models,
                  List<FieldValidator> validators, FieldProcessor processor, String label, String description,
-                 boolean revalidate, String condition)
+                 boolean revalidate, String condition, InstallData installData)
     {
         this.variable = variable;
         this.set = set;
@@ -136,6 +153,12 @@ public abstract class Field
         this.description = description;
         this.revalidate = revalidate;
         this.condition = condition;
+        this.installData = installData;
+
+        if (variable != null)
+        {
+            addExistsCondition();
+        }
     }
 
     /**
@@ -146,6 +169,16 @@ public abstract class Field
     public String getVariable()
     {
         return variable;
+    }
+
+    /**
+     * Returns all variables that this field updates.
+     *
+     * @return all variables that this field updates
+     */
+    public List<String> getVariables()
+    {
+        return variable != null ? Arrays.asList(variable) : Collections.<String>emptyList();
     }
 
     /**
@@ -182,19 +215,42 @@ public abstract class Field
      * Returns the initial value.
      * <p/>
      * If the field is associated with a variable, and the variable value is non-null, this is returned, otherwise
-     * {@link #getDefaultValue} is returned
+     * {@link #getDefaultValue} is returned.
      *
-     * @param installData the installation data
      * @return the initial value
      */
-    public String getInitialValue(InstallData installData)
+    public String getInitialValue()
     {
-        String result = installData.getVariable(getVariable());
+        String result = getValue();
         if (result == null)
         {
             result = getDefaultValue();
         }
         return result;
+    }
+
+    /**
+     * Returns the variable value.
+     *
+     * @return the variable value. May be {@code null}
+     */
+    public String getValue()
+    {
+        return installData.getVariable(variable);
+    }
+
+    /**
+     * Sets the variable value.
+     *
+     * @param value the variable value. May be {@code null}
+     */
+    public void setValue(String value)
+    {
+        if (logger.isLoggable(Level.FINE))
+        {
+            logger.fine("Field setting variable=" + variable + " to value=" + value);
+        }
+        installData.setVariable(variable, value);
     }
 
     /**
@@ -268,13 +324,36 @@ public abstract class Field
     }
 
     /**
-     * Returns the condition that determines if the field is displayed or not.
+     * Determines if the condition associated with the field is true.
      *
-     * @return the condition. May be {@code null}
+     * @return {@code true} if the condition evaluates {true} or if the field has no condition
      */
-    public String getCondition()
+    public boolean isConditionTrue()
     {
-        return condition;
+        return (condition == null || installData.getRules().isConditionTrue(condition, installData));
+    }
+
+    /**
+     * Returns the installation data.
+     *
+     * @return the installation data
+     */
+    public InstallData getInstallData()
+    {
+        return installData;
+    }
+
+    /**
+     * Adds an 'exists' condition for the variable.
+     */
+    private void addExistsCondition()
+    {
+        ExistsCondition existsCondition = new ExistsCondition();
+        existsCondition.setContentType(ExistsCondition.ContentType.VARIABLE);
+        existsCondition.setContent(variable);
+        existsCondition.setId("izpack.input." + variable);
+        existsCondition.setInstallData(installData);
+        installData.getRules().addCondition(existsCondition);
     }
 
 }

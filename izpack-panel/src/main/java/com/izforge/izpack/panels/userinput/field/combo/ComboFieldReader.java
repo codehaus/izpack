@@ -28,9 +28,9 @@ import java.util.StringTokenizer;
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.Config;
 import com.izforge.izpack.panels.userinput.field.FieldReader;
-import com.izforge.izpack.panels.userinput.field.KeyValue;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 
 
@@ -70,10 +70,10 @@ public class ComboFieldReader extends FieldReader
      *
      * @return the choices
      */
-    public List<KeyValue> getChoices()
+    public List<Choice> getChoices()
     {
         selected = -1;
-        List<KeyValue> result = new ArrayList<KeyValue>();
+        List<Choice> result = new ArrayList<Choice>();
         Config config = getConfig();
         String variableValue = installData.getVariable(getVariable());
         for (IXMLElement choice : getSpec().getChildrenNamed("choice"))
@@ -102,7 +102,7 @@ public class ComboFieldReader extends FieldReader
                     {
                         selected = result.size();
                     }
-                    result.add(new KeyValue(token, token));
+                    result.add(new Choice(token, token));
                 }
             }
             else
@@ -112,7 +112,7 @@ public class ComboFieldReader extends FieldReader
                 {
                     selected = result.size();
                 }
-                result.add(new KeyValue(value, getText(choice)));
+                result.add(new Choice(value, getText(choice)));
             }
         }
         return result;

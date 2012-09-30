@@ -17,9 +17,36 @@
  * the License.
  */
 
-package com.izforge.izpack.panels.userinput;
+package com.izforge.izpack.panels.userinput.gui;
 
-public enum UIElementType
+import javax.swing.JComponent;
+
+/**
+ * Field component.
+ *
+ * @author Dennis Reil
+ */
+public class Component
 {
-    LABEL, TEXT, CHECKBOX, MULTIPLE_FILE, FILE, DIRECTORY, RULE, COMBOBOX, RADIOBUTTON, PASSWORD, SEARCH, SEARCHBUTTON, SPACE, DIVIDER, DESCRIPTION
+
+    private final JComponent component;
+
+    private final Object constraints;
+
+    public Component(JComponent component, Object constraints)
+    {
+        this.component = component;
+        this.constraints = constraints;
+    }
+
+    public JComponent getComponent()
+    {
+        return component;
+    }
+
+    public Object getConstraints()
+    {
+        return constraints;
+    }
+
 }

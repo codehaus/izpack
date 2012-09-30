@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.field.text;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
 
@@ -35,12 +36,13 @@ public class TextField extends Field
     /**
      * Constructs a {@code TextField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public TextField(TextFieldReader reader)
+    public TextField(TextFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
     }
 
 }

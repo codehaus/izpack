@@ -160,6 +160,11 @@ public class FieldReader extends ElementReader
         return result;
     }
 
+    /**
+     * Returns the validators for the field.
+     *
+     * @return the validators for the field
+     */
     public List<FieldValidator> getValidators()
     {
         List<FieldValidator> result = new ArrayList<FieldValidator>();
@@ -172,22 +177,42 @@ public class FieldReader extends ElementReader
         return result;
     }
 
+    /**
+     * Returns the processor the field.
+     *
+     * @return the field processor, or {@code null} if none exists
+     */
     public FieldProcessor getProcessor()
     {
         IXMLElement element = (spec != null) ? spec.getFirstChildNamed("processor") : null;
         return element != null ? new FieldProcessor(element, getConfig()) : null;
     }
 
+    /**
+     * Returns the field description.
+     *
+     * @return the field description. May be @{code null}
+     */
     public String getDescription()
     {
         return getText(field.getFirstChildNamed("description"));
     }
 
+    /**
+     * Returns the field label.
+     *
+     * @return the field label. May be {@code null}
+     */
     public String getLabel()
     {
         return getText(getSpec());
     }
 
+    /**
+     * Determines if field updates trigger re-validation.
+     *
+     * @return {@code true} if the field triggers revalidation
+     */
     public boolean getRevalidate()
     {
         return (spec != null) && getConfig().getBoolean(spec, "revalidate", false);

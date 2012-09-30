@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
@@ -92,7 +93,8 @@ public class MultipleFileInputField extends JPanel implements ActionListener, Fo
         this.validators = validatorConfig;
         this.set = field.getDefaultValue();
         this.size = field.getSize();
-        if (size < 1) {
+        if (size < 1)
+        {
             size = 1;
         }
         this.fileExtension = field.getFileExtension();
@@ -143,10 +145,11 @@ public class MultipleFileInputField extends JPanel implements ActionListener, Fo
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         Messages messages = data.getMessages();
-        browseBtn = ButtonFactory.createButton(messages.get("UserInputPanel.button.browse"), data.buttonsHColor);
+        browseBtn = ButtonFactory.createButton(messages.get("UserInputPanel.search.browse"), data.buttonsHColor);
+        browseBtn.setName(GuiId.BUTTON_BROWSE.id);
         browseBtn.addActionListener(this);
 
-        deleteBtn = ButtonFactory.createButton(messages.get("UserInputPanel.button.delete"), data.buttonsHColor);
+        deleteBtn = ButtonFactory.createButton(messages.get("UserInputPanel.search.delete"), data.buttonsHColor);
         deleteBtn.addActionListener(this);
 
         JScrollPane scroller = new JScrollPane(fileList);

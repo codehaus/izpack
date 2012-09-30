@@ -55,7 +55,7 @@ public class RuleInputFieldTest
         Toolkit toolkit = Mockito.mock(Toolkit.class);
 
         GUIInstallData installData = new GUIInstallData(new DefaultVariables(), Platforms.HP_UX);
-        RuleField model = new RuleField(layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null);
+        RuleField model = new RuleField(layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null, installData);
 
         RuleInputField field = new RuleInputField(model, toolkit, installData);
 

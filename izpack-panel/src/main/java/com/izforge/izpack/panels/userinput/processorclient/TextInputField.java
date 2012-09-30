@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
-import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.gui.FlowLayout;
 import com.izforge.izpack.panels.userinput.field.FieldValidator;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
@@ -63,10 +62,9 @@ public class TextInputField extends JComponent implements ProcessingClient
     /**
      * Constructs a text input field.
      *
-     * @param model       the field model
-     * @param installData the installation data
+     * @param model the field model
      */
-    public TextInputField(TextField model, InstallData installData)
+    public TextInputField(TextField model)
     {
         FieldValidator fieldValidator = model.getValidator();
         if (fieldValidator != null)
@@ -83,7 +81,7 @@ public class TextInputField extends JComponent implements ProcessingClient
         // ----------------------------------------------------
         // construct the UI element and add it to the composite
         // ----------------------------------------------------
-        field = new JTextField(model.getInitialValue(installData), model.getSize());
+        field = new JTextField(model.getInitialValue(), model.getSize());
         field.setName(model.getVariable());
         field.setCaretPosition(0);
         add(field);

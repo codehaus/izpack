@@ -22,10 +22,9 @@
 package com.izforge.izpack.panels.userinput.field.radio;
 
 import java.util.List;
-import java.util.Map;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.combo.ComboFieldReader;
 import com.izforge.izpack.panels.userinput.field.Field;
 
 /**
@@ -49,12 +48,13 @@ public class RadioField extends Field
     /**
      * Constructs a {@code ComboField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public RadioField(RadioFieldReader reader)
+    public RadioField(RadioFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         this.choices = reader.getChoices();
         this.selected = reader.getSelectedIndex();
     }
@@ -74,7 +74,8 @@ public class RadioField extends Field
      *
      * @return the selected choice, or {2code -1} if no choice is selected
      */
-    public int getSelectedIndex() {
+    public int getSelectedIndex()
+    {
         return selected;
     }
 

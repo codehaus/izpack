@@ -19,31 +19,35 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.statictext;
+package com.izforge.izpack.panels.userinput.gui;
 
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
+import javax.swing.JPanel;
+
+import com.izforge.izpack.gui.TwoColumnConstraints;
+import com.izforge.izpack.panels.userinput.field.space.Spacer;
+
 
 /**
- * Static text field.
+ * Spacer view.
  *
  * @author Tim Anderson
  */
-public class StaticText extends Field
+public class GUISpacerView extends GUIFieldView
 {
 
     /**
-     * Constructs a {@code StaticText}.
+     * Constructs a {@code GUISpacerView}.
      *
-     * @param reader      the reader to get field information from
-     * @param installData the installation data
-     * @throws IzPackException if the field cannot be read
+     * @param field the field
      */
-    public StaticText(SimpleFieldReader reader, InstallData installData)
+    public GUISpacerView(Spacer field)
     {
-        super(reader, installData);
+        super(field);
+        JPanel panel = new JPanel();
+        TwoColumnConstraints constraints = new TwoColumnConstraints(TwoColumnConstraints.BOTH);
+        constraints.stretch = true;
+
+        addComponent(panel, constraints);
     }
 
 }

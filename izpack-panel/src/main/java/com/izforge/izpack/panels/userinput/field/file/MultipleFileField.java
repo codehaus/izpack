@@ -21,6 +21,10 @@
 
 package com.izforge.izpack.panels.userinput.field.file;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 
 
@@ -50,20 +54,80 @@ public class MultipleFileField extends AbstractFileField
     /**
      * Determines if multiple variables should be created to hold the selected files.
      */
-    private boolean multipleVariables;
+    private final boolean multipleVariables;
+
+    /**
+     * Variables modified by this field.
+     */
+    private final List<String> variables = new ArrayList<String>();
+
 
     /**
      * Constructs a {@code MultipleFileField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public MultipleFileField(MultipleFileFieldReader reader)
+    public MultipleFileField(MultipleFileFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         visibleRows = reader.getVisibleRows();
         width = reader.getPreferredWidth();
         height = reader.getPreferredHeight();
+        multipleVariables = reader.getCreateMultipleVariables();
+        variables.add(getVariable());
+    }
+
+    /**
+     * Sets the values. If multiple variables are being used, this creates a variable for each value,
+     * using the naming convention: name, name_1, name_2....
+     * If a single variable is being used, the values are concatenated together separated by ';'.
+     *
+     * @param values the file names
+     */
+    public void setValues(List<String> values)
+    {
+        if (multipleVariables)
+        {
+            InstallData installData = getInstallData();
+            variables.clear();
+            String variable = getVariable();
+            variables.add(variable);
+            int index = 0;
+            for (String value : values)
+            {
+                String newVariable = variable;
+                if (index > 0)
+                {
+                    newVariable += "_" + index;
+                    variables.add(newVariable);
+                }
+                index++;
+                installData.setVariable(newVariable, value);
+            }
+        }
+        else
+        {
+            StringBuilder buffer = new StringBuilder();
+            for (String value : values)
+            {
+                buffer.append(value);
+                buffer.append(";");
+            }
+            setValue(buffer.toString());
+        }
+    }
+
+    /**
+     * Returns all variables that this field updates.
+     *
+     * @return all variables that this field updates
+     */
+    @Override
+    public List<String> getVariables()
+    {
+        return variables;
     }
 
     /**

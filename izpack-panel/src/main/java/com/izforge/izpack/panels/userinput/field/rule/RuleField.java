@@ -24,6 +24,7 @@ package com.izforge.izpack.panels.userinput.field.rule;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.FieldProcessor;
@@ -56,12 +57,13 @@ public class RuleField extends Field
     /**
      * Constructs a {@code RuleField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public RuleField(RuleFieldReader reader)
+    public RuleField(RuleFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         this.layout = reader.getLayout();
         this.format = reader.getFormat();
         this.separator = reader.getSeparator();
@@ -70,19 +72,20 @@ public class RuleField extends Field
     /**
      * Constructs a {@code RuleField}.
      *
-     * @param layout    the field layout. May be {@code null}
-     * @param format    the rule format
-     * @param set       the initial value. May be {@code null}
-     * @param separator the field separator
-     * @param validator the field validator
-     * @param processor the field processor
+     * @param layout      the field layout. May be {@code null}
+     * @param format      the rule format
+     * @param set         the initial value. May be {@code null}
+     * @param separator   the field separator
+     * @param validator   the field validator
+     * @param processor   the field processor
+     * @param installData the installation data
      */
     public RuleField(String layout, RuleFormat format, String set, String separator, FieldValidator validator,
-                     FieldProcessor processor)
+                     FieldProcessor processor, InstallData installData)
     {
         super(null, set, 0, null, null,
               validator != null ? Arrays.asList(validator) : Collections.<FieldValidator>emptyList(),
-              processor, null, null, false, null);
+              processor, null, null, false, null, installData);
         this.layout = layout;
         this.separator = separator;
         this.format = format;

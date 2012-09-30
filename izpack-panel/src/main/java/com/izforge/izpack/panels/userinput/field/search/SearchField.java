@@ -23,6 +23,7 @@ package com.izforge.izpack.panels.userinput.field.search;
 
 import java.util.List;
 
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
 
@@ -69,12 +70,13 @@ public class SearchField extends Field
     /**
      * Constructs a {@code SearchField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public SearchField(SearchFieldReader reader)
+    public SearchField(SearchFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         filename = reader.getFilename();
         checkFilename = reader.getCheckFilename();
         type = reader.getSearchType();

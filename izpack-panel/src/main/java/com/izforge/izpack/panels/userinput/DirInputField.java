@@ -31,6 +31,7 @@ import javax.swing.JFileChooser;
 
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
+import com.izforge.izpack.panels.userinput.field.file.DirField;
 import com.izforge.izpack.panels.userinput.validator.ValidatorContainer;
 import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.OsVersion;
@@ -41,16 +42,10 @@ public class DirInputField extends FileInputField
 
     private static final transient Logger logger = Logger.getLogger(DirInputField.class.getName());
 
-    private final boolean mustExist;
-
-    private final boolean canCreate;
-
-    public DirInputField(IzPanel parent, GUIInstallData installDataGUI, boolean directory, String set, int size,
-                         List<ValidatorContainer> validatorConfig, boolean mustExist, boolean canCreate)
+    public DirInputField(DirField field, IzPanel parent, GUIInstallData installDataGUI,
+                         List<ValidatorContainer> validatorConfig)
     {
-        super(parent, installDataGUI, directory, set, size, validatorConfig, null, null);
-        this.mustExist = mustExist;
-        this.canCreate = canCreate;
+        super(field, parent, installDataGUI, validatorConfig);
     }
 
     @Override
@@ -62,17 +57,15 @@ public class DirInputField extends FileInputField
     @Override
     protected boolean _validate(File dir)
     {
-        System.err.println(dir.getAbsolutePath() + " - isDir: " + dir.isDirectory()
-                                   + " - mustExist: " + mustExist + " - canCreate: " + canCreate);
         if (dir.isDirectory())
         {
             return true;
         }
-        else if (mustExist)
+        else if (getField().getMustExist())
         {
             return false;
         }
-        else if (canCreate)
+        else if (getField().getCreate())
         {
             // try to create the directory, if requested
             return verifyCreateOK(dir);
@@ -94,6 +87,12 @@ public class DirInputField extends FileInputField
         {
             showMessage("dir.nodirectory");
         }
+    }
+
+    @Override
+    protected DirField getField()
+    {
+        return (DirField) super.getField();
     }
 
     private boolean verifyCreateOK(File path)

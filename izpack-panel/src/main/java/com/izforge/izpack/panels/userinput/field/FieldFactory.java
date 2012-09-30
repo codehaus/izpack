@@ -95,46 +95,46 @@ public class FieldFactory
         switch (type)
         {
             case CHECK:
-                result = new CheckField(new CheckFieldReader(element, config));
+                result = new CheckField(new CheckFieldReader(element, config), installData);
                 break;
             case COMBO:
-                result = new ComboField(new ComboFieldReader(element, config, installData));
+                result = new ComboField(new ComboFieldReader(element, config, installData), installData);
                 break;
             case DIR:
-                result = new DirField(new DirFieldReader(element, config));
+                result = new DirField(new DirFieldReader(element, config), installData);
                 break;
             case DIVIDER:
-                result = new Divider(new DividerReader(element, config));
+                result = new Divider(new DividerReader(element, config), installData);
                 break;
             case FILE:
-                result = new FileField(new FileFieldReader(element, config));
+                result = new FileField(new FileFieldReader(element, config), installData);
                 break;
             case MULTIFILE:
-                result = new MultipleFileField(new MultipleFileFieldReader(element, config));
+                result = new MultipleFileField(new MultipleFileFieldReader(element, config), installData);
                 break;
             case PASSWORD:
-                result = new PasswordGroupField(new PasswordGroupFieldReader(element, config));
+                result = new PasswordGroupField(new PasswordGroupFieldReader(element, config), installData);
                 break;
             case RADIO:
-                result = new RadioField(new RadioFieldReader(element, config));
+                result = new RadioField(new RadioFieldReader(element, config), installData);
                 break;
             case RULE:
-                result = new RuleField(new RuleFieldReader(element, config));
+                result = new RuleField(new RuleFieldReader(element, config), installData);
                 break;
             case SEARCH:
-                result = new SearchField(new SearchFieldReader(element, config, matcher));
+                result = new SearchField(new SearchFieldReader(element, config, matcher), installData);
                 break;
             case SPACE:
-                result = new Spacer(new SimpleFieldReader(element, config));
+                result = new Spacer(new SimpleFieldReader(element, config), installData);
                 break;
             case STATICTEXT:
-                result = new StaticText(new SimpleFieldReader(element, config));
+                result = new StaticText(new SimpleFieldReader(element, config), installData);
                 break;
             case TEXT:
-                result = new TextField(new TextFieldReader(element, config));
+                result = new TextField(new TextFieldReader(element, config), installData);
                 break;
             case TITLE:
-                result = new TitleField(new TitleFieldReader(element, config));
+                result = new TitleField(new TitleFieldReader(element, config), installData);
                 break;
             default:
                 throw new IzPackException("Unsupported field type: " + value + " in " + config.getContext(element));

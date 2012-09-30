@@ -47,12 +47,13 @@ public class CheckField extends Field
     /**
      * Constructs a {@code CheckField}.
      *
-     * @param reader the reader to get field information from
+     * @param reader      the reader to get field information from
+     * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public CheckField(CheckFieldReader reader)
+    public CheckField(CheckFieldReader reader, InstallData installData)
     {
-        super(reader);
+        super(reader, installData);
         trueValue = reader.getTrueValue();
         falseValue = reader.getFalseValue();
     }
@@ -83,12 +84,11 @@ public class CheckField extends Field
      * The initial selection is determined by the {@link #getInitialValue initial value}. If this is the same as the
      * {@link #getTrueValue() 'true value'} or {@code "true"} then the check box should be selected.
      *
-     * @param installData the installation data
      * @return {@code true} if the check box should be selected, {@code false} if it should be deselected.
      */
-    public boolean getInitialSelection(InstallData installData)
+    public boolean getInitialSelection()
     {
-        String value = getInitialValue(installData);
+        String value = getInitialValue();
         boolean result = false;
         if (value != null)
         {
