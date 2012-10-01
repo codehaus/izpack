@@ -22,6 +22,8 @@
 package com.izforge.izpack.panels.userinput.field.rule;
 
 
+import com.izforge.izpack.panels.userinput.processor.Processor;
+
 /**
  * Describes the format of an {@link RuleField}.
  *
@@ -49,8 +51,7 @@ public enum RuleFormat
     SPECIAL_SEPARATOR("specialSeparator"),
 
     /**
-     * Specifies to return the contents of all fields in a somehow modified way. How the content is modified depends
-     * on the operation performed by the processor element.
+     * Specifies to return the contents of all fields using an {@link Processor}.
      */
     PROCESSED("processed");
 
@@ -62,6 +63,16 @@ public enum RuleFormat
     private RuleFormat(String format)
     {
         this.format = format;
+    }
+
+    /**
+     * Returns a string representation of this.
+     *
+     * @return the format
+     */
+    public String toString()
+    {
+        return format;
     }
 
     /**

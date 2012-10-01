@@ -40,6 +40,20 @@ import com.izforge.izpack.panels.userinput.field.space.Spacer;
 import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.field.title.TitleField;
+import com.izforge.izpack.panels.userinput.gui.check.GUICheckFieldView;
+import com.izforge.izpack.panels.userinput.gui.combo.GUIComboFieldView;
+import com.izforge.izpack.panels.userinput.gui.divider.GUIDividerView;
+import com.izforge.izpack.panels.userinput.gui.file.GUIDirFieldView;
+import com.izforge.izpack.panels.userinput.gui.file.GUIFileFieldView;
+import com.izforge.izpack.panels.userinput.gui.file.GUIMultipleFileFieldView;
+import com.izforge.izpack.panels.userinput.gui.password.GUIPasswordGroupFieldView;
+import com.izforge.izpack.panels.userinput.gui.radio.GUIRadioFieldView;
+import com.izforge.izpack.panels.userinput.gui.rule.GUIRuleFieldView;
+import com.izforge.izpack.panels.userinput.gui.search.GUISearchFieldView;
+import com.izforge.izpack.panels.userinput.gui.space.GUISpacerView;
+import com.izforge.izpack.panels.userinput.gui.statictext.GUIStaticTextView;
+import com.izforge.izpack.panels.userinput.gui.text.GUITextFieldView;
+import com.izforge.izpack.panels.userinput.gui.title.GUITitleFieldView;
 
 
 /**
@@ -92,7 +106,7 @@ public class GUIFieldViewFactory
         GUIFieldView result;
         if (field instanceof RuleField)
         {
-            result = new GUIRuleFieldView((RuleField) field, parent.getToolkit(), installData);
+            result = new GUIRuleFieldView((RuleField) field, installData);
         }
         else if (field instanceof TextField)
         {

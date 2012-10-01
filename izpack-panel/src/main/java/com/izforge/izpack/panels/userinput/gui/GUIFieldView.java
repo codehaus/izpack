@@ -23,7 +23,6 @@ package com.izforge.izpack.panels.userinput.gui;
 
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -37,9 +36,7 @@ import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.GUIPrompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.FieldValidator;
 import com.izforge.izpack.panels.userinput.field.FieldView;
-import com.izforge.izpack.panels.userinput.validator.ValidatorContainer;
 import com.izforge.izpack.util.HyperlinkHandler;
 
 
@@ -201,28 +198,6 @@ public abstract class GUIFieldView implements FieldView
     protected void addLabel(String label)
     {
         addComponent(new JLabel(label), new TwoColumnConstraints(TwoColumnConstraints.WEST));
-    }
-
-    /**
-     * Returns the validator containers.
-     *
-     * @return the validator containers
-     */
-    protected List<ValidatorContainer> getValidatorContainers()
-    {
-        List<ValidatorContainer> result = Collections.emptyList();
-        List<FieldValidator> validators = field.getValidators();
-        if (!validators.isEmpty())
-        {
-            result = new ArrayList<ValidatorContainer>(validators.size());
-            for (FieldValidator validator : validators)
-            {
-                ValidatorContainer container = new ValidatorContainer(validator.create(), validator.getMessage(),
-                                                                      validator.getParameters());
-                result.add(container);
-            }
-        }
-        return result;
     }
 
     /**

@@ -21,11 +21,17 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.izforge.izpack.api.adaptator.IXMLElement;
+import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.processor.Processor;
+import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
+
 
 /**
- * FieldProcessor is a factory for an {@link Processor}, specified at construction by its class name.
+ * FieldProcessor is a wrapper around a {@link Processor}.
  *
  * @author Tim Anderson
  */
@@ -43,6 +49,17 @@ public class FieldProcessor
     private final String className;
 
     /**
+     * The cached processor instance.
+     */
+    private Processor processor;
+
+    /**
+     * The logger.
+     */
+    private static final Logger logger = Logger.getLogger(FieldProcessor.class.getName());
+
+
+    /**
      * Constructs a {@code FieldProcessor}.
      *
      * @param processor the processor element
@@ -55,12 +72,35 @@ public class FieldProcessor
     }
 
     /**
-     * Creates an instance of the processor.
+     * Processes a set of values.
      *
-     * @return the new processor
+     * @param values the values to process
+     * @return the result of the processing
+     * @throws IzPackException if processing fails
      */
-    public Processor create()
+    public String process(String[] values)
     {
-        return config.getFactory().create(className, Processor.class);
+        String result;
+        try
+        {
+            if (processor == null)
+            {
+                processor = config.getFactory().create(className, Processor.class);
+            }
+            result = processor.process(new ValuesProcessingClient(values));
+        }
+        catch (Throwable exception)
+        {
+            logger.log(Level.WARNING, "Processing using " + className + " failed: " + exception.getMessage(),
+                       exception);
+            if (exception instanceof IzPackException)
+            {
+                throw (IzPackException) exception;
+            }
+            throw new IzPackException("Processing using " + className + " failed: " + exception.getMessage(),
+                                      exception);
+        }
+        return result;
     }
+
 }

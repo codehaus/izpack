@@ -23,20 +23,18 @@ package com.izforge.izpack.panels.userinput.processorclient;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Toolkit;
-
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
+import com.izforge.izpack.panels.userinput.gui.rule.RuleInputField;
 import com.izforge.izpack.util.Platforms;
 
 
 /**
- * Tests the {@link RuleInputField}.
+ * Tests the {@link com.izforge.izpack.panels.userinput.gui.rule.RuleInputField}.
  *
  * @author Tim Anderson
  */
@@ -44,7 +42,7 @@ public class RuleInputFieldTest
 {
 
     /**
-     * Tests {@link RuleInputField} support for entering IP addresses.
+     * Tests {@link com.izforge.izpack.panels.userinput.gui.rule.RuleInputField} support for entering IP addresses.
      */
     @Test
     public void testIPAddressRuleInputField()
@@ -52,21 +50,21 @@ public class RuleInputFieldTest
         String layout = "N:3:3 . N:3:3 . N:3:3 . N:3:3"; // IP address format
         String set = "0:192 1:168 2:0 3:1";              // default value
         String separator = null;
-        Toolkit toolkit = Mockito.mock(Toolkit.class);
 
         GUIInstallData installData = new GUIInstallData(new DefaultVariables(), Platforms.HP_UX);
         RuleField model = new RuleField(layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null, installData);
 
-        RuleInputField field = new RuleInputField(model, toolkit, installData);
-
-        assertEquals(4, field.getNumFields());
+        RuleInputField field = new RuleInputField(model, installData);
 
         // check default value
         assertEquals("192.168.0.1", field.getText());
-        assertEquals("192", field.getFieldContents(0));
-        assertEquals("168", field.getFieldContents(1));
-        assertEquals("0", field.getFieldContents(2));
-        assertEquals("1", field.getFieldContents(3));
+
+        String[] values = field.getValues();
+        assertEquals(4, values.length);
+        assertEquals("192", values[0]);
+        assertEquals("168", values[1]);
+        assertEquals("0", values[2]);
+        assertEquals("1", values[3]);
 
         // TODO - need to provide methods to update fields and verify field formats
     }

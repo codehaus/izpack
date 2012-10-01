@@ -20,13 +20,16 @@
 package com.izforge.izpack.panels.userinput.field;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.izforge.izpack.api.factory.ObjectFactory;
+import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
 import com.izforge.izpack.panels.userinput.validator.Validator;
 
 
 /**
- * Describes a validator for a field.
+ * FieldValidator is a wrapper around a {@link Validator}.
  *
  * @author Tim Anderson
  */
@@ -53,6 +56,16 @@ public class FieldValidator
      */
     private final ObjectFactory factory;
 
+    /**
+     * The validator.
+     */
+    private Validator validator;
+
+    /**
+     * The logger.
+     */
+    private static final Logger logger = Logger.getLogger(FieldValidator.class.getName());
+
 
     /**
      * Constructs a {@code FieldValidator}.
@@ -68,10 +81,10 @@ public class FieldValidator
     /**
      * Constructs a {@code FieldValidator}.
      *
-     * @param className the validator class name
+     * @param className  the validator class name
      * @param parameters the validation parameters. May be {@code null}
-     * @param message the validation error message. May be {@code null}
-     * @param factory the factory for creating the validator
+     * @param message    the validation error message. May be {@code null}
+     * @param factory    the factory for creating the validator
      */
     public FieldValidator(String className, Map<String, String> parameters, String message, ObjectFactory factory)
     {
@@ -79,16 +92,6 @@ public class FieldValidator
         this.parameters = parameters;
         this.message = message;
         this.factory = factory;
-    }
-
-    /**
-     * The validation parameters.
-     *
-     * @return the validation parameters. May be {@code null}
-     */
-    public Map<String, String> getParameters()
-    {
-        return parameters;
     }
 
     /**
@@ -102,12 +105,44 @@ public class FieldValidator
     }
 
     /**
-     * Creates the validator.
+     * Validates field values.
      *
-     * @return a new validator
+     * @param values the values to validate
+     * @return {@code true} if the values are valid, otherwise {@code false}
      */
-    public Validator create()
+    public boolean validate(String[] values)
     {
-        return factory.create(className, Validator.class);
+        return validate(new ValuesProcessingClient(values));
+    }
+
+    /**
+     * Validates field values.
+     *
+     * @param values the values to validate
+     * @return {@code true} if the values are valid, otherwise {@code false}
+     */
+    public boolean validate(ValuesProcessingClient values)
+    {
+        boolean result = false;
+        try
+        {
+            if (validator == null)
+            {
+                validator = factory.create(className, Validator.class);
+            }
+            values.setParameters(parameters);
+            result = validator.validate(values);
+            if (logger.isLoggable(Level.FINE))
+            {
+                logger.log(Level.FINE, "Validation " + (result ? "OK" : "FAILED") + " using "
+                        + validator.getClass().getSimpleName());
+            }
+        }
+        catch (Throwable exception)
+        {
+            logger.log(Level.WARNING, "Validation using " + className + " failed: " + exception.getMessage(),
+                       exception);
+        }
+        return result;
     }
 }

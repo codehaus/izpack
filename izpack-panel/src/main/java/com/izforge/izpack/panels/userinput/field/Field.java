@@ -31,6 +31,7 @@ import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.core.rules.process.ExistsCondition;
+import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
 
 /**
  * Describes a user input field.
@@ -264,13 +265,60 @@ public abstract class Field
     }
 
     /**
-     * Returns the field validators.
+     * Validates values using any validators associated with the field.
      *
-     * @return the field validators
+     * @param values the values to validate
+     * @return the status of the validation
      */
-    public List<FieldValidator> getValidators()
+    public ValidationStatus validate(String... values)
     {
-        return validators;
+        return validate(new ValuesProcessingClient(values));
+    }
+
+    /**
+     * Validates values using any validators associated with the field.
+     *
+     * @param values the values to validate
+     * @return the status of the validation
+     */
+    public ValidationStatus validate(ValuesProcessingClient values)
+    {
+        try
+        {
+            for (FieldValidator validator : validators)
+            {
+                if (!validator.validate(values))
+                {
+                    return new ValidationStatus(false, validator.getMessage());
+                }
+            }
+        }
+        catch (Throwable exception)
+        {
+            return new ValidationStatus(false, exception.getMessage());
+        }
+        return new ValidationStatus(true, null);
+    }
+
+    /**
+     * Processes a set of values.
+     *
+     * @param values the values to process
+     * @return the result of processing
+     * @throws IzPackException if processing fails
+     */
+    public String process(String... values)
+    {
+        String result = null;
+        if (processor != null)
+        {
+            result = processor.process(values);
+        }
+        else if (values.length > 0)
+        {
+            result = values[0];
+        }
+        return result;
     }
 
     /**
