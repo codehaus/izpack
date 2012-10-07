@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -39,9 +38,8 @@ import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.ValidationStatus;
-import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
+import com.izforge.izpack.panels.userinput.rule.file.AbstractFileField;
+import com.izforge.izpack.panels.userinput.rule.file.FileFieldView;
 
 public class FileInputField extends JPanel implements ActionListener
 {
@@ -49,6 +47,14 @@ public class FileInputField extends JPanel implements ActionListener
 
     private static final transient Logger logger = Logger.getLogger(FileInputField.class.getName());
 
+    /**
+     * The field view.
+     */
+    private final FileFieldView view;
+
+    /**
+     * The field.
+     */
     private final AbstractFileField field;
 
     InstallerFrame parentFrame;
@@ -59,50 +65,16 @@ public class FileInputField extends JPanel implements ActionListener
 
     JButton browseBtn;
 
-    String set;
-
     GUIInstallData installDataGUI;
 
-    boolean allowEmpty;
-
-    protected static final int INVALID = 0, EMPTY = 1;
-
-    public FileInputField(AbstractFileField field, IzPanel parent, GUIInstallData installDataGUI)
+    public FileInputField(FileFieldView view, IzPanel parent, GUIInstallData installDataGUI)
     {
-        this.field = field;
+        this.view = view;
+        this.field = view.getField();
         this.parent = parent;
         this.parentFrame = parent.getInstallerFrame();
         this.installDataGUI = installDataGUI;
-        this.set = field.getDefaultValue();
-        setAllowEmptyInput(field.getAllowEmptyValue());
         this.initialize();
-    }
-
-    private void initialize()
-    {
-        int size = field.getSize() < 0 ? 0 : field.getSize();
-        filetxt = new JTextField(field.getDefaultValue(), size);
-        filetxt.setName(field.getVariable());
-        filetxt.setCaretPosition(0);
-
-        GridBagLayout layout = new GridBagLayout();
-        setLayout(layout);
-        GridBagConstraints fileTextConstraint = new GridBagConstraints();
-        GridBagConstraints fileButtonConstraint = new GridBagConstraints();
-        fileTextConstraint.gridx = 0;
-        fileTextConstraint.gridy = 0;
-        fileTextConstraint.anchor = GridBagConstraints.WEST;
-        fileTextConstraint.insets = new Insets(0, 0, 0, 5);
-        fileButtonConstraint.gridx = 1;
-        fileButtonConstraint.gridy = 0;
-        fileButtonConstraint.anchor = GridBagConstraints.WEST;
-
-        // TODO: use separate key for button text
-        browseBtn = ButtonFactory.createButton(installDataGUI.getMessages().get("UserInputPanel.search.browse"),
-                                               installDataGUI.buttonsHColor);
-        browseBtn.addActionListener(this);
-        this.add(filetxt, fileTextConstraint);
-        this.add(browseBtn, fileButtonConstraint);
     }
 
     public void setFile(String filename)
@@ -133,11 +105,6 @@ public class FileInputField extends JPanel implements ActionListener
         }
     }
 
-    protected Field getField()
-    {
-        return field;
-    }
-
     protected void prepareFileChooser(JFileChooser filechooser)
     {
         filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -162,85 +129,39 @@ public class FileInputField extends JPanel implements ActionListener
         return result;
     }
 
-    protected void showMessage(int k)
-    {
-        if (k == INVALID)
-        {
-            showMessage("file.notfile");
-        }
-        else if (k == EMPTY)
-        {
-            showMessage("file.nofile");
-        }
-    }
-
-    protected void showMessage(String messageType)
-    {
-        JOptionPane.showMessageDialog(parentFrame, parentFrame.getMessages().get("UserInputPanel." + messageType
-                                                                                         + ".message"),
-                                      parentFrame.getMessages().get("UserInputPanel." + messageType + ".caption"),
-                                      JOptionPane.WARNING_MESSAGE);
-    }
-
     public boolean validateField()
     {
-        boolean result = false;
-        String input = filetxt.getText();
-
-        boolean empty = (input == null) || (input.length() == 0);
-        if (empty && allowEmpty)
-        {
-            result = true;
-        }
-        else if (!empty)
-        {
-            // Expand unix home reference
-            if (input.startsWith("~"))
-            {
-                String home = System.getProperty("user.home");
-                input = home + input.substring(1);
-            }
-
-            // Normalize the path
-            File file = new File(input).getAbsoluteFile();
-            input = file.toString();
-
-            filetxt.setText(input);
-
-            if (!_validate(file))
-            {
-                result = false;
-                showMessage(INVALID);
-            }
-            else
-            {
-                ValidationStatus status = field.validate(input);
-                if (!status.isValid())
-                {
-                    JOptionPane.showMessageDialog(parentFrame, status.getMessage(),
-                                                  parentFrame.getMessages().get("UserInputPanel.error.caption"),
-                                                  JOptionPane.WARNING_MESSAGE);
-                }
-                else
-                {
-                    result = true;
-                }
-            }
-        }
-        else
-        {
-            showMessage(EMPTY);
-        }
-        return result;
+        String path = filetxt.getText();
+        File file = field.getAbsoluteFile(path);
+        filetxt.setText(file.getPath());
+        return view.validate(filetxt.getText());
     }
 
-    protected boolean _validate(File file)
+    private void initialize()
     {
-        return file.isFile();
+        int size = field.getSize() < 0 ? 0 : field.getSize();
+        filetxt = new JTextField(field.getDefaultValue(), size);
+        filetxt.setName(field.getVariable());
+        filetxt.setCaretPosition(0);
+
+        GridBagLayout layout = new GridBagLayout();
+        setLayout(layout);
+        GridBagConstraints fileTextConstraint = new GridBagConstraints();
+        GridBagConstraints fileButtonConstraint = new GridBagConstraints();
+        fileTextConstraint.gridx = 0;
+        fileTextConstraint.gridy = 0;
+        fileTextConstraint.anchor = GridBagConstraints.WEST;
+        fileTextConstraint.insets = new Insets(0, 0, 0, 5);
+        fileButtonConstraint.gridx = 1;
+        fileButtonConstraint.gridy = 0;
+        fileButtonConstraint.anchor = GridBagConstraints.WEST;
+
+        // TODO: use separate key for button text
+        browseBtn = ButtonFactory.createButton(installDataGUI.getMessages().get("UserInputPanel.search.browse"),
+                                               installDataGUI.buttonsHColor);
+        browseBtn.addActionListener(this);
+        this.add(filetxt, fileTextConstraint);
+        this.add(browseBtn, fileButtonConstraint);
     }
 
-    public void setAllowEmptyInput(boolean allowEmpty)
-    {
-        this.allowEmpty = allowEmpty;
-    }
 }

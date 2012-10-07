@@ -27,9 +27,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -37,16 +34,11 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import org.apache.regexp.RE;
-
-import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.gui.FlowLayout;
-import com.izforge.izpack.panels.userinput.field.rule.FieldLayout;
-import com.izforge.izpack.panels.userinput.field.rule.FieldSpec;
-import com.izforge.izpack.panels.userinput.field.rule.RuleField;
-import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
-import com.izforge.izpack.panels.userinput.processor.Processor;
-import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
+import com.izforge.izpack.panels.userinput.rule.rule.FieldLayout;
+import com.izforge.izpack.panels.userinput.rule.rule.FieldSpec;
+import com.izforge.izpack.panels.userinput.rule.rule.RuleField;
+import com.izforge.izpack.panels.userinput.rule.rule.RuleFormat;
 
 /**
  * This class assists the user in entering serial numbers. <BR>
@@ -88,8 +80,6 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
 
     private final RuleField field;
 
-    private final InstallData installData;
-
     /**
      * The input fields, in the order in which they appear on the screen.
      */
@@ -99,19 +89,14 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
 
     private boolean backstep = false;
 
-    private static final Logger logger = Logger.getLogger(RuleInputField.class.getName());
-
-
     /**
      * Constructs a {@code RuleInputField}.
      *
-     * @param field       the field
-     * @param installData the installation data
+     * @param field the field
      */
-    public RuleInputField(RuleField field, InstallData installData)
+    public RuleInputField(RuleField field)
     {
         this.field = field;
-        this.installData = installData;
 
         FlowLayout layout = new FlowLayout();
         layout.setAlignment(com.izforge.izpack.gui.FlowLayout.LEFT);
@@ -122,10 +107,10 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
         // ----------------------------------------------------
         createItems();
 
-        String preset = field.getDefaultValue();
-        if (preset != null && preset.length() > 0)
+        String[] defaultValues = field.getDefaultValues();
+        for (int i = 0; i < defaultValues.length; ++i)
         {
-            setFields(preset);
+            inputFields.get(i).setText(defaultValues[i]);
         }
 
         // ----------------------------------------------------
@@ -167,6 +152,22 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
     }
 
     /**
+     * Sets the field values.
+     *
+     * @param values the values to set
+     */
+    public void setValues(String[] values)
+    {
+        for (int i = 0; i < values.length; ++i)
+        {
+            if (i < inputFields.size())
+            {
+                inputFields.get(i).setText(values[i]);
+            }
+        }
+    }
+
+    /**
      * Creates the items that make up this field. All fields are stored in <code>inputFields</code>.
      */
     private void createItems()
@@ -188,92 +189,6 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
             else
             {
                 add(new JLabel((String) item));
-            }
-        }
-    }
-
-    /**
-     * Sets each field to a pre-defined value.
-     *
-     * @param data a <code>String</code> containing the preset values for each field. The format
-     *             of the string is as follows: The content for the individuals fields must be separated by
-     *             whitespace. Each installDataGUI block is preceeded by the index of the field to set (counting starts at
-     *             0) followed by a colon ':'and after that the actual installDataGUI for the field.
-     */
-    private void setFields(String data)
-    {
-        StringTokenizer tokenizer = new StringTokenizer(data);
-        String token;
-        String indexString;
-        int index;
-        boolean process = false;
-
-        while (tokenizer.hasMoreTokens())
-        {
-            token = tokenizer.nextToken();
-            indexString = token.substring(0, token.indexOf(':'));
-
-            try
-            {
-                index = Integer.parseInt(indexString);
-                if (index < inputFields.size())
-                {
-                    String val = token.substring((token.indexOf(':') + 1), token.length());
-                    String className = "";
-                    if (val.contains(":"))
-                    {
-                        className = val.substring(val.indexOf(":") + 1);
-                        val = val.substring(0, val.indexOf(":"));
-                    }
-
-                    if (!"".equals(className) && !process)
-                    {
-                        process = true;
-                    }
-                    val = installData.getVariables().replace(val);
-                    inputFields.get(index).setText(val);
-                }
-            }
-            catch (Throwable exception)
-            {
-                logger.log(Level.WARNING, exception.getMessage(), exception);
-            }
-        }
-
-        if (process)
-        {
-            tokenizer = new StringTokenizer(data);
-            while (tokenizer.hasMoreTokens())
-            {
-                token = tokenizer.nextToken();
-                indexString = token.substring(0, token.indexOf(':'));
-
-                try
-                {
-                    index = Integer.parseInt(indexString);
-                    if (index < inputFields.size())
-                    {
-                        String val = token.substring((token.indexOf(':') + 1), token.length());
-                        String className = "";
-                        String presult = "";
-                        if (val.contains(":"))
-                        {
-                            className = val.substring(val.indexOf(":") + 1);
-                        }
-
-                        if (!"".equals(className))
-                        {
-                            Processor processor = (Processor) Class.forName(className).newInstance();
-                            presult = processor.process(new ValuesProcessingClient(getValues()));
-                        }
-                        String[] td = new RE("\\*").split(presult);
-                        inputFields.get(index).setText(td[index]);
-                    }
-                }
-                catch (Throwable exception)
-                {
-                    logger.log(Level.WARNING, exception.getMessage(), exception);
-                }
             }
         }
     }

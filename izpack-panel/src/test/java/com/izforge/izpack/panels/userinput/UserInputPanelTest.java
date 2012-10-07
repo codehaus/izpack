@@ -51,7 +51,7 @@ import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.panels.simplefinish.SimpleFinishPanel;
 import com.izforge.izpack.panels.test.AbstractPanelTest;
 import com.izforge.izpack.panels.test.TestGUIPanelContainer;
-import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.rule.Choice;
 import com.izforge.izpack.test.Container;
 
 
@@ -104,16 +104,25 @@ public class UserInputPanelTest extends AbstractPanelTest
         FrameFixture frame = showUserInputPanel();
 
         JTextComponentFixture rule1 = frame.textBox("rule1.1");
-        assertEquals("80", rule1.text());
+        assertEquals("192", rule1.text());
+        JTextComponentFixture rule2 = frame.textBox("rule1.2");
+        assertEquals("168", rule2.text());
+        JTextComponentFixture rule3 = frame.textBox("rule1.3");
+        assertEquals("0", rule3.text());
+        JTextComponentFixture rule4 = frame.textBox("rule1.4");
+        assertEquals("1", rule4.text());
 
         assertNull(installData.getVariable("rule1"));
 
-        rule1.setText("12345");
+        rule1.setText("127");
+        rule2.setText("0");
+        rule3.setText("0");
+        rule4.setText("1");
 
         // attempt to navigate to the next panel
         checkNavigateNext(frame);
 
-        assertEquals("12345", installData.getVariable("rule1"));
+        assertEquals("127.0.0.1", installData.getVariable("rule1"));
     }
 
     /**

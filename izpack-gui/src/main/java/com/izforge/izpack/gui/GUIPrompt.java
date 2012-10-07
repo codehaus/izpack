@@ -119,6 +119,30 @@ public class GUIPrompt implements Prompt
     }
 
     /**
+     * Displays a warning message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    @Override
+    public void warn(String title, String message)
+    {
+        message(Type.WARNING, title, message);
+    }
+
+    /**
+     * Displays an error message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    @Override
+    public void error(String title, String message)
+    {
+        message(Type.ERROR, title, message);
+    }
+
+    /**
      * Displays a confirmation message.
      *
      * @param type    the type of the message
@@ -324,13 +348,12 @@ public class GUIPrompt implements Prompt
     }
 
     /**
-     *
      * Displays an option dialog, ensuring that it is displayed from the event dispatch thread.
      *
-     * @param type         the dialog type
-     * @param title        the title
-     * @param message      the message
-     * @param optionType   the option type
+     * @param type       the dialog type
+     * @param title      the title
+     * @param message    the message
+     * @param optionType the option type
      * @return the selected option
      */
     @SuppressWarnings("MagicConstant")

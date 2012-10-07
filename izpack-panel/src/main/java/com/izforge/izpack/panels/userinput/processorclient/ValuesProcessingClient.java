@@ -64,6 +64,16 @@ public class ValuesProcessingClient implements ProcessingClient
     }
 
     /**
+     * Returns the values.
+     *
+     * @return the values
+     */
+    public String[] getValues()
+    {
+        return values;
+    }
+
+    /**
      * Sets the parameters.
      *
      * @param parameters the parameters. May be {@code null}

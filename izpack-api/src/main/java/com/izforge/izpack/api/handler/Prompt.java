@@ -70,6 +70,22 @@ public interface Prompt
     void message(Type type, String title, String message);
 
     /**
+     * Displays a warning message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    void warn(String title, String message);
+
+    /**
+     * Displays an error message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    void error(String title, String message);
+
+    /**
      * Displays a confirmation message.
      *
      * @param type    the type of the message

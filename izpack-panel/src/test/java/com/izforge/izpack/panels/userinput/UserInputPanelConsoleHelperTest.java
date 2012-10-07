@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -98,6 +99,34 @@ public class UserInputPanelConsoleHelperTest
         this.resources = resources;
         this.console = console;
         this.container = container;
+    }
+
+    /**
+     * Tests rule fields.
+     *
+     * @throws Exception for any error
+     */
+    @Ignore("Not quite ready yet")
+    @Test
+    public void testRuleField() throws Exception
+    {
+        // Set the base path in order to pick up com/izforge/izpack/panels/userinput/rule/userInputSpec.xml
+        resources.setResourceBasePath("/com/izforge/izpack/panels/userinput/rule/");
+
+        installData.setVariable("text3value", "text3 default value");
+
+        ConsolePanels panels = createPanels(UserInputPanel.class);
+
+        console.addScript("text1", "text1 value");
+        console.addScript("text2", "\n");
+        console.addScript("text3", "\n");
+        console.addScript("Continue", "1");
+
+        assertTrue(panels.next());
+
+        assertEquals("text1 value", installData.getVariable("text1"));
+        assertEquals("text2 value", installData.getVariable("text2"));
+        assertEquals("text3 default value", installData.getVariable("text3"));
     }
 
     /**

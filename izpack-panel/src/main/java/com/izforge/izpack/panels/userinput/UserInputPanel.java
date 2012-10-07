@@ -37,23 +37,22 @@ import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.factory.ObjectFactory;
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.gui.TwoColumnLayout;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.field.ElementReader;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.FieldFactory;
-import com.izforge.izpack.panels.userinput.field.FieldHelper;
-import com.izforge.izpack.panels.userinput.field.FieldView;
-import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
+import com.izforge.izpack.panels.userinput.rule.ElementReader;
+import com.izforge.izpack.panels.userinput.rule.Field;
+import com.izforge.izpack.panels.userinput.rule.FieldHelper;
+import com.izforge.izpack.panels.userinput.rule.FieldView;
+import com.izforge.izpack.panels.userinput.rule.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.gui.Component;
-import com.izforge.izpack.panels.userinput.gui.GUIFieldView;
-import com.izforge.izpack.panels.userinput.gui.GUIFieldViewFactory;
+import com.izforge.izpack.panels.userinput.gui.GUIField;
+import com.izforge.izpack.panels.userinput.gui.GUIFieldFactory;
 import com.izforge.izpack.panels.userinput.gui.UpdateListener;
-import com.izforge.izpack.util.OsConstraintHelper;
 import com.izforge.izpack.util.PlatformModelMatcher;
 
 /**
@@ -63,17 +62,7 @@ import com.izforge.izpack.util.PlatformModelMatcher;
  */
 public class UserInputPanel extends IzPanel
 {
-    private static final String FIELD_NODE_ID = "field";
-
     private static final String TOPBUFFER = "topBuffer";
-
-    protected static final String ATTRIBUTE_CONDITIONID_NAME = "conditionid";
-
-    protected static final String VARIABLE_NODE = "variable";
-
-    protected static final String ATTRIBUTE_VARIABLE_NAME = "name";
-
-    protected static final String ATTRIBUTE_VARIABLE_VALUE = "value";
 
     /**
      * The parsed result from reading the XML specification from the file
@@ -83,9 +72,10 @@ public class UserInputPanel extends IzPanel
     private boolean eventsActivated = false;
 
     private Set<String> variables = new HashSet<String>();
-    private List<GUIFieldView> views = new ArrayList<GUIFieldView>();
+    private List<GUIField> views = new ArrayList<GUIField>();
 
     private JPanel panel;
+
     private RulesEngine rules;
 
     /**
@@ -97,6 +87,11 @@ public class UserInputPanel extends IzPanel
      * The platform-model matcher.
      */
     private final PlatformModelMatcher matcher;
+
+    /**
+     * The prompt.
+     */
+    private final Prompt prompt;
 
     private UserInputPanelSpec userInputModel;
 
@@ -123,15 +118,17 @@ public class UserInputPanel extends IzPanel
      * @param rules       the rules engine
      * @param factory     factory
      * @param matcher     the platform-model matcher
+     * @param prompt      the prompt
      */
     public UserInputPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, Resources resources,
-                          RulesEngine rules, ObjectFactory factory, PlatformModelMatcher matcher)
+                          RulesEngine rules, ObjectFactory factory, PlatformModelMatcher matcher, Prompt prompt)
     {
         super(panel, parent, installData, resources);
 
         this.rules = rules;
         this.factory = factory;
         this.matcher = matcher;
+        this.prompt = prompt;
     }
 
     /**
@@ -271,10 +268,7 @@ public class UserInputPanel extends IzPanel
         // for its type, then an appropriate member function
         // is called that will create the correct UI elements.
         // ----------------------------------------------------
-        List<IXMLElement> fields = spec.getChildrenNamed(FIELD_NODE_ID);
-
-        FieldFactory factory = new FieldFactory();
-        GUIFieldViewFactory viewFactory = new GUIFieldViewFactory(installData, this, parent);
+        GUIFieldFactory viewFactory = new GUIFieldFactory(installData, this, parent, prompt);
         UpdateListener listener = new UpdateListener()
         {
             @Override
@@ -284,15 +278,12 @@ public class UserInputPanel extends IzPanel
             }
         };
 
-        for (IXMLElement element : fields)
+        List<Field> fields = userInputModel.createFields(spec);
+        for (Field field : fields)
         {
-            Field field = factory.create(element, userInputModel.getConfig(), installData, matcher);
-            if (field.isConditionTrue())
-            {
-                GUIFieldView view = viewFactory.create(field);
-                view.setUpdateListener(listener);
-                views.add(view);
-            }
+            GUIField view = viewFactory.create(field);
+            view.setUpdateListener(listener);
+            views.add(view);
         }
         eventsActivated = true;
     }
@@ -301,7 +292,7 @@ public class UserInputPanel extends IzPanel
     {
         boolean updated = false;
 
-        for (GUIFieldView view : views)
+        for (GUIField view : views)
         {
             updated |= view.updateView();
         }
@@ -316,7 +307,7 @@ public class UserInputPanel extends IzPanel
      */
     private void buildUI()
     {
-        for (GUIFieldView view : views)
+        for (GUIField view : views)
         {
             Field field = view.getField();
             if (FieldHelper.isRequired(field, installData, matcher))
@@ -359,7 +350,7 @@ public class UserInputPanel extends IzPanel
      */
     private boolean readInput()
     {
-        for (GUIFieldView view : views)
+        for (GUIField view : views)
         {
             if (view.isDisplayed())
             {
@@ -380,64 +371,13 @@ public class UserInputPanel extends IzPanel
      */
     private IXMLElement readSpec()
     {
-        userInputModel = new UserInputPanelSpec(getResources(), installData, factory);
+        userInputModel = new UserInputPanelSpec(getResources(), installData, factory, rules, matcher);
         return userInputModel.getPanelSpec(getMetadata());
     }
 
     protected void updateVariables()
     {
-        /**
-         * Look if there are new variables defined
-         */
-        List<IXMLElement> variables = spec.getChildrenNamed(VARIABLE_NODE);
-
-        for (IXMLElement variable : variables)
-        {
-            String vname = variable.getAttribute(ATTRIBUTE_VARIABLE_NAME);
-            String vvalue = variable.getAttribute(ATTRIBUTE_VARIABLE_VALUE);
-
-            if (vvalue == null)
-            {
-                // try to read value element
-                if (variable.hasChildren())
-                {
-                    IXMLElement value = variable.getFirstChildNamed("value");
-                    vvalue = value.getContent();
-                }
-            }
-
-            String conditionid = variable.getAttribute(ATTRIBUTE_CONDITIONID_NAME);
-            if (conditionid != null)
-            {
-                // check if condition for this variable is fulfilled
-                if (!rules.isConditionTrue(conditionid, this.installData))
-                {
-                    continue;
-                }
-            }
-            // are there any OS-Constraints?
-            List<OsModel> osList = OsConstraintHelper.getOsList(variable);
-            if (matcher.matchesCurrentPlatform(osList))
-            {
-                if (vname != null)
-                {
-                    if (vvalue != null)
-                    {
-                        // substitute variables in value field
-                        vvalue = replaceVariables(vvalue);
-
-                        // try to cut out circular references
-                        installData.setVariable(vname, "");
-                        vvalue = replaceVariables(vvalue);
-                    }
-                    // set variable
-                    installData.setVariable(vname, vvalue);
-
-                    // for save this variable to be used later by Automation Helper
-                    this.variables.add(vname);
-                }
-            }
-        }
+        variables = userInputModel.updateVariables(spec);
     }
 
     private void updateDialog()
@@ -458,17 +398,6 @@ public class UserInputPanel extends IzPanel
             }
             this.eventsActivated = true;
         }
-    }
-
-    /**
-     * Helper to replace variables in text.
-     *
-     * @param text the text to perform replacement on. May be {@code null}
-     * @return the text with any variables replaced with their values
-     */
-    private String replaceVariables(String text)
-    {
-        return installData.getVariables().replace(text);
     }
 
 }

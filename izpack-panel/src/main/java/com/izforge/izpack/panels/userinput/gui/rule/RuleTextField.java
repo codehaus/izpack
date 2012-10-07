@@ -27,7 +27,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
-import com.izforge.izpack.panels.userinput.field.rule.FieldSpec;
+import com.izforge.izpack.panels.userinput.rule.rule.FieldSpec;
 
 /*---------------------------------------------------------------------------*/
 
@@ -69,12 +69,12 @@ public class RuleTextField extends JTextField
 
     public int getEditLength()
     {
-        return spec.getEditLength();
+        return spec.getLength();
     }
 
     public boolean unlimitedEdit()
     {
-        return spec.getUnlimitedEdit();
+        return spec.isUnlimitedLength();
     }
 
     public void setColumns(int columns)
@@ -120,7 +120,7 @@ public class RuleTextField extends JTextField
             // --------------------------------------------------
             int totalSize = getLength() + str.length();
 
-            if (spec.getUnlimitedEdit() || totalSize <= spec.getEditLength())
+            if (spec.isUnlimitedLength() || totalSize <= spec.getLength())
             {
                 if (spec.validate(str))
                 {

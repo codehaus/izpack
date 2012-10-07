@@ -37,8 +37,8 @@ public interface Processor
     /**
      * Processes the content of an input field.
      *
-     * @param client the client object using the services of this processor.
-     * @return The result of the encryption.
+     * @param client the client using the services of this processor
+     * @return the result of processing
      * @throws IzPackException if processing fails
      */
     public String process(ProcessingClient client);

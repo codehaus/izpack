@@ -72,6 +72,30 @@ public class ConsolePrompt implements Prompt
     }
 
     /**
+     * Displays a warning message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    @Override
+    public void warn(String title, String message)
+    {
+        message(Type.WARNING, title, message);
+    }
+
+    /**
+     * Displays an error message.
+     *
+     * @param title   the message title. May be {@code null}
+     * @param message the message display
+     */
+    @Override
+    public void error(String title, String message)
+    {
+        message(Type.ERROR, title, message);
+    }
+
+    /**
      * Displays a confirmation message.
      *
      * @param type    the type of the message
