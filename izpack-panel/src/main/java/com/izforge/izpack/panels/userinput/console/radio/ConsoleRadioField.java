@@ -23,8 +23,8 @@ package com.izforge.izpack.panels.userinput.console.radio;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleChoiceField;
-import com.izforge.izpack.panels.userinput.rule.radio.RadioChoice;
-import com.izforge.izpack.panels.userinput.rule.radio.RadioField;
+import com.izforge.izpack.panels.userinput.field.radio.RadioChoice;
+import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.util.Console;
 
 /**

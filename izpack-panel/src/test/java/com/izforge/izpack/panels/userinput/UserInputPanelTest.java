@@ -51,7 +51,7 @@ import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.panels.simplefinish.SimpleFinishPanel;
 import com.izforge.izpack.panels.test.AbstractPanelTest;
 import com.izforge.izpack.panels.test.TestGUIPanelContainer;
-import com.izforge.izpack.panels.userinput.rule.Choice;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.test.Container;
 
 

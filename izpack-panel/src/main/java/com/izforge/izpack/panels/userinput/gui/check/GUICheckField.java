@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.check.CheckField;
+import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

@@ -24,7 +24,7 @@ package com.izforge.izpack.panels.userinput.gui.space;
 import javax.swing.JPanel;
 
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.space.Spacer;
+import com.izforge.izpack.panels.userinput.field.space.Spacer;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

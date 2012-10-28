@@ -23,8 +23,8 @@ package com.izforge.izpack.panels.userinput.console.combo;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleChoiceField;
-import com.izforge.izpack.panels.userinput.rule.Choice;
-import com.izforge.izpack.panels.userinput.rule.combo.ComboField;
+import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.util.Console;
 
 /**

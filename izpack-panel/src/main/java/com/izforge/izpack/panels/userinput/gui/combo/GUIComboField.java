@@ -26,8 +26,8 @@ import java.awt.event.ItemListener;
 
 import javax.swing.JComboBox;
 
-import com.izforge.izpack.panels.userinput.rule.Choice;
-import com.izforge.izpack.panels.userinput.rule.combo.ComboField;
+import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

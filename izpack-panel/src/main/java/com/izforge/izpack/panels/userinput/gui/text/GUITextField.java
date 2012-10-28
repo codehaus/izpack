@@ -26,8 +26,8 @@ import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
 
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
-import com.izforge.izpack.panels.userinput.rule.text.TextField;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

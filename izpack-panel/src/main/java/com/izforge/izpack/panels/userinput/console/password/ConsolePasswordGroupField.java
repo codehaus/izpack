@@ -25,9 +25,9 @@ import java.util.List;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleField;
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
-import com.izforge.izpack.panels.userinput.rule.password.PasswordField;
-import com.izforge.izpack.panels.userinput.rule.password.PasswordGroupField;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.password.PasswordField;
+import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
 import com.izforge.izpack.panels.userinput.gui.password.PasswordGroup;
 import com.izforge.izpack.util.Console;
 

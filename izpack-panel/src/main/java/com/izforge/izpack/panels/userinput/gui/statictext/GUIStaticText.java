@@ -21,7 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.gui.statictext;
 
-import com.izforge.izpack.panels.userinput.rule.statictext.StaticText;
+import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

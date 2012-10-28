@@ -27,7 +27,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
-import com.izforge.izpack.panels.userinput.rule.rule.FieldSpec;
+import com.izforge.izpack.panels.userinput.field.rule.FieldSpec;
 
 /*---------------------------------------------------------------------------*/
 

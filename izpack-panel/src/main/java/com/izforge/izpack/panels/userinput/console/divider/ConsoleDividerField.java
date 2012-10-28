@@ -23,7 +23,7 @@ package com.izforge.izpack.panels.userinput.console.divider;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleField;
-import com.izforge.izpack.panels.userinput.rule.Field;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.util.Console;
 
 /**

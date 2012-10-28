@@ -169,7 +169,7 @@ public class Console
      */
     public String prompt(String prompt, String eof)
     {
-        return prompt(prompt, (String) null, eof);
+        return prompt(prompt, "", eof);
     }
 
     /**

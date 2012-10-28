@@ -27,10 +27,10 @@ import java.util.List;
 import javax.swing.JPasswordField;
 
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.Field;
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
-import com.izforge.izpack.panels.userinput.rule.password.PasswordField;
-import com.izforge.izpack.panels.userinput.rule.password.PasswordGroupField;
+import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.password.PasswordField;
+import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

@@ -27,8 +27,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.Alignment;
-import com.izforge.izpack.panels.userinput.rule.divider.Divider;
+import com.izforge.izpack.panels.userinput.field.Alignment;
+import com.izforge.izpack.panels.userinput.field.divider.Divider;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 /**

@@ -49,8 +49,8 @@ import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
-import com.izforge.izpack.panels.userinput.rule.file.MultipleFileField;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.file.MultipleFileField;
 
 
 public class MultipleFileInputField extends JPanel implements ActionListener, FocusListener

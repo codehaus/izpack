@@ -23,7 +23,7 @@ package com.izforge.izpack.panels.userinput.console.check;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleField;
-import com.izforge.izpack.panels.userinput.rule.check.CheckField;
+import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.util.Console;
 
 

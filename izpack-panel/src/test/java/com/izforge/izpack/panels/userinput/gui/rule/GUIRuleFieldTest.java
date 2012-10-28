@@ -36,9 +36,9 @@ import com.izforge.izpack.core.factory.DefaultObjectFactory;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
 import com.izforge.izpack.installer.data.GUIInstallData;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleField;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleFormat;
-import com.izforge.izpack.panels.userinput.rule.rule.TestDefaultIPProcessor;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
+import com.izforge.izpack.panels.userinput.field.rule.TestDefaultIPProcessor;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.util.Platforms;
 

@@ -31,8 +31,8 @@ import javax.swing.JRadioButton;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.radio.RadioChoice;
-import com.izforge.izpack.panels.userinput.rule.radio.RadioField;
+import com.izforge.izpack.panels.userinput.field.radio.RadioChoice;
+import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

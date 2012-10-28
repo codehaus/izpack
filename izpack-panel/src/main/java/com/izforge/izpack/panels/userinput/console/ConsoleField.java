@@ -24,8 +24,8 @@ package com.izforge.izpack.panels.userinput.console;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
-import com.izforge.izpack.panels.userinput.rule.AbstractFieldView;
-import com.izforge.izpack.panels.userinput.rule.Field;
+import com.izforge.izpack.panels.userinput.field.AbstractFieldView;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.util.Console;
 
 

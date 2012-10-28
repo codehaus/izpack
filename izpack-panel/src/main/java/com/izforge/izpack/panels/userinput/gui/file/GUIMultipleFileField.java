@@ -24,7 +24,7 @@ package com.izforge.izpack.panels.userinput.gui.file;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
-import com.izforge.izpack.panels.userinput.rule.file.MultipleFileField;
+import com.izforge.izpack.panels.userinput.field.file.MultipleFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

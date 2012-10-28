@@ -33,8 +33,8 @@ import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.Alignment;
-import com.izforge.izpack.panels.userinput.rule.title.TitleField;
+import com.izforge.izpack.panels.userinput.field.Alignment;
+import com.izforge.izpack.panels.userinput.field.title.TitleField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 /**

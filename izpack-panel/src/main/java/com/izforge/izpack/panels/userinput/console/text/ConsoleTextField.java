@@ -23,7 +23,7 @@ package com.izforge.izpack.panels.userinput.console.text;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleInputField;
-import com.izforge.izpack.panels.userinput.rule.text.TextField;
+import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.util.Console;
 
 

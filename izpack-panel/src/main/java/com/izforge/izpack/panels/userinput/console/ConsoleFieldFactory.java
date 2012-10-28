@@ -32,16 +32,16 @@ import com.izforge.izpack.panels.userinput.console.password.ConsolePasswordGroup
 import com.izforge.izpack.panels.userinput.console.radio.ConsoleRadioField;
 import com.izforge.izpack.panels.userinput.console.rule.ConsoleRuleField;
 import com.izforge.izpack.panels.userinput.console.text.ConsoleTextField;
-import com.izforge.izpack.panels.userinput.rule.Field;
-import com.izforge.izpack.panels.userinput.rule.check.CheckField;
-import com.izforge.izpack.panels.userinput.rule.combo.ComboField;
-import com.izforge.izpack.panels.userinput.rule.divider.Divider;
-import com.izforge.izpack.panels.userinput.rule.file.DirField;
-import com.izforge.izpack.panels.userinput.rule.file.FileField;
-import com.izforge.izpack.panels.userinput.rule.password.PasswordGroupField;
-import com.izforge.izpack.panels.userinput.rule.radio.RadioField;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleField;
-import com.izforge.izpack.panels.userinput.rule.text.TextField;
+import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.check.CheckField;
+import com.izforge.izpack.panels.userinput.field.combo.ComboField;
+import com.izforge.izpack.panels.userinput.field.divider.Divider;
+import com.izforge.izpack.panels.userinput.field.file.DirField;
+import com.izforge.izpack.panels.userinput.field.file.FileField;
+import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
+import com.izforge.izpack.panels.userinput.field.radio.RadioField;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.util.Console;
 
 

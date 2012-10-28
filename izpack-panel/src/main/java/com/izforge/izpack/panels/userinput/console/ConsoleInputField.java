@@ -22,8 +22,8 @@
 package com.izforge.izpack.panels.userinput.console;
 
 import com.izforge.izpack.api.handler.Prompt;
-import com.izforge.izpack.panels.userinput.rule.Field;
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.util.Console;
 
 /**

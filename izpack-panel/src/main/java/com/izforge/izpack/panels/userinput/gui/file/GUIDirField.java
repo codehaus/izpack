@@ -24,8 +24,8 @@ package com.izforge.izpack.panels.userinput.gui.file;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.rule.file.DirField;
-import com.izforge.izpack.panels.userinput.rule.file.DirFieldView;
+import com.izforge.izpack.panels.userinput.field.file.DirField;
+import com.izforge.izpack.panels.userinput.field.file.DirFieldView;
 
 
 /**

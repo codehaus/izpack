@@ -38,8 +38,8 @@ import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.rule.file.AbstractFileField;
-import com.izforge.izpack.panels.userinput.rule.file.FileFieldView;
+import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
+import com.izforge.izpack.panels.userinput.field.file.FileFieldView;
 
 public class FileInputField extends JPanel implements ActionListener
 {

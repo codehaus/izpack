@@ -24,8 +24,8 @@ package com.izforge.izpack.panels.userinput.console;
 import java.util.List;
 
 import com.izforge.izpack.api.handler.Prompt;
-import com.izforge.izpack.panels.userinput.rule.Choice;
-import com.izforge.izpack.panels.userinput.rule.ChoiceField;
+import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.ChoiceField;
 import com.izforge.izpack.util.Console;
 
 

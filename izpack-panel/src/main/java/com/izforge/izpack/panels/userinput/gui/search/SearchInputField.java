@@ -40,9 +40,9 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.GUIPrompt;
 import com.izforge.izpack.installer.gui.InstallerFrame;
-import com.izforge.izpack.panels.userinput.rule.search.ResultType;
-import com.izforge.izpack.panels.userinput.rule.search.SearchField;
-import com.izforge.izpack.panels.userinput.rule.search.SearchType;
+import com.izforge.izpack.panels.userinput.field.search.ResultType;
+import com.izforge.izpack.panels.userinput.field.search.SearchField;
+import com.izforge.izpack.panels.userinput.field.search.SearchType;
 
 /**
  * This class encapsulates a lot of search field functionality.

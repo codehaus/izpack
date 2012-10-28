@@ -24,7 +24,7 @@ package com.izforge.izpack.panels.userinput.gui.file;
 import java.io.File;
 
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.rule.file.AbstractFileField;
+import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 

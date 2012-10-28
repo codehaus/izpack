@@ -35,10 +35,10 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import com.izforge.izpack.gui.FlowLayout;
-import com.izforge.izpack.panels.userinput.rule.rule.FieldLayout;
-import com.izforge.izpack.panels.userinput.rule.rule.FieldSpec;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleField;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleFormat;
+import com.izforge.izpack.panels.userinput.field.rule.FieldLayout;
+import com.izforge.izpack.panels.userinput.field.rule.FieldSpec;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 
 /**
  * This class assists the user in entering serial numbers. <BR>

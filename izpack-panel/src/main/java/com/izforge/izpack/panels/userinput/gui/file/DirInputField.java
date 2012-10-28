@@ -25,7 +25,7 @@ import javax.swing.JFileChooser;
 
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.rule.file.DirFieldView;
+import com.izforge.izpack.panels.userinput.field.file.DirFieldView;
 
 public class DirInputField extends FileInputField
 {

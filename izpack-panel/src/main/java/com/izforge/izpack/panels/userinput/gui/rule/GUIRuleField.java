@@ -23,9 +23,9 @@ package com.izforge.izpack.panels.userinput.gui.rule;
 
 import javax.swing.JTextField;
 
-import com.izforge.izpack.panels.userinput.rule.Field;
-import com.izforge.izpack.panels.userinput.rule.ValidationStatus;
-import com.izforge.izpack.panels.userinput.rule.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
+import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 
