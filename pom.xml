@@ -9,7 +9,7 @@
 
     <artifactId>izpack</artifactId>
     <groupId>org.codehaus.izpack</groupId>
-    <version>5.0.0-beta11</version>
+    <version>5.0.0-rc1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>IzPack parent</name>
@@ -686,7 +686,7 @@
         <connection>scm:git:git://git.codehaus.org/izpack.git</connection>
         <developerConnection>scm:git:ssh://git@git.codehaus.org/izpack.git</developerConnection>
         <url>http://git.codehaus.org/gitweb.cgi?p=izpack.git</url>
-      <tag>izpack-5.0.0-beta11</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <licenses>
