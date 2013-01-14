@@ -19,10 +19,13 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.console.check;
+package com.izforge.izpack.panels.userinput.console.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -34,17 +37,19 @@ import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
-import com.izforge.izpack.panels.userinput.field.check.CheckField;
+import com.izforge.izpack.panels.userinput.console.combo.ConsoleComboField;
+import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.test.util.TestConsole;
 import com.izforge.izpack.util.Platforms;
 
 
 /**
- * Tests the {@link ConsoleCheckField}.
+ * Tests the {@link ConsoleFileField}.
  *
  * @author Tim Anderson
  */
-public class ConsoleCheckFieldTest
+public class ConsoleFileFieldTest
 {
 
     /**
@@ -63,9 +68,14 @@ public class ConsoleCheckFieldTest
     private final Prompt prompt;
 
     /**
+     * The choices.
+     */
+    private List<Choice> choices;
+
+    /**
      * Default constructor.
      */
-    public ConsoleCheckFieldTest()
+    public ConsoleFileFieldTest()
     {
         installData = new AutomatedInstallData(new DefaultVariables(), Platforms.HP_UX);
         RulesEngine rules = new RulesEngineImpl(new ConditionContainer(new DefaultContainer()),
@@ -73,6 +83,8 @@ public class ConsoleCheckFieldTest
         console = new TestConsole();
         prompt = new ConsolePrompt(console);
         installData.setRules(rules);
+
+        choices = Arrays.asList(new Choice("A", "A String"), new Choice("B", "B String"), new Choice("C", "C String"));
     }
 
     /**
@@ -81,70 +93,32 @@ public class ConsoleCheckFieldTest
     @Test
     public void testSelectDefaultValue()
     {
-        String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
-        ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
+        String variable = "combo";
+        ComboField model = new ComboField(variable, choices, 1, null, null, "Some label", "Select the choice",
+                                          installData);
+        ConsoleComboField field = new ConsoleComboField(model, console, prompt);
 
         console.addScript("Select default", "\n");
         assertTrue(field.display());
 
-        assertEquals("selected", installData.getVariable(variable));
+        assertEquals("B", installData.getVariable(variable));
     }
 
     /**
-     * Tests setting the state from deselected to selected.
+     * Tests selection of a choice.
      */
     @Test
     public void testSelect()
     {
-        String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "false", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
-        ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
+        String variable = "combo";
+        ComboField model = new ComboField(variable, choices, -1, null, null, "Some label", "Select the choice",
+                                          installData);
+        ConsoleComboField field = new ConsoleComboField(model, console, prompt);
 
-
-        console.addScript("Select", "1\n");
+        console.addScript("Select C", "2");
         assertTrue(field.display());
 
-        assertEquals("selected", installData.getVariable(variable));
-    }
-
-    /**
-     * Tests setting the state from selected to deselected.
-     */
-    @Test
-    public void testDeselect()
-    {
-        String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
-        ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
-
-
-        console.addScript("Deselect", "0\n");
-        assertTrue(field.display());
-
-        assertEquals("unselected", installData.getVariable(variable));
-    }
-
-    /**
-     * Tests setting the state from selected to deselected.
-     */
-    @Test
-    public void testReselect()
-    {
-        String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
-        ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
-
-
-        console.addScript("Deselect", "0\n");
-        console.addScript("Redo", "1\n");
-        assertTrue(field.display());
-
-        assertEquals("unselected", installData.getVariable(variable));
+        assertEquals("C", installData.getVariable(variable));
     }
 
 }

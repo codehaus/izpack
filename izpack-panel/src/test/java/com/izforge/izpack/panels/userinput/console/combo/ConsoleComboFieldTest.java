@@ -65,6 +65,10 @@ public class ConsoleComboFieldTest
      * The prompt.
      */
     private final Prompt prompt;
+
+    /**
+     * The choices.
+     */
     private List<Choice> choices;
 
     /**
