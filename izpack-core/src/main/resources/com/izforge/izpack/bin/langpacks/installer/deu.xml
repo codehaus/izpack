@@ -105,7 +105,7 @@
     <str id="TargetPanel.notwritable"
          txt="Sie haben ein Ziel eingegeben, welches nicht beschreibbar ist! Bitte wählen Sie ein anderes Verzeichnis aus!"/>
     <str id="TargetPanel.incompatibleInstallation"
-         txt="Inkompatible Installation erkannt. Siese zuerst deinstallieren, oder ein anderes Installations-Verzeichnis wählen."/>
+         txt="Eine inkompatible Installation wurde erkannt. Deinstallieren sie diese oder wählen Sie ein anderes Installations-Verzeichnis."/>
 
     <!-- JDKPathPanel strings -->
 
