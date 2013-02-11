@@ -115,7 +115,7 @@ public class UserInputPanelConsoleHelperTest
 
         installData.setVariable("text3value", "text3 default value");
 
-        ConsolePanels panels = createPanels(UserInputPanel.class);
+        ConsolePanels panels = createPanels(UserInputPanel.class, "ruleinput");
 
         console.addScript("text1", "text1 value");
         console.addScript("text2", "\n");
@@ -140,7 +140,7 @@ public class UserInputPanelConsoleHelperTest
 
         installData.setVariable("text3value", "text3 default value");
 
-        ConsolePanels panels = createPanels(UserInputPanel.class);
+        ConsolePanels panels = createPanels(UserInputPanel.class, "textinput");
 
         console.addScript("text1", "text1 value");
         console.addScript("text2", "\n");
@@ -170,7 +170,7 @@ public class UserInputPanelConsoleHelperTest
         // create a dynamic variable that will be updated with the value of the address field
         installData.getVariables().add(new DynamicVariableImpl("dynamicMasterAddress", "${address}"));
 
-        ConsolePanels panels = createPanels(UserInputPanel.class);
+        ConsolePanels panels = createPanels(UserInputPanel.class, "userinputAddress");
 
         console.addScript("Select address", "myhost");
         console.addScript("Continue", "1");
@@ -189,12 +189,14 @@ public class UserInputPanelConsoleHelperTest
      * implementation.
      *
      * @param panelClass the panel class
+     * @param id         the panel identifier
      * @return a new {@code ConsolePanels}
      */
-    private ConsolePanels createPanels(Class panelClass)
+    private ConsolePanels createPanels(Class panelClass, String id)
     {
         Panel panel = new Panel();
         panel.setClassName(panelClass.getName());
+        panel.setPanelId(id);
         ConsolePanelView panelView = new ConsolePanelView(panel, factory, installData, console);
         ConsolePanels panels = new ConsolePanels(Arrays.asList(panelView), installData.getVariables());
         container.addComponent(ConsolePanels.class, panels);

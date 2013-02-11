@@ -48,6 +48,16 @@ public class UserInputPanelSpec
 {
 
     /**
+     * The name of the XML file that specifies the panel layout.
+     */
+    public static final String SPEC_FILE_NAME = "userInputSpec.xml";
+
+    /**
+     * Panel element name.
+     */
+    public static final String PANEL = "panel";
+
+    /**
      * Provides access to the XML configuration.
      */
     private final Config config;
@@ -68,31 +78,9 @@ public class UserInputPanelSpec
     private final PlatformModelMatcher matcher;
 
     /**
-     * {@link InstallData#getAttribute(String) Installation data attribute name} that tracks the number of
-     * UserInputPanel panels that have been created in order to associate the correct panel specification with the
-     * right panel.
-     */
-    private static final String PANEL_COUNT = "UserInputPanel.instanceCount";
-
-    /**
-     * The name of the XML file that specifies the panel layout.
-     */
-    private static final String SPEC_FILE_NAME = "userInputSpec.xml";
-
-    /**
      * The user input language pack resource name.
      */
     private static final String LANG_FILE_NAME = "userInputLang.xml";
-
-    /**
-     * Panel attribute name.
-     */
-    private static final String PANEL = "panel";
-
-    /**
-     * The panel order attribute name.
-     */
-    private static final String ORDER = "order";
 
     /**
      * The panel identifier attribute name
@@ -187,20 +175,14 @@ public class UserInputPanelSpec
      */
     public IXMLElement getPanelSpec(Panel panel)
     {
-        // extract the spec to this specific panel instance
-        Integer count = (Integer) installData.getAttribute(PANEL_COUNT);
-        count = (count == null) ? 0 : count + 1;
-
-        String instance = Integer.toString(count);
         String panelId = panel.getPanelId();
         List<IXMLElement> panels = config.getRoot().getChildrenNamed(PANEL);
         IXMLElement result = null;
         for (IXMLElement spec : panels)
         {
-            String order = spec.getAttribute(ORDER);
             String id = spec.getAttribute(PANEL_IDENTIFIER);
 
-            if ((order != null && instance.equals(order)) || (id != null && panelId != null && panelId.equals(id)))
+            if (id != null && panelId != null && panelId.equals(id))
             {
                 // use the current element as spec
                 result = spec;
@@ -209,10 +191,8 @@ public class UserInputPanelSpec
         }
         if (result == null)
         {
-            throw new IzPackException("No user input specification with " + PANEL_IDENTIFIER + "=" + panelId
-                                              + " or " + ORDER + "=" + instance);
+            throw new IzPackException("No user input specification with " + PANEL_IDENTIFIER + "=" + panelId);
         }
-        installData.setAttribute(PANEL_COUNT, count);
         return result;
     }
 

@@ -24,6 +24,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
@@ -41,6 +43,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.factory.ObjectFactory;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.data.DynamicVariableImpl;
@@ -48,6 +51,7 @@ import com.izforge.izpack.core.resource.ResourceManager;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
+import com.izforge.izpack.installer.gui.IzPanelView;
 import com.izforge.izpack.panels.simplefinish.SimpleFinishPanel;
 import com.izforge.izpack.panels.test.AbstractPanelTest;
 import com.izforge.izpack.panels.test.TestGUIPanelContainer;
@@ -101,7 +105,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         InstallData installData = getInstallData();
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("ruleinput");
 
         JTextComponentFixture rule1 = frame.textBox("rule1.1");
         assertEquals("192", rule1.text());
@@ -140,7 +144,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         installData.setVariable("text3value", "text3 default value");
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("textinput");
 
         JTextComponentFixture text1 = frame.textBox("text1");
         assertEquals("", text1.text());
@@ -181,7 +185,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         installData.setVariable("combo2", "value3"); // should select the 3rd value
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("comboinput");
 
         // for combo1, the initial selection is determined by the 'set' attribute
         checkCombo("combo1", "value2", frame);
@@ -221,7 +225,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         InstallData installData = getInstallData();
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("radioinput");
 
         // for radioA, the initial selection is determined by the 'set' attribute
         checkRadioButton("radioA.1", false, frame);
@@ -262,7 +266,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         InstallData installData = getInstallData();
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("passwordinput");
 
         // for passwordA, the initial value is determined by the 'set' attribute
         JTextComponentFixture passwordA1 = frame.textBox("passwordA.1");
@@ -317,7 +321,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         installData.setVariable("check6", "check6unset");
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("checkinput");
 
         checkCheckBox("check1", true, frame);
         checkCheckBox("check2", false, frame);
@@ -358,7 +362,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         assertTrue(new File(path, "dir2").mkdir());
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("searchinput");
 
         JComboBoxFixture search1 = frame.comboBox("search1");
         assertEquals(-1, search1.component().getSelectedIndex());
@@ -389,7 +393,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         assertTrue(new File(path, "fileB").createNewFile());
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("fileinput");
 
         JTextComponentFixture file1 = frame.textBox("file1");
         String expected = new File(path, "fileB").getPath();
@@ -422,7 +426,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         assertTrue(fileC.createNewFile());
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("multifileinput");
 
         frame.button(GuiId.BUTTON_BROWSE.id).click();
         DialogFixture dialog = frame.dialog(Timeout.timeout(10000));
@@ -464,7 +468,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         assertTrue(new File(path, "dirB").mkdir());
 
         // show the panel
-        FrameFixture frame = showUserInputPanel();
+        FrameFixture frame = showUserInputPanel("dirinput");
 
         JTextComponentFixture dir1 = frame.textBox("dir1");
         String expected = new File(path, "dirB").getPath();
@@ -494,7 +498,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         installData.getVariables().add(new DynamicVariableImpl("dynamicMasterAddress", "${address}"));
 
         // show the panel
-        FrameFixture fixture = showUserInputPanel();
+        FrameFixture fixture = showUserInputPanel("userinputAddress");
 
         JTextComponentFixture address = fixture.textBox();
         assertEquals("localhost", address.text());
@@ -593,12 +597,35 @@ public class UserInputPanelTest extends AbstractPanelTest
      * @return the frame fixture
      * @throws InterruptedException if interrupted waiting for the frame to display
      */
-    private FrameFixture showUserInputPanel() throws InterruptedException
+    private FrameFixture showUserInputPanel(String id) throws InterruptedException
     {
-        FrameFixture fixture = show(UserInputPanel.class, SimpleFinishPanel.class);
+        FrameFixture fixture = show(createPanel(UserInputPanel.class, id), createPanel(SimpleFinishPanel.class));
         Thread.sleep(2000);
         assertTrue(getPanels().getView() instanceof UserInputPanel);
         return fixture;
+    }
+
+    private FrameFixture show(Panel... panels)
+    {
+        List<IzPanelView> panelViews = new ArrayList<IzPanelView>();
+        for (Panel panel : panels)
+        {
+            panelViews.add(createPanelView(panel));
+        }
+        return show(panelViews);
+    }
+
+    private Panel createPanel(Class panelClass)
+    {
+        return createPanel(panelClass, null);
+    }
+
+    private Panel createPanel(Class panelClass, String id)
+    {
+        Panel panel = new Panel();
+        panel.setPanelId(id);
+        panel.setClassName(panelClass.getName());
+        return panel;
     }
 
 }

@@ -50,8 +50,7 @@
                             </xs:element>
                             <xs:element name="field" type="fieldType" maxOccurs="unbounded"/>
                         </xs:sequence>
-                        <xs:attribute name="order" type="xs:unsignedByte" use="optional"/>
-                        <xs:attribute name="id" type="xs:string" use="optional"/>
+                        <xs:attribute name="id" type="xs:string" use="required"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
