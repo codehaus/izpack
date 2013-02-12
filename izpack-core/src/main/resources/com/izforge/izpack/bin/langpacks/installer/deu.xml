@@ -54,7 +54,7 @@
     <str id="installer.step" txt="Schritt"/>
     <str id="installer.of" txt="von"/>
     <str id="installer.Message" txt="Meldung"/>
-    <str id="installer.uninstall.writefailed" txt="Schreiben der Deinstallations Information fehlgeschlagen."/>
+    <str id="installer.uninstall.writefailed" txt="Schreiben der Deinstallationsinformation fehlgeschlagen."/>
 
     <!-- Uninstaller specific strings -->
     <str id="uninstaller.warning" txt="Jetzt werden die installierten Anwendungen entfernt!"/>
