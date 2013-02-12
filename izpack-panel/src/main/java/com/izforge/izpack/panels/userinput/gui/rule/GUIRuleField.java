@@ -23,6 +23,7 @@ package com.izforge.izpack.panels.userinput.gui.rule;
 
 import javax.swing.JTextField;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
@@ -96,10 +97,11 @@ public class GUIRuleField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         boolean result = false;
         Field field = getField();
@@ -111,7 +113,7 @@ public class GUIRuleField extends GUIField
         }
         else if (status.getMessage() != null)
         {
-            warning(status.getMessage());
+            prompt.warn(status.getMessage());
         }
         return result;
     }

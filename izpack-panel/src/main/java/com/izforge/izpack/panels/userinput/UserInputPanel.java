@@ -93,6 +93,12 @@ public class UserInputPanel extends IzPanel
      */
     private final Prompt prompt;
 
+    /**
+     * The delegating prompt. This is used to switch between the above prompt and a no-op prompt when performing
+     * updates.
+     */
+    private final DelegatingPrompt delegatingPrompt;
+
     private UserInputPanelSpec userInputModel;
 
     /*--------------------------------------------------------------------------*/
@@ -109,7 +115,7 @@ public class UserInputPanel extends IzPanel
     /*--------------------------------------------------------------------------*/
 
     /**
-     * Constructs an <code>UserInputPanel</code>.
+     * Constructs an {@code UserInputPanel}.
      *
      * @param panel       the panel meta-data
      * @param parent      the parent IzPack installer frame
@@ -129,6 +135,7 @@ public class UserInputPanel extends IzPanel
         this.factory = factory;
         this.matcher = matcher;
         this.prompt = prompt;
+        this.delegatingPrompt = new DelegatingPrompt(prompt);
     }
 
     /**
@@ -140,7 +147,7 @@ public class UserInputPanel extends IzPanel
     @Override
     public boolean isValidated()
     {
-        return readInput();
+        return readInput(prompt);
     }
 
     /**
@@ -181,7 +188,6 @@ public class UserInputPanel extends IzPanel
                 Dimension size = getMaximumSize();
                 setSize(size.width, size.height);
                 validate();
-                parent.lockPrevButton();
             }
         }
     }
@@ -268,7 +274,7 @@ public class UserInputPanel extends IzPanel
         // for its type, then an appropriate member function
         // is called that will create the correct UI elements.
         // ----------------------------------------------------
-        GUIFieldFactory viewFactory = new GUIFieldFactory(installData, this, parent, prompt);
+        GUIFieldFactory viewFactory = new GUIFieldFactory(installData, this, parent, delegatingPrompt);
         UpdateListener listener = new UpdateListener()
         {
             @Override
@@ -346,15 +352,18 @@ public class UserInputPanel extends IzPanel
     /**
      * Reads the input installDataGUI from all UI elements and sets the associated variables.
      *
-     * @return <code>true</code> if the operation is successful, otherwise <code>false</code>.
+     * @param prompt the prompt to display messages
+     * @return {@code true} if the operation is successful, otherwise {@code false}.
      */
-    private boolean readInput()
+    private boolean readInput(Prompt prompt)
     {
+        delegatingPrompt.setPrompt(prompt);
+
         for (GUIField view : views)
         {
             if (view.isDisplayed())
             {
-                if (!view.updateField())
+                if (!view.updateField(prompt))
                 {
                     return false;
                 }
@@ -385,7 +394,7 @@ public class UserInputPanel extends IzPanel
         if (this.eventsActivated)
         {
             this.eventsActivated = false;
-            if (isValidated())
+            if (readInput(LoggingPrompt.INSTANCE)) // read from the input fields, but don't display a prompt for errors
             {
                 // read input
                 // and update elements

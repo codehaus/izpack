@@ -1,10 +1,10 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,42 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.handler;
+package com.izforge.izpack.panels.userinput;
+
+import com.izforge.izpack.api.handler.Prompt;
 
 /**
- * Prompts users for a value or informs them of something.
+ * Implementation of {@link Prompt} that delegates all requests to another prompt.
+ * The underlying prompt may be switched.
  *
  * @author Tim Anderson
  */
-public interface Prompt
+public class DelegatingPrompt implements Prompt
 {
+
     /**
-     * The prompt type.
+     * The prompt to delegate to.
      */
-    enum Type
+    private Prompt prompt;
+
+    /**
+     * Constructs a {@code DelegatingPrompt}.
+     *
+     * @param prompt the prompt to delegate to
+     */
+    public DelegatingPrompt(Prompt prompt)
     {
-        INFORMATION, QUESTION, WARNING, ERROR
+        this.prompt = prompt;
     }
 
     /**
-     * A prompt option.
+     * Registers the prompt to delegate to.
+     *
+     * @param prompt the prompt
      */
-    enum Option
+    public void setPrompt(Prompt prompt)
     {
-        OK, YES, NO, CANCEL
-    }
-
-    /**
-     * Predefined options.
-     */
-    enum Options
-    {
-        OK_CANCEL, YES_NO, YES_NO_CANCEL
+        this.prompt = prompt;
     }
 
     /**
@@ -58,7 +63,11 @@ public interface Prompt
      * @param type    the type of the message
      * @param message the message to display
      */
-    void message(Type type, String message);
+    @Override
+    public void message(Type type, String message)
+    {
+        prompt.message(type, message);
+    }
 
     /**
      * Displays a message.
@@ -67,14 +76,22 @@ public interface Prompt
      * @param title   the message title. If {@code null}, the title will be determined from the type
      * @param message the message to display
      */
-    void message(Type type, String title, String message);
+    @Override
+    public void message(Type type, String title, String message)
+    {
+        prompt.message(type, title, message);
+    }
 
     /**
      * Displays a warning message.
      *
      * @param message the message to display
      */
-    void warn(String message);
+    @Override
+    public void warn(String message)
+    {
+        prompt.warn(message);
+    }
 
     /**
      * Displays a warning message.
@@ -82,14 +99,22 @@ public interface Prompt
      * @param title   the message title. May be {@code null}
      * @param message the message to display
      */
-    void warn(String title, String message);
+    @Override
+    public void warn(String title, String message)
+    {
+        prompt.warn(title, message);
+    }
 
     /**
      * Displays an error message.
      *
      * @param message the message to display
      */
-    void error(String message);
+    @Override
+    public void error(String message)
+    {
+        prompt.error(message);
+    }
 
     /**
      * Displays an error message.
@@ -97,7 +122,11 @@ public interface Prompt
      * @param title   the message title. May be {@code null}
      * @param message the message display
      */
-    void error(String title, String message);
+    @Override
+    public void error(String title, String message)
+    {
+        prompt.error(title, message);
+    }
 
     /**
      * Displays a confirmation message.
@@ -107,7 +136,11 @@ public interface Prompt
      * @param options the options which may be selected
      * @return the selected option
      */
-    Option confirm(Type type, String message, Options options);
+    @Override
+    public Option confirm(Type type, String message, Options options)
+    {
+        return prompt.confirm(type, message, options);
+    }
 
     /**
      * Displays a confirmation message.
@@ -118,7 +151,11 @@ public interface Prompt
      * @param defaultOption the default option to select
      * @return the selected option
      */
-    Option confirm(Type type, String message, Options options, Option defaultOption);
+    @Override
+    public Option confirm(Type type, String message, Options options, Option defaultOption)
+    {
+        return prompt.confirm(type, message, options, defaultOption);
+    }
 
     /**
      * Displays a confirmation message.
@@ -129,7 +166,11 @@ public interface Prompt
      * @param options the options which may be selected
      * @return the selected option
      */
-    Option confirm(Type type, String title, String message, Options options);
+    @Override
+    public Option confirm(Type type, String title, String message, Options options)
+    {
+        return prompt.confirm(type, title, message, options);
+    }
 
     /**
      * Displays a confirmation message.
@@ -141,6 +182,9 @@ public interface Prompt
      * @param defaultOption the default option to select
      * @return the selected option
      */
-    Option confirm(Type type, String title, String message, Options options, Option defaultOption);
-
+    @Override
+    public Option confirm(Type type, String title, String message, Options options, Option defaultOption)
+    {
+        return prompt.confirm(type, title, message, options, defaultOption);
+    }
 }

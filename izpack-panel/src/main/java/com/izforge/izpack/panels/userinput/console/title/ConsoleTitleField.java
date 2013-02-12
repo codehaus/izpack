@@ -1,10 +1,10 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.console.divider;
+package com.izforge.izpack.panels.userinput.console.title;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleField;
@@ -27,20 +27,20 @@ import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.util.Console;
 
 /**
- * Console divider field.
+ * Console title field.
  *
  * @author Tim Anderson
  */
-public class ConsoleDividerField extends ConsoleField
+public class ConsoleTitleField extends ConsoleField
 {
 
     /**
-     * Constructs a {@code ConsoleDividerField}.
+     * Constructs a {@code ConsoleTitleField}.
      *
      * @param field   the field
      * @param console the console
      */
-    public ConsoleDividerField(Field field, Console console, Prompt prompt)
+    public ConsoleTitleField(Field field, Console console, Prompt prompt)
     {
         super(field, console, prompt);
     }
@@ -53,7 +53,11 @@ public class ConsoleDividerField extends ConsoleField
     @Override
     public boolean display()
     {
-        println("------------------------------------------");
+        String title = getField().getLabel();
+        if (title != null) {
+            println(title);
+            println("");
+        }
         return true;
     }
 }

@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.gui.file;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
@@ -72,10 +73,11 @@ public class GUIMultipleFileField extends GUIField
      * <p/>
      * This implementation simply returns {@code true}.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         boolean result = fileInput.validateField();
         if (result)

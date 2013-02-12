@@ -36,6 +36,7 @@ import com.izforge.izpack.core.factory.DefaultObjectFactory;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
 import com.izforge.izpack.installer.data.GUIInstallData;
+import com.izforge.izpack.panels.userinput.LoggingPrompt;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 import com.izforge.izpack.panels.userinput.field.rule.TestDefaultIPProcessor;
@@ -101,17 +102,17 @@ public class GUIRuleFieldTest
         assertEquals("0", values[2]);
         assertEquals("1", values[3]);
 
-        assertTrue(field.updateField());
+        assertTrue(field.updateField(LoggingPrompt.INSTANCE));
 
         assertEquals("192.168.0.1", installData.getVariable(variable));
 
         field.setValues("127", "0", "0", "1");
-        assertTrue(field.updateField());
+        assertTrue(field.updateField(LoggingPrompt.INSTANCE));
         assertEquals("127.0.0.1", installData.getVariable(variable));
 
         // the following is a bit ridiculous but highlights that a minimum length can't be specified for a field
         field.setValues("", "", "", "");
-        assertTrue(field.updateField());
+        assertTrue(field.updateField(LoggingPrompt.INSTANCE));
         assertEquals("...", installData.getVariable(variable));
     }
 
@@ -131,7 +132,7 @@ public class GUIRuleFieldTest
         assertEquals("192.168.0.1", field.getValue());
 
         assertNull(installData.getVariable("variable1"));
-        assertTrue(field.updateField());
+        assertTrue(field.updateField(LoggingPrompt.INSTANCE));
         assertEquals("192.168.0.1", installData.getVariable(variable));
     }
 }

@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
@@ -91,10 +92,11 @@ public class GUICheckField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         CheckField field = getField();
         if (checkbox.isSelected())

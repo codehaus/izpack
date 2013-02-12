@@ -30,6 +30,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
 
 import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.radio.RadioChoice;
 import com.izforge.izpack.panels.userinput.field.radio.RadioField;
@@ -119,10 +120,11 @@ public class GUIRadioField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         for (RadioChoiceView view : choices)
         {

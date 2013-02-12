@@ -31,7 +31,10 @@ import com.izforge.izpack.panels.userinput.console.file.ConsoleFileField;
 import com.izforge.izpack.panels.userinput.console.password.ConsolePasswordGroupField;
 import com.izforge.izpack.panels.userinput.console.radio.ConsoleRadioField;
 import com.izforge.izpack.panels.userinput.console.rule.ConsoleRuleField;
+import com.izforge.izpack.panels.userinput.console.spacer.ConsoleSpacerField;
+import com.izforge.izpack.panels.userinput.console.staticText.ConsoleStaticText;
 import com.izforge.izpack.panels.userinput.console.text.ConsoleTextField;
+import com.izforge.izpack.panels.userinput.console.title.ConsoleTitleField;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
@@ -41,7 +44,10 @@ import com.izforge.izpack.panels.userinput.field.file.FileField;
 import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
 import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.space.Spacer;
+import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
+import com.izforge.izpack.panels.userinput.field.title.TitleField;
 import com.izforge.izpack.util.Console;
 
 
@@ -117,9 +123,21 @@ public class ConsoleFieldFactory
         {
             result = new ConsoleRuleField((RuleField) field, console, prompt);
         }
+        else if (field instanceof Spacer)
+        {
+            result = new ConsoleSpacerField(field, console, prompt);
+        }
+        else if (field instanceof StaticText)
+        {
+            result = new ConsoleStaticText(field, console, prompt);
+        }
         else if (field instanceof TextField)
         {
             result = new ConsoleTextField((TextField) field, console, prompt);
+        }
+        else if (field instanceof TitleField)
+        {
+            result = new ConsoleTitleField(field, console, prompt);
         }
         else
         {

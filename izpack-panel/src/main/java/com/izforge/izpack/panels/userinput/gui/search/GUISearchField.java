@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.FlowLayout;
@@ -121,10 +122,11 @@ public class GUISearchField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         getField().setValue(searchInputField.getResult());
         return true;

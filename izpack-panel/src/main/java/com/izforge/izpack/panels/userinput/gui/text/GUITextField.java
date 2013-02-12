@@ -26,6 +26,7 @@ import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
@@ -76,10 +77,11 @@ public class GUITextField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         boolean result = false;
         String text = this.text.getText();
@@ -96,7 +98,7 @@ public class GUITextField extends GUIField
             {
                 message = "Text entered did not pass validation.";
             }
-            warning(message);
+            warning(message, prompt);
         }
         return result;
     }

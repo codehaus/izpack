@@ -23,6 +23,7 @@ package com.izforge.izpack.panels.userinput.gui.file;
 
 import java.io.File;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
@@ -53,10 +54,11 @@ public abstract class AbstractGUIFileField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         boolean result = false;
         if (fileInput.validateField())
@@ -94,7 +96,14 @@ public abstract class AbstractGUIFileField extends GUIField
     protected void init(FileInputField inputField)
     {
         this.fileInput = inputField;
-        addLabel();
-        addComponent(inputField, new TwoColumnConstraints(TwoColumnConstraints.EAST));
+        if (getField().getLabel() != null)
+        {
+            addLabel();
+            addComponent(inputField, new TwoColumnConstraints(TwoColumnConstraints.EAST));
+        }
+        else
+        {
+            addComponent(inputField, new TwoColumnConstraints(TwoColumnConstraints.BOTH));
+        }
     }
 }

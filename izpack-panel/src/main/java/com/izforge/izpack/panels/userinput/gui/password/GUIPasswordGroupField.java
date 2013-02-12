@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.swing.JPasswordField;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
@@ -74,10 +75,11 @@ public class GUIPasswordGroupField extends GUIField
     /**
      * Updates the field from the view.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         boolean result = false;
         Field field = getField();
@@ -93,12 +95,12 @@ public class GUIPasswordGroupField extends GUIField
             }
             catch (Throwable exception)
             {
-                warning(exception.getMessage());
+                warning(exception.getMessage(), prompt);
             }
         }
         else
         {
-            warning(status.getMessage());
+            warning(status.getMessage(), prompt);
         }
         return result;
     }

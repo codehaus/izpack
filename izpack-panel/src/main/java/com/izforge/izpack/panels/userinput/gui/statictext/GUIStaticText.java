@@ -26,7 +26,7 @@ import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 
 /**
- * Static text view.
+ * GUI Static text.
  *
  * @author Tim Anderson
  */
@@ -34,14 +34,14 @@ public class GUIStaticText extends GUIField
 {
 
     /**
-     * Constructs a {@code GUIStaticTextView}.
+     * Constructs a {@code GUIStaticText}.
      *
      * @param field the field
      */
     public GUIStaticText(StaticText field)
     {
         super(field);
-        addDescription();
+        addText(getField().getLabel());
     }
 
 }

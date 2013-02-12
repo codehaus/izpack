@@ -33,7 +33,6 @@ import javax.swing.UIManager;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
-import com.izforge.izpack.gui.GUIPrompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.AbstractFieldView;
 import com.izforge.izpack.panels.userinput.field.Field;
@@ -74,9 +73,10 @@ public abstract class GUIField extends AbstractFieldView
      * <p/>
      * This implementation simply returns {@code true}.
      *
+     * @param prompt the prompt to display messages
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
-    public boolean updateField()
+    public boolean updateField(Prompt prompt)
     {
         return true;
     }
@@ -158,11 +158,24 @@ public abstract class GUIField extends AbstractFieldView
 
     /**
      * Adds a field description to the list of UI elements.
+     * <p/>
+     * The description spans both columns.
      */
     protected void addDescription()
     {
-        String description = getField().getDescription();
-        if (description != null)
+        addText(getField().getDescription());
+    }
+
+    /**
+     * Adds a static text field.
+     * <p/>
+     * The text spans both columns and may include html.
+     *
+     * @param text the text. May be {@code null}
+     */
+    protected void addText(String text)
+    {
+        if (text != null)
         {
             TwoColumnConstraints constraints = new TwoColumnConstraints(TwoColumnConstraints.BOTH);
             constraints.stretch = true;
@@ -174,12 +187,12 @@ public abstract class GUIField extends AbstractFieldView
 
             // If html tags are present enable html rendering, otherwise the JTextPane
             // looks exactly like MultiLineLabel.
-            if (description.startsWith("<html>") && description.endsWith("</html>"))
+            if (text.startsWith("<html>") && text.endsWith("</html>"))
             {
                 label.setContentType("text/html");
                 label.addHyperlinkListener(new HyperlinkHandler());
             }
-            label.setText(description);
+            label.setText(text);
 
             // Background color and font to match the label's.
             label.setBackground(UIManager.getColor("label.background"));
@@ -228,12 +241,12 @@ public abstract class GUIField extends AbstractFieldView
      * Show localized warning message dialog basing on given parameters.
      *
      * @param message the message to print out in dialog box.
+     * @param prompt  the prompt to use
      */
-    protected void warning(String message)
+    protected void warning(String message, Prompt prompt)
     {
         Messages messages = getInstallData().getMessages();
-        GUIPrompt prompt = new GUIPrompt();
-        prompt.message(Prompt.Type.WARNING, messages.get("UserInputPanel.error.caption"), message);
+        prompt.warn(messages.get("UserInputPanel.error.caption"), message);
     }
 
     /**

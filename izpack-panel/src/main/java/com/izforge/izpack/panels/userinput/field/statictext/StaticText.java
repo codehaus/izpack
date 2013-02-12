@@ -24,7 +24,6 @@ package com.izforge.izpack.panels.userinput.field.statictext;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
 
 /**
  * Static text field.
@@ -41,7 +40,7 @@ public class StaticText extends Field
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public StaticText(SimpleFieldReader reader, InstallData installData)
+    public StaticText(StaticTextFieldReader reader, InstallData installData)
     {
         super(reader, installData);
     }

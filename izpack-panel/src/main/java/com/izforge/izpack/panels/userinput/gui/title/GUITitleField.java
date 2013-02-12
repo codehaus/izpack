@@ -51,7 +51,7 @@ public class GUITitleField extends GUIField
     private static final Logger logger = Logger.getLogger(GUITitleField.class.getName());
 
     /**
-     * Constructs a  {@code GUITitleField}.
+     * Constructs a {@code GUITitleField}.
      *
      * @param field       the field
      * @param installData the installation data
