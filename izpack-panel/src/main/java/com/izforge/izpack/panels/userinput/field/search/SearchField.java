@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -70,19 +70,19 @@ public class SearchField extends Field
     /**
      * Constructs a {@code SearchField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public SearchField(SearchFieldReader reader, InstallData installData)
+    public SearchField(SearchFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        filename = reader.getFilename();
-        checkFilename = reader.getCheckFilename();
-        type = reader.getSearchType();
-        resultType = reader.getResultType();
-        choices = reader.getChoices();
-        selected = reader.getSelectedIndex();
+        super(config, installData);
+        filename = config.getFilename();
+        checkFilename = config.getCheckFilename();
+        type = config.getSearchType();
+        resultType = config.getResultType();
+        choices = config.getChoices();
+        selected = config.getSelectedIndex();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -36,12 +36,13 @@ public class FileField extends AbstractFileField
     /**
      * Constructs a {@code FileField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public FileField(FileFieldReader reader, InstallData installData)
+    public FileField(FileFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
+        super(config, installData);
     }
+
 }

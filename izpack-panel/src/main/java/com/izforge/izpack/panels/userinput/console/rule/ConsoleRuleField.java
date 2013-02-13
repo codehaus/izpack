@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -23,6 +23,7 @@ package com.izforge.izpack.panels.userinput.console.rule;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.console.ConsoleInputField;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.util.Console;
 
@@ -46,4 +47,15 @@ public class ConsoleRuleField extends ConsoleInputField
         super(field, console, prompt);
     }
 
+    /**
+     * Validates a value.
+     *
+     * @param value the value to validate
+     * @return the validation status
+     */
+    @Override
+    protected ValidationStatus validate(String value)
+    {
+        return ((RuleField) getField()).validateFormatted(value);
+    }
 }

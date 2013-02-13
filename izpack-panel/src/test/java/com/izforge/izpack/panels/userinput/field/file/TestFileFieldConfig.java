@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.izforge.izpack.panels.userinput.field.file;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.Config;
-import com.izforge.izpack.panels.userinput.field.FieldReader;
+import com.izforge.izpack.panels.userinput.field.TestFieldConfig;
 
 
 /**
- * File field reader functionality.
+ * Implementation of {@code FileFieldConfig} for testing.
  *
  * @author Tim Anderson
  */
-public abstract class AbstractFileFieldReader extends FieldReader implements FileFieldConfig
+public class TestFileFieldConfig extends TestFieldConfig implements FileFieldConfig
 {
 
     /**
-     * Constructs an {@code AbstractFileFieldReader}.
-     *
-     * @param field  the field element
-     * @param config the configuration
+     * Determines if empty input is allowed.
      */
-    public AbstractFileFieldReader(IXMLElement field, Config config)
+    private boolean allowEmptyInput;
+
+
+    /**
+     * Constructs a {@code TestFileFieldConfig}.
+     *
+     * @param variable the variable
+     */
+    public TestFileFieldConfig(String variable)
     {
-        super(field, config);
+        super(variable);
     }
 
     /**
@@ -50,9 +52,10 @@ public abstract class AbstractFileFieldReader extends FieldReader implements Fil
      *
      * @return the file extension. May be {@code null}
      */
+    @Override
     public String getFileExtension()
     {
-        return getConfig().getString(getSpec(), "fileext", null);
+        return null;
     }
 
     /**
@@ -60,11 +63,10 @@ public abstract class AbstractFileFieldReader extends FieldReader implements Fil
      *
      * @return the file extension description. May be {@code null}
      */
+    @Override
     public String getFileExtensionDescription()
     {
-        Config config = getConfig();
-        String result = config.getString(getSpec(), "fileext", null);
-        return config.getLocalString(result);
+        return null;
     }
 
     /**
@@ -72,8 +74,19 @@ public abstract class AbstractFileFieldReader extends FieldReader implements Fil
      *
      * @return {@code true} if empty input values are allowed
      */
+    @Override
     public boolean getAllowEmptyValue()
     {
-        return getConfig().getBoolean(getSpec(), "allowEmptyValue", false);
+        return false;
+    }
+
+    /**
+     * Determines if empty input values are allowed.
+     *
+     * @param allow if {@code true}, allow empty input values
+     */
+    public void setAllowEmptyValue(boolean allow)
+    {
+        allowEmptyInput = allow;
     }
 }

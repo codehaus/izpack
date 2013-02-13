@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -65,17 +65,17 @@ public class MultipleFileField extends AbstractFileField
     /**
      * Constructs a {@code MultipleFileField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public MultipleFileField(MultipleFileFieldReader reader, InstallData installData)
+    public MultipleFileField(MultipleFileFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        visibleRows = reader.getVisibleRows();
-        width = reader.getPreferredWidth();
-        height = reader.getPreferredHeight();
-        multipleVariables = reader.getCreateMultipleVariables();
+        super(config, installData);
+        visibleRows = config.getVisibleRows();
+        width = config.getPreferredWidth();
+        height = config.getPreferredHeight();
+        multipleVariables = config.getCreateMultipleVariables();
         variables.add(getVariable());
     }
 

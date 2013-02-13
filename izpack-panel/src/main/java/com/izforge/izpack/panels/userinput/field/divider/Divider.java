@@ -42,15 +42,15 @@ public class Divider extends Field
     /**
      * Constructs a {@code DividerField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the configuration to get field information from
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public Divider(DividerReader reader, InstallData installData)
+    public Divider(DividerConfig config, InstallData installData)
     {
-        super(reader, installData);
+        super(config, installData);
 
-        alignment = reader.getAlignment();
+        alignment = config.getAlignment();
     }
 
     /**

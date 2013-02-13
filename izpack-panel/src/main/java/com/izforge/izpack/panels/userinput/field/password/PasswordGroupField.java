@@ -37,7 +37,7 @@ public class PasswordGroupField extends Field
 {
 
     /**
-     * The password field.
+     * The password fields.
      */
     private final List<PasswordField> fields;
 
@@ -45,14 +45,14 @@ public class PasswordGroupField extends Field
     /**
      * Constructs a {@code PasswordGroupField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the configuration to get field information from
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public PasswordGroupField(PasswordGroupFieldReader reader, InstallData installData)
+    public PasswordGroupField(PasswordGroupFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        this.fields = reader.getPasswordFields();
+        super(config, installData);
+        this.fields = config.getPasswordFields();
     }
 
     /**

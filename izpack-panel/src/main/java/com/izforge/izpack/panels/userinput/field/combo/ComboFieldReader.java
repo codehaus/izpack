@@ -29,8 +29,9 @@ import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldReader;
+import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.Config;
+import com.izforge.izpack.panels.userinput.field.FieldReader;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 
 
@@ -39,7 +40,7 @@ import com.izforge.izpack.panels.userinput.processor.Processor;
  *
  * @author Tim Anderson
  */
-public class ComboFieldReader extends ChoiceFieldReader<Choice>
+public class ComboFieldReader extends FieldReader implements ChoiceFieldConfig<Choice>
 {
 
     /**

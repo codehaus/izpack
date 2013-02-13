@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -24,10 +24,10 @@ package com.izforge.izpack.panels.userinput.field.space;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
+import com.izforge.izpack.panels.userinput.field.FieldConfig;
 
 /**
- * Space field.
+ * Field spacer.
  *
  * @author Tim Anderson
  */
@@ -35,14 +35,14 @@ public class Spacer extends Field
 {
 
     /**
-     * Constructs a {@code SpaceField}.
+     * Constructs a {@code Spacer}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public Spacer(SimpleFieldReader reader, InstallData installData)
+    public Spacer(FieldConfig config, InstallData installData)
     {
-        super(reader, installData);
+        super(config, installData);
     }
 }

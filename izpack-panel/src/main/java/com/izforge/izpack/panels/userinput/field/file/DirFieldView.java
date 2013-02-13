@@ -59,14 +59,20 @@ public class DirFieldView extends FileFieldView
     protected boolean validate(File value)
     {
         boolean result;
+        DirField field = getField();
         if (value.isDirectory())
         {
             result = true;
         }
+        else if (value.isFile() || field.getMustExist())
+        {
+            error(getMessage("UserInputPanel.dir.notdirectory.caption"),
+                  getMessage("UserInputPanel.dir.notdirectory.message"));
+            result = false;
+        }
         else
         {
-            DirField field = getField();
-            result = !field.getMustExist() && (!field.getCreate() || initDir(value));
+            result = !field.getCreate() || initDir(value);
         }
         return result;
     }

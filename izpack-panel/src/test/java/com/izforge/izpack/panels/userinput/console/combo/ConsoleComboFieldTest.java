@@ -38,6 +38,7 @@ import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
 import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.choice.TestChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.test.util.TestConsole;
 import com.izforge.izpack.util.Platforms;
@@ -93,8 +94,7 @@ public class ConsoleComboFieldTest
     public void testSelectDefaultValue()
     {
         String variable = "combo";
-        ComboField model = new ComboField(variable, choices, 1, null, null, "Some label", "Select the choice",
-                                          installData);
+        ComboField model = new ComboField(new TestChoiceFieldConfig<Choice>(variable, choices, 1), installData);
         ConsoleComboField field = new ConsoleComboField(model, console, prompt);
 
         console.addScript("Select default", "\n");
@@ -110,8 +110,7 @@ public class ConsoleComboFieldTest
     public void testSelect()
     {
         String variable = "combo";
-        ComboField model = new ComboField(variable, choices, -1, null, null, "Some label", "Select the choice",
-                                          installData);
+        ComboField model = new ComboField(new TestChoiceFieldConfig<Choice>(variable, choices, 1), installData);
         ConsoleComboField field = new ConsoleComboField(model, console, prompt);
 
         console.addScript("Select C", "2");

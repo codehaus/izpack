@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +18,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.izforge.izpack.panels.userinput.field.file;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.Config;
-
-
 /**
- * Directory field reader.
+ * Implementation of {@code DirFieldConfig} for testing.
  *
  * @author Tim Anderson
  */
-public class DirFieldReader extends AbstractFileFieldReader implements DirFieldConfig
+public class TestDirFieldConfig extends TestFileFieldConfig implements DirFieldConfig
 {
 
     /**
-     * Constructs a {@code DirFieldReader}.
-     *
-     * @param field  the field element
-     * @param config the configuration
+     * Determines if the directory must exist.
      */
-    public DirFieldReader(IXMLElement field, Config config)
+    private boolean mustExist;
+
+    /**
+     * Determines if the directory can be created.
+     */
+    private boolean create;
+
+
+    /**
+     * Constructs a {@code TestDirFieldConfig}.
+     *
+     * @param variable the variable
+     */
+    public TestDirFieldConfig(String variable)
     {
-        super(field, config);
+        super(variable);
     }
 
     /**
@@ -49,19 +54,41 @@ public class DirFieldReader extends AbstractFileFieldReader implements DirFieldC
      *
      * @return {@code true} if the directories must exist
      */
+    @Override
     public boolean getMustExist()
     {
-        return getConfig().getBoolean(getSpec(), "mustExist", true);
+        return mustExist;
     }
+
+    /**
+     * Determines if directories must exist.
+     *
+     * @param mustExist if {@code true} if the directories must exist
+     */
+    public void setMustExist(boolean mustExist)
+    {
+        this.mustExist = mustExist;
+    }
+
 
     /**
      * Determines if directories can be created if they don't exist.
      *
      * @return {@code true} if directories can be created if they don't exist
      */
+    @Override
     public boolean getCreate()
     {
-        return getConfig().getBoolean(getSpec(), "create", false);
+        return create;
     }
 
+    /**
+     * Determines if directories can be created if they don't exist.
+     *
+     * @param create if {@code true} create directories if they don't exist
+     */
+    public void setCreate(boolean create)
+    {
+        this.create = create;
+    }
 }

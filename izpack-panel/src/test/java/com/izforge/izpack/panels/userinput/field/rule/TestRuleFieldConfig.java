@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,46 @@
 
 package com.izforge.izpack.panels.userinput.field.rule;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.Config;
-import com.izforge.izpack.panels.userinput.field.FieldReader;
+import com.izforge.izpack.panels.userinput.field.TestFieldConfig;
 
 
 /**
- * Rule field reader.
+ * Implementation of {@link RuleFieldConfig} for testing purposes.
  *
  * @author Tim Anderson
  */
-public class RuleFieldReader extends FieldReader implements RuleFieldConfig
+public class TestRuleFieldConfig extends TestFieldConfig implements RuleFieldConfig
 {
 
     /**
-     * Constructs a {@code RuleFieldReader}.
-     *
-     * @param field the field element
-     * @param config the configuration
+     * The field layout.
      */
-    public RuleFieldReader(IXMLElement field, Config config)
+    private final String layout;
+
+    /**
+     * The field separator.
+     */
+    private final String separator;
+
+    /**
+     * The rule format.
+     */
+    private final RuleFormat format;
+
+    /**
+     * Constructs a {@code TestRuleFieldConfig}.
+     *
+     * @param variable  the variable
+     * @param layout    the field layout
+     * @param separator the field separator
+     * @param format    the rule format
+     */
+    public TestRuleFieldConfig(String variable, String layout, String separator, RuleFormat format)
     {
-        super(field, config);
+        super(variable);
+        this.layout = layout;
+        this.separator = separator;
+        this.format = format;
     }
 
     /**
@@ -50,9 +68,10 @@ public class RuleFieldReader extends FieldReader implements RuleFieldConfig
      *
      * @return the field layout
      */
+    @Override
     public String getLayout()
     {
-        return getConfig().getAttribute(getSpec(), "layout");
+        return layout;
     }
 
     /**
@@ -62,9 +81,10 @@ public class RuleFieldReader extends FieldReader implements RuleFieldConfig
      *
      * @return the field separator. May be {@code null}
      */
+    @Override
     public String getSeparator()
     {
-        return getSpec().getAttribute("separator");
+        return separator;
     }
 
     /**
@@ -72,9 +92,9 @@ public class RuleFieldReader extends FieldReader implements RuleFieldConfig
      *
      * @return the field format
      */
+    @Override
     public RuleFormat getFormat()
     {
-        RuleFormat result = RuleFormat.fromString(getSpec().getAttribute("resultFormat"));
-        return (result == null) ? RuleFormat.DISPLAY_FORMAT : result;
+        return format;
     }
 }

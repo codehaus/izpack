@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -59,15 +59,15 @@ public class DirField extends AbstractFileField
     /**
      * Constructs a {@code DirField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public DirField(DirFieldReader reader, InstallData installData)
+    public DirField(DirFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        mustExist = reader.getMustExist();
-        create = reader.getCreate();
+        super(config, installData);
+        mustExist = config.getMustExist();
+        create = config.getCreate();
     }
 
     /**

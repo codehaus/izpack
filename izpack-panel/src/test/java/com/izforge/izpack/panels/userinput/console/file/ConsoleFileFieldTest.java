@@ -22,26 +22,32 @@
 package com.izforge.izpack.panels.userinput.console.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.handler.Prompt;
+import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.container.DefaultContainer;
 import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
-import com.izforge.izpack.panels.userinput.console.combo.ConsoleComboField;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.combo.ComboField;
+import com.izforge.izpack.panels.userinput.field.file.FileField;
+import com.izforge.izpack.panels.userinput.field.file.TestFileFieldConfig;
 import com.izforge.izpack.test.util.TestConsole;
 import com.izforge.izpack.util.Platforms;
+import com.izforge.izpack.util.file.FileUtils;
 
 
 /**
@@ -68,9 +74,10 @@ public class ConsoleFileFieldTest
     private final Prompt prompt;
 
     /**
-     * The choices.
+     * Test file.
      */
-    private List<Choice> choices;
+    private File file;
+
 
     /**
      * Default constructor.
@@ -78,47 +85,126 @@ public class ConsoleFileFieldTest
     public ConsoleFileFieldTest()
     {
         installData = new AutomatedInstallData(new DefaultVariables(), Platforms.HP_UX);
+        installData.setMessages(Mockito.mock(Messages.class));
         RulesEngine rules = new RulesEngineImpl(new ConditionContainer(new DefaultContainer()),
                                                 installData.getPlatform());
         console = new TestConsole();
         prompt = new ConsolePrompt(console);
         installData.setRules(rules);
-
-        choices = Arrays.asList(new Choice("A", "A String"), new Choice("B", "B String"), new Choice("C", "C String"));
     }
 
     /**
-     * Tests selection of the default value.
+     * Sets up the test.
+     *
+     * @throws IOException for any error
+     */
+    @Before
+    public void aetUp() throws IOException
+    {
+        file = FileUtils.createTempFile("foo", "bar");
+    }
+
+    /**
+     * Cleans up after the test.
+     */
+    @After
+    public void tearDown()
+    {
+        assertTrue(file.delete());
+    }
+
+
+    /**
+     * Verifies that pressing return enters the default value.
      */
     @Test
     public void testSelectDefaultValue()
     {
-        String variable = "combo";
-        ComboField model = new ComboField(variable, choices, 1, null, null, "Some label", "Select the choice",
-                                          installData);
-        ConsoleComboField field = new ConsoleComboField(model, console, prompt);
+        ConsoleFileField field = createField(file.getPath());
+        checkValid(field, "\n");
 
-        console.addScript("Select default", "\n");
-        assertTrue(field.display());
+        assertEquals(file.getAbsolutePath(), installData.getVariable("file"));
+    }
 
-        assertEquals("B", installData.getVariable(variable));
+    @Test
+    public void testSetValue()
+    {
+        ConsoleFileField field = createField(null);
+        checkValid(field, file.getPath(), "\n");
+
+        assertEquals(file.getAbsolutePath(), installData.getVariable("file"));
     }
 
     /**
-     * Tests selection of a choice.
+     * Verify that validation fails if the entered file doesn't exist.
+     *
+     * @throws IOException for any I/O error
      */
     @Test
-    public void testSelect()
+    public void testFileNoExists() throws IOException
     {
-        String variable = "combo";
-        ComboField model = new ComboField(variable, choices, -1, null, null, "Some label", "Select the choice",
-                                          installData);
-        ConsoleComboField field = new ConsoleComboField(model, console, prompt);
-
-        console.addScript("Select C", "2");
-        assertTrue(field.display());
-
-        assertEquals("C", installData.getVariable(variable));
+        ConsoleFileField field = createField(null);
+        checkInvalid(field, "badfile");
+        assertNull(installData.getVariable("file"));
     }
+
+    /**
+     * Verify that validation fails if the entered path is a directory.
+     *
+     * @throws IOException for any I/O error
+     */
+    @Test
+    public void testInvalidDir() throws IOException
+    {
+        ConsoleFileField field = createField(null);
+
+        File dir = FileUtils.createTempFile("foo", "bar");
+        assertTrue(dir.delete());
+        assertTrue(dir.mkdir());
+        checkInvalid(field, dir.getPath());
+        assertNull(installData.getVariable("file"));
+
+        assertTrue(dir.delete());
+    }
+
+    /**
+     * Runs the specified script for the field, and ensures its valid.
+     *
+     * @param field  the field
+     * @param script the script to run
+     */
+    private void checkValid(ConsoleFileField field, String... script)
+    {
+        console.addScript("Valid script", script);
+        assertTrue(field.display());
+    }
+
+    /**
+     * Runs the specified script for the field, and ensures its valid.
+     *
+     * @param field  the field
+     * @param script the script to run
+     */
+    private void checkInvalid(ConsoleFileField field, String... script)
+    {
+        console.addScript("Invalid script", script);
+        assertFalse(field.display());
+    }
+
+    /**
+     * Helper to create a field that updates the 'file' variable.
+     *
+     * @param defaultValue the default value. May be {@code null}
+     * @return a new field
+     */
+    private ConsoleFileField createField(String defaultValue)
+    {
+        TestFileFieldConfig config = new TestFileFieldConfig("file");
+        config.setLabel("Enter file: ");
+        config.setDefaultValue(defaultValue);
+        FileField model = new FileField(config, installData);
+        return new ConsoleFileField(model, console, prompt);
+    }
+
 
 }

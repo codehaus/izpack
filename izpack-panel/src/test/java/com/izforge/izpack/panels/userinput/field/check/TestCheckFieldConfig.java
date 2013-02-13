@@ -1,10 +1,10 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,40 @@
 
 package com.izforge.izpack.panels.userinput.field.check;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.Config;
-import com.izforge.izpack.panels.userinput.field.FieldReader;
+import com.izforge.izpack.panels.userinput.field.TestFieldConfig;
 
 
 /**
- * A reader for 'check' fields.
+ * Implementation of {@link CheckFieldConfig} for testing purposes.
  *
  * @author Tim Anderson
  */
-public class CheckFieldReader extends FieldReader implements CheckFieldConfig
+public class TestCheckFieldConfig extends TestFieldConfig implements CheckFieldConfig
 {
 
     /**
-     * Constructs a {@code CheckFieldReader}.
-     *
-     * @param field  the field element
-     * @param config the configuration
+     * The value to assign to the variable when the checkbox is selected.
      */
-    public CheckFieldReader(IXMLElement field, Config config)
+    private String trueValue;
+
+    /**
+     * The value to assign to the variable when the checkbox is not selected.
+     */
+    private String falseValue;
+
+
+    /**
+     * Constructs a {@code TestCheckFieldConfig}.
+     *
+     * @param variable   the variable
+     * @param trueValue  the value to assign to the variable when the checkbox is selected
+     * @param falseValue the value to assign to the variable when the checkbox is not selected
+     */
+    public TestCheckFieldConfig(String variable, String trueValue, String falseValue)
     {
-        super(field, config);
+        super(variable);
+        this.trueValue = trueValue;
+        this.falseValue = falseValue;
     }
 
     /**
@@ -50,9 +62,10 @@ public class CheckFieldReader extends FieldReader implements CheckFieldConfig
      *
      * @return the 'true' value. May be {@code null}
      */
+    @Override
     public String getTrueValue()
     {
-        return getConfig().getString(getSpec(), "true", null);
+        return trueValue;
     }
 
     /**
@@ -60,8 +73,9 @@ public class CheckFieldReader extends FieldReader implements CheckFieldConfig
      *
      * @return the 'false' value
      */
+    @Override
     public String getFalseValue()
     {
-        return getConfig().getString(getSpec(), "false", null);
+        return falseValue;
     }
 }

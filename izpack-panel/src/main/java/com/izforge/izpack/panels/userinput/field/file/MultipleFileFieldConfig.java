@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,66 +21,40 @@
 
 package com.izforge.izpack.panels.userinput.field.file;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.Config;
-
-
 /**
- * Multiple file field reader.
+ *
+ * Multiple file field configuration.
  *
  * @author Tim Anderson
  */
-public class MultipleFileFieldReader extends AbstractFileFieldReader implements MultipleFileFieldConfig
+public interface MultipleFileFieldConfig extends FileFieldConfig
 {
-
-    /**
-     * Constructs a {@code MultipleFileFieldReader}.
-     *
-     * @param field  the field element
-     * @param config the configuration
-     */
-    public MultipleFileFieldReader(IXMLElement field, Config config)
-    {
-        super(field, config);
-    }
 
     /**
      * Returns the number of visible rows.
      *
      * @return the number of visible rows, or {@code -1} if none is specified
      */
-    public int getVisibleRows()
-    {
-        return getConfig().getInt(getSpec(), "visibleRows", -1);
-    }
+    int getVisibleRows();
 
     /**
      * Returns the preferred width of the field.
      *
      * @return the preferred width, or {@code -1} if none is specified
      */
-    public int getPreferredWidth()
-    {
-        return getConfig().getInt(getSpec(), "prefX", -1);
-    }
+    int getPreferredWidth();
 
     /**
      * Returns the preferred width of the field.
      *
      * @return the preferred height, or {@code -1} if none is specified
      */
-    public int getPreferredHeight()
-    {
-        return getConfig().getInt(getSpec(), "prefY", -1);
-    }
+    int getPreferredHeight();
 
     /**
      * Determines if multiple variables should be created to hold the selected files.
      *
      * @return {@code true} if multiple variables should be created; {@code false} if a single variable should be used
      */
-    public boolean getCreateMultipleVariables()
-    {
-        return getConfig().getBoolean(getSpec(), "multipleVariables", false);
-    }
+    boolean getCreateMultipleVariables();
 }

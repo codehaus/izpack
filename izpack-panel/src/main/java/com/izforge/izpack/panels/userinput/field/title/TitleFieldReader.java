@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -31,7 +31,7 @@ import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
  *
  * @author Tim Anderson
  */
-public class TitleFieldReader extends SimpleFieldReader
+public class TitleFieldReader extends SimpleFieldReader implements TitleFieldConfig
 {
 
     /**

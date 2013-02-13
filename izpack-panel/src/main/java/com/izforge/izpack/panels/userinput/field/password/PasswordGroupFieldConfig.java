@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,25 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.combo;
+package com.izforge.izpack.panels.userinput.field.password;
 
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceField;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
+import java.util.List;
+
+import com.izforge.izpack.panels.userinput.field.FieldConfig;
 
 
 /**
- * Combo field.
+ * Password group field configuration.
  *
  * @author Tim Anderson
  */
-public class ComboField extends ChoiceField<Choice>
+public interface PasswordGroupFieldConfig extends FieldConfig
 {
 
     /**
-     * Constructs a {@code ComboField}.
+     * Returns the password fields.
      *
-     * @param config the field configuration
-     * @throws IzPackException if the field cannot be read
+     * @return the password fields
      */
-    public ComboField(ChoiceFieldConfig<Choice> config, InstallData installData)
-    {
-        super(config, installData);
-    }
-
+    List<PasswordField> getPasswordFields();
 }

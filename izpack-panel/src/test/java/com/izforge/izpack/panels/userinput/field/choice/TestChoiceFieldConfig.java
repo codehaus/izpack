@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,21 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field;
+package com.izforge.izpack.panels.userinput.field.choice;
 
 import java.util.List;
 
-import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.panels.userinput.field.Choice;
+import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
+import com.izforge.izpack.panels.userinput.field.TestFieldConfig;
 
 
 /**
- * A field with a number of pre-defined choices.
+ * Implementation of {@link ChoiceFieldConfig} for testing purposes.
  *
  * @author Tim Anderson
  */
-public abstract class ChoiceField<T extends Choice> extends Field
+public class TestChoiceFieldConfig<T extends Choice> extends TestFieldConfig implements ChoiceFieldConfig<T>
 {
     /**
      * The available choices.
@@ -39,38 +41,41 @@ public abstract class ChoiceField<T extends Choice> extends Field
     private final List<T> choices;
 
     /**
-     * The selected index.
+     * The selected choice, or {@code -1} if no choice is selected.
      */
     private final int selected;
 
     /**
-     * Constructs a {@code ChoiceField}.
+     * Constructs a {@code TestChoiceFieldConfig}.
      *
-     * @param config      the field configuration
-     * @param installData the installation data
+     * @param variable the variable
+     * @param choices  the available choices
+     * @param selected the initial selection, or {@code -1} if no choice is selected
      */
-    public ChoiceField(ChoiceFieldConfig<T> config, InstallData installData)
+    public TestChoiceFieldConfig(String variable, List<T> choices, int selected)
     {
-        super(config, installData);
-        this.choices = config.getChoices();
-        this.selected = config.getSelectedIndex();
+        super(variable);
+        this.choices = choices;
+        this.selected = selected;
     }
 
     /**
      * Returns the choices.
      *
-     * @return the choices. The key is the choice identifier, the value, the display text
+     * @return the choices
      */
+    @Override
     public List<T> getChoices()
     {
         return choices;
     }
 
     /**
-     * Returns the selected choice.
+     * Returns the index of the selected choice.
      *
-     * @return the selected choice, or {@code -1} if no choice is selected
+     * @return the selected index or {@code -1} if no choice is selected
      */
+    @Override
     public int getSelectedIndex()
     {
         return selected;

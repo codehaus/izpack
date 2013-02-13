@@ -21,14 +21,9 @@
 
 package com.izforge.izpack.panels.userinput.field.check;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.FieldValidator;
 
 
 /**
@@ -52,39 +47,15 @@ public class CheckField extends Field
     /**
      * Constructs a {@code CheckField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the configuration to get field information from
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public CheckField(CheckFieldReader reader, InstallData installData)
+    public CheckField(CheckFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        trueValue = reader.getTrueValue();
-        falseValue = reader.getFalseValue();
-    }
-
-    /**
-     * Constructs a {@code CheckField}.
-     *
-     * @param variable    the variable associated with the field
-     * @param trueValue   assigned to the variable if the check box is selected. May be {@code null}
-     * @param falseValue  assigned to the variable if the check box is unselected. May be {@code null}
-     * @param set         the pre-set value for the field
-     * @param packs       the packs that the field is associated with. If {@code null} or empty,
-     *                    indicates the field applies to all packs
-     * @param models      the operating systems that the field applies to. An empty list indicates it applies to all
-     *                    operating systems
-     * @param label       the field label. May be {@code null}
-     * @param description the field description. May be {@code null}
-     * @param installData the installation data
-     */
-    public CheckField(String variable, String trueValue, String falseValue, String set, List<String> packs,
-                      List<OsModel> models, String label, String description, InstallData installData)
-    {
-        super(variable, set, 0, packs, models, Collections.<FieldValidator>emptyList(), null, label, description,
-              false, null, installData);
-        this.trueValue = trueValue;
-        this.falseValue = falseValue;
+        super(config, installData);
+        trueValue = config.getTrueValue();
+        falseValue = config.getFalseValue();
     }
 
     /**

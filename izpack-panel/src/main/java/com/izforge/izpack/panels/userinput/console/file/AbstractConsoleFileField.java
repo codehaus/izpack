@@ -69,7 +69,8 @@ public class AbstractConsoleFileField extends ConsoleField
         printDescription();
         AbstractFileField field = getField();
         String initialValue = field.getInitialValue();
-        String path = getConsole().prompt(field.getLabel() + " [" + initialValue + "]", null);
+        String prompt = field.getLabel() + "[" + ((initialValue != null) ? initialValue : "") + "] ";
+        String path = getConsole().prompt(prompt, null);
         if (path != null)
         {
             path = path.trim();
@@ -77,7 +78,10 @@ public class AbstractConsoleFileField extends ConsoleField
             {
                 path = initialValue;
             }
-            path = field.getAbsoluteFile(path).toString();
+            if (path != null)
+            {
+                path = field.getAbsoluteFile(path).toString();
+            }
             if (view.validate(path))
             {
                 field.setValue(path);

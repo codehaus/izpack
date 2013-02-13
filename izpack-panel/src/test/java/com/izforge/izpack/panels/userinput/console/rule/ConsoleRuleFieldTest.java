@@ -40,6 +40,7 @@ import com.izforge.izpack.core.rules.RulesEngineImpl;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 import com.izforge.izpack.panels.userinput.field.rule.TestDefaultIPProcessor;
+import com.izforge.izpack.panels.userinput.field.rule.TestRuleFieldConfig;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.test.util.TestConsole;
 import com.izforge.izpack.util.Platforms;
@@ -94,12 +95,14 @@ public class ConsoleRuleFieldTest
     public void testSelectDefaultValue()
     {
         String layout = "N:3:3 . N:3:3 . N:3:3 . N:3:3"; // IP address format
-        String set = "0:192 1:168 2:0 3:1";              // default value
+        String defaultValue = "0:192 1:168 2:0 3:1";
         String separator = null;
-
         String variable = "variable1";
-        RuleField model = new RuleField(variable, layout, RuleFormat.DISPLAY_FORMAT, set, separator, null,
-                                        null, "IP:", "Enter the IP Address", installData, factory);
+
+        TestRuleFieldConfig config = new TestRuleFieldConfig(variable, layout, separator, RuleFormat.DISPLAY_FORMAT);
+        config.setDefaultValue(defaultValue);
+
+        RuleField model = new RuleField(config, installData, factory);
 
         ConsoleRuleField field = new ConsoleRuleField(model, console, prompt);
         console.addScript("Select default", "\n");
@@ -115,12 +118,13 @@ public class ConsoleRuleFieldTest
     public void testIPAddress()
     {
         String layout = "N:3:3 . N:3:3 . N:3:3 . N:3:3"; // IP address format
-        String set = "0:192 1:168 2:0 3:1";              // default value
         String separator = null;
-
         String variable = "variable1";
-        RuleField model = new RuleField(variable, layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null,
-                                        null, null, installData, factory);
+        String defaultValue = "0:192 1:168 2:0 3:1";
+
+        TestRuleFieldConfig config = new TestRuleFieldConfig(variable, layout, separator, RuleFormat.DISPLAY_FORMAT);
+        config.setDefaultValue(defaultValue);
+        RuleField model = new RuleField(config, installData, factory);
 
         ConsoleRuleField field = new ConsoleRuleField(model, console, prompt);
         console.addScript("Set value", "127.0.0.1");
@@ -136,11 +140,14 @@ public class ConsoleRuleFieldTest
     public void testDefaultValueProcessor()
     {
         String layout = "N:3:3 . N:3:3 . N:3:3 . N:3:3"; // IP address format
-        String set = "0::" + TestDefaultIPProcessor.class.getName(); // The processor will be run for the first field
         String variable = "variable1";
         String separator = null;
-        RuleField model = new RuleField(variable, layout, RuleFormat.DISPLAY_FORMAT, set, separator, null, null,
-                                        null, null, installData, factory);
+        String defaultValue = "0::" + TestDefaultIPProcessor.class.getName();
+        // The processor will be run for the first field
+
+        TestRuleFieldConfig config = new TestRuleFieldConfig(variable, layout, separator, RuleFormat.DISPLAY_FORMAT);
+        config.setDefaultValue(defaultValue);
+        RuleField model = new RuleField(config, installData, factory);
         ConsoleRuleField field = new ConsoleRuleField(model, console, prompt);
 
         assertNull(installData.getVariable("variable1"));

@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -25,8 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldReader;
+import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.Config;
+import com.izforge.izpack.panels.userinput.field.FieldReader;
 
 
 /**
@@ -34,7 +35,7 @@ import com.izforge.izpack.panels.userinput.field.Config;
  *
  * @author Tim Anderson
  */
-public class RadioFieldReader extends ChoiceFieldReader<RadioChoice>
+public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<RadioChoice>
 {
     /**
      * The initial selected index.

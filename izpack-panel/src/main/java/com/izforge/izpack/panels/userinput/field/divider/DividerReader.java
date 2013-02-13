@@ -32,7 +32,7 @@ import com.izforge.izpack.panels.userinput.field.SimpleFieldReader;
  *
  * @author Tim Anderson
  */
-public class DividerReader extends SimpleFieldReader
+public class DividerReader extends SimpleFieldReader implements DividerConfig
 {
 
     /**

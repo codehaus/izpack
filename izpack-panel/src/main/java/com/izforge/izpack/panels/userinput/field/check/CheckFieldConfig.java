@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,30 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.combo;
+package com.izforge.izpack.panels.userinput.field.check;
 
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceField;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
+import com.izforge.izpack.panels.userinput.field.FieldConfig;
 
 
 /**
- * Combo field.
+ * Configuration for 'check' fields.
  *
  * @author Tim Anderson
  */
-public class ComboField extends ChoiceField<Choice>
+public interface CheckFieldConfig extends FieldConfig
 {
 
     /**
-     * Constructs a {@code ComboField}.
+     * Returns the value to assign to the associated variable when the checkbox is selected (i.e. is 'true').
      *
-     * @param config the field configuration
-     * @throws IzPackException if the field cannot be read
+     * @return the 'true' value. May be {@code null}
      */
-    public ComboField(ChoiceFieldConfig<Choice> config, InstallData installData)
-    {
-        super(config, installData);
-    }
+    String getTrueValue();
 
+    /**
+     * Returns the value to assign to the associated variable when the checkbox is not selected (i.e. is 'false').
+     *
+     * @return the 'false' value
+     */
+    String getFalseValue();
 }

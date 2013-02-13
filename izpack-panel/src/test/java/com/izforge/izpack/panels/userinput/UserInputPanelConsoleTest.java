@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,13 +46,13 @@ import com.izforge.izpack.test.util.TestConsole;
 
 
 /**
- * Tests the {@link UserInputPanelConsoleHelper}.
+ * Tests the {@link UserInputPanelConsole}.
  *
  * @author Tim Anderson
  */
 @RunWith(PicoRunner.class)
 @Container(TestConsolePanelContainer.class)
-public class UserInputPanelConsoleHelperTest
+public class UserInputPanelConsoleTest
 {
 
     /**
@@ -91,8 +90,8 @@ public class UserInputPanelConsoleHelperTest
      * @param console     the console
      * @param container   the container
      */
-    public UserInputPanelConsoleHelperTest(InstallData installData, ObjectFactory factory, ResourceManager resources,
-                                           TestConsole console, TestConsolePanelContainer container)
+    public UserInputPanelConsoleTest(InstallData installData, ObjectFactory factory, ResourceManager resources,
+                                     TestConsole console, TestConsolePanelContainer container)
     {
         this.installData = installData;
         this.factory = factory;
@@ -106,27 +105,20 @@ public class UserInputPanelConsoleHelperTest
      *
      * @throws Exception for any error
      */
-    @Ignore("Not quite ready yet")
     @Test
     public void testRuleField() throws Exception
     {
         // Set the base path in order to pick up com/izforge/izpack/panels/userinput/rule/userInputSpec.xml
         resources.setResourceBasePath("/com/izforge/izpack/panels/userinput/rule/");
 
-        installData.setVariable("text3value", "text3 default value");
-
         ConsolePanels panels = createPanels(UserInputPanel.class, "ruleinput");
 
-        console.addScript("text1", "text1 value");
-        console.addScript("text2", "\n");
-        console.addScript("text3", "\n");
+        console.addScript("rule1", "127.0.0.1");
         console.addScript("Continue", "1");
 
         assertTrue(panels.next());
 
-        assertEquals("text1 value", installData.getVariable("text1"));
-        assertEquals("text2 value", installData.getVariable("text2"));
-        assertEquals("text3 default value", installData.getVariable("text3"));
+        assertEquals("127.0.0.1", installData.getVariable("rule1"));
     }
 
     /**

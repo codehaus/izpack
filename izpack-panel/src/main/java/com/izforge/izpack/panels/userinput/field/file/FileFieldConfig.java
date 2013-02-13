@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.izforge.izpack.panels.userinput.field.file;
 
-package com.izforge.izpack.panels.userinput.field.combo;
-
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceField;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
+import com.izforge.izpack.panels.userinput.field.FieldConfig;
 
 
 /**
- * Combo field.
+ * File field configuration.
  *
  * @author Tim Anderson
  */
-public class ComboField extends ChoiceField<Choice>
+public interface FileFieldConfig extends FieldConfig
 {
 
     /**
-     * Constructs a {@code ComboField}.
+     * Returns the file extension.
      *
-     * @param config the field configuration
-     * @throws IzPackException if the field cannot be read
+     * @return the file extension. May be {@code null}
      */
-    public ComboField(ChoiceFieldConfig<Choice> config, InstallData installData)
-    {
-        super(config, installData);
-    }
+    String getFileExtension();
+
+    /**
+     * Returns the file extension description.
+     *
+     * @return the file extension description. May be {@code null}
+     */
+    String getFileExtensionDescription();
+
+    /**
+     * Determines if empty input values are allowed.
+     *
+     * @return {@code true} if empty input values are allowed
+     */
+    boolean getAllowEmptyValue();
 
 }

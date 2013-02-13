@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -23,38 +23,25 @@ package com.izforge.izpack.panels.userinput.field;
 
 import java.util.List;
 
-import com.izforge.izpack.api.adaptator.IXMLElement;
-
 
 /**
- * A reader for fields that have a set of pre-defined choices.
+ * Configuration for fields that have a set of pre-defined choices.
  *
  * @author Tim Anderson
  */
-public abstract class ChoiceFieldReader<T extends Choice> extends FieldReader
+public interface ChoiceFieldConfig<T extends Choice> extends FieldConfig
 {
-    /**
-     * Constructs a {@code ChoiceFieldReader}.
-     *
-     * @param field  the field element to read
-     * @param config the configuration
-     */
-    public ChoiceFieldReader(IXMLElement field, Config config)
-    {
-        super(field, config);
-    }
-
     /**
      * Returns the choices.
      *
      * @return the choices
      */
-    public abstract List<T> getChoices();
+    List<T> getChoices();
 
     /**
      * Returns the index of the selected choice.
      *
      * @return the selected index or {@code -1} if no choice is selected
      */
-    public abstract int getSelectedIndex();
+    int getSelectedIndex();
 }

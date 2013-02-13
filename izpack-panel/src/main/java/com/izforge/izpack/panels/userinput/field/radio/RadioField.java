@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -24,6 +24,7 @@ package com.izforge.izpack.panels.userinput.field.radio;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.panels.userinput.field.ChoiceField;
+import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 
 
 /**
@@ -35,15 +36,15 @@ public class RadioField extends ChoiceField<RadioChoice>
 {
 
     /**
-     * Constructs a {@code ComboField}.
+     * Constructs a {@code RadioField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public RadioField(RadioFieldReader reader, InstallData installData)
+    public RadioField(ChoiceFieldConfig<RadioChoice> config, InstallData installData)
     {
-        super(reader, installData);
+        super(config, installData);
     }
 
 }

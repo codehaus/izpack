@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -65,18 +65,18 @@ public class TitleField extends Field
     /**
      * Constructs a {@code TitleField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public TitleField(TitleFieldReader reader, InstallData installData)
+    public TitleField(TitleFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        this.iconId = reader.getIconId();
-        this.bold = reader.isBold();
-        this.italic = reader.isItalic();
-        this.titleSize = reader.getTitleSize();
-        this.alignment = reader.getAlignment();
+        super(config, installData);
+        this.iconId = config.getIconId();
+        this.bold = config.isBold();
+        this.italic = config.isItalic();
+        this.titleSize = config.getTitleSize();
+        this.alignment = config.getAlignment();
     }
 
     /**

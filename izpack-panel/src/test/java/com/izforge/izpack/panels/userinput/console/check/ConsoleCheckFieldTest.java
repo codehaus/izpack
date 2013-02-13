@@ -35,6 +35,7 @@ import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
+import com.izforge.izpack.panels.userinput.field.check.TestCheckFieldConfig;
 import com.izforge.izpack.test.util.TestConsole;
 import com.izforge.izpack.util.Platforms;
 
@@ -82,8 +83,11 @@ public class ConsoleCheckFieldTest
     public void testSelectDefaultValue()
     {
         String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
+
+        TestCheckFieldConfig config = new TestCheckFieldConfig(variable, "selected", "unselected");
+        config.setDefaultValue("true");
+
+        CheckField model = new CheckField(config, installData);
         ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
 
         console.addScript("Select default", "\n");
@@ -99,8 +103,7 @@ public class ConsoleCheckFieldTest
     public void testSelect()
     {
         String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "false", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
+        CheckField model = new CheckField(new TestCheckFieldConfig(variable, "selected", "unselected"), installData);
         ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
 
 
@@ -117,10 +120,10 @@ public class ConsoleCheckFieldTest
     public void testDeselect()
     {
         String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
+        TestCheckFieldConfig config = new TestCheckFieldConfig(variable, "selected", "unselected");
+        config.setDefaultValue("true");
+        CheckField model = new CheckField(config, installData);
         ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
-
 
         console.addScript("Deselect", "0\n");
         assertTrue(field.display());
@@ -135,10 +138,10 @@ public class ConsoleCheckFieldTest
     public void testReselect()
     {
         String variable = "check";
-        CheckField model = new CheckField(variable, "selected", "unselected", "true", null, null, "Some label",
-                                          "Select/deselect the check box", installData);
+        TestCheckFieldConfig config = new TestCheckFieldConfig(variable, "selected", "unselected");
+        config.setDefaultValue("true");
+        CheckField model = new CheckField(config, installData);
         ConsoleCheckField field = new ConsoleCheckField(model, console, prompt);
-
 
         console.addScript("Deselect", "0\n");
         console.addScript("Redo", "1\n");

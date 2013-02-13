@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -34,7 +34,7 @@ import com.izforge.izpack.panels.userinput.field.FieldReader;
  *
  * @author Tim Anderson
  */
-public class PasswordGroupFieldReader extends FieldReader
+public class PasswordGroupFieldReader extends FieldReader implements PasswordGroupFieldConfig
 {
 
     /**

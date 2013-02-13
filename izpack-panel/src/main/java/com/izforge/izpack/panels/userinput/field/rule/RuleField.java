@@ -22,8 +22,6 @@
 package com.izforge.izpack.panels.userinput.field.rule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -33,7 +31,6 @@ import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.factory.ObjectFactory;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.FieldProcessor;
-import com.izforge.izpack.panels.userinput.field.FieldValidator;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
@@ -75,46 +72,18 @@ public class RuleField extends Field
     /**
      * Constructs a {@code RuleField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
      * @param factory     the factory for creating {@link Processor} instances
      * @throws IzPackException if the field cannot be read
      */
-    public RuleField(RuleFieldReader reader, InstallData installData, ObjectFactory factory)
+    public RuleField(RuleFieldConfig config, InstallData installData, ObjectFactory factory)
     {
-        super(reader, installData);
-        this.layout = new FieldLayout(reader.getLayout());
+        super(config, installData);
+        this.layout = new FieldLayout(config.getLayout());
         this.defaultValues = parseSet(getSet(), factory);
-        this.format = reader.getFormat();
-        this.separator = reader.getSeparator();
-    }
-
-    /**
-     * Constructs a {@code RuleField}.
-     *
-     * @param variable    the variable
-     * @param layout      the field layout
-     * @param format      the rule format
-     * @param set         the initial value. May be {@code null}
-     * @param separator   the field separator
-     * @param validator   the field validator
-     * @param processor   the field processor
-     * @param label       the field label
-     * @param description the field description. May be {@code null}
-     * @param installData the installation data
-     * @param factory     the factory for creating {@link Processor} instances
-     */
-    public RuleField(String variable, String layout, RuleFormat format, String set, String separator,
-                     FieldValidator validator, FieldProcessor processor, String label, String description,
-                     InstallData installData, ObjectFactory factory)
-    {
-        super(variable, set, 0, null, null,
-              validator != null ? Arrays.asList(validator) : Collections.<FieldValidator>emptyList(),
-              processor, label, description, false, null, installData);
-        this.layout = new FieldLayout(layout);
-        this.defaultValues = parseSet(getSet(), factory);
-        this.separator = separator;
-        this.format = format;
+        this.format = config.getFormat();
+        this.separator = config.getSeparator();
     }
 
     /**
@@ -201,19 +170,30 @@ public class RuleField extends Field
     }
 
     /**
-     * Validates a value.
-     * <p/>
-     * This validate the value using the field layout and any associated validators.
+     * Validates the field values against the field layout and any associated validators.
+     *
+     * @param values the values to validate
+     * @return the status of the validation
+     */
+    @Override
+    public ValidationStatus validate(String... values)
+    {
+        String value = formatDisplay(values); // format the values into one long string, and validate it.
+        return validateFormatted(value);
+    }
+
+    /**
+     * Validates a formatted value.
      *
      * @param value the value to validate
-     * @return the validation status
+     * @return the status of the validation
      */
-    public ValidationStatus validate(String value)
+    public ValidationStatus validateFormatted(String value)
     {
         ValidationStatus status = layout.validate(value);
         if (status.isValid())
         {
-            status = validate(status.getValues());
+            status = super.validate(status.getValues());
         }
         return status;
     }

@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,40 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.combo;
+package com.izforge.izpack.panels.userinput.field.rule;
 
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceField;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
+import com.izforge.izpack.panels.userinput.field.FieldConfig;
 
 
 /**
- * Combo field.
+ * Rule field configuration.
  *
  * @author Tim Anderson
  */
-public class ComboField extends ChoiceField<Choice>
+public interface RuleFieldConfig extends FieldConfig
 {
 
     /**
-     * Constructs a {@code ComboField}.
+     * Returns the field layout.
      *
-     * @param config the field configuration
-     * @throws IzPackException if the field cannot be read
+     * @return the field layout
      */
-    public ComboField(ChoiceFieldConfig<Choice> config, InstallData installData)
-    {
-        super(config, installData);
-    }
+    String getLayout();
+
+    /**
+     * Returns the field separator.
+     * <p/>
+     * This is a string used for separating the contents of individual fields.
+     *
+     * @return the field separator. May be {@code null}
+     */
+    String getSeparator();
+
+    /**
+     * Returns the field format.
+     *
+     * @return the field format
+     */
+    RuleFormat getFormat();
 
 }

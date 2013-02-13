@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -110,51 +110,23 @@ public abstract class Field
     /**
      * Constructs a {@code Field}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the field configuration
      * @param installData the installation data
-     * @throws IzPackException if the field cannot be read
+     * @throws IzPackException if the configuration is invalid
      */
-    public Field(FieldReader reader, InstallData installData)
+    public Field(FieldConfig config, InstallData installData)
     {
-        this(reader.getVariable(), reader.getDefaultValue(), reader.getSize(), reader.getPacks(), reader.getOsModels(),
-             reader.getValidators(), reader.getProcessor(), reader.getLabel(), reader.getDescription(),
-             reader.getRevalidate(), reader.getCondition(), installData);
-    }
-
-
-    /**
-     * Constructs a {@code Field}.
-     *
-     * @param variable    the variable associated with the field
-     * @param set         the pre-set value for the field
-     * @param size        the field size
-     * @param packs       the packs that the field is associated with. If {@code null} or empty,
-     *                    indicates the field applies to all packs
-     * @param models      the operating systems that the field applies to. If {@code null} or empty, indicates it
-     *                    applies to all operating systems
-     * @param validators  the field validators. May be empty
-     * @param processor   the field processor. May be {@code null}
-     * @param label       the field label. May be {@code null}
-     * @param description the field description. May be {@code null}
-     * @param revalidate  determines if field updates trigger re-validation
-     * @param condition   condition that determines if the field is displayed or not
-     * @param installData the installation data
-     */
-    public Field(String variable, String set, int size, List<String> packs, List<OsModel> models,
-                 List<FieldValidator> validators, FieldProcessor processor, String label, String description,
-                 boolean revalidate, String condition, InstallData installData)
-    {
-        this.variable = variable;
-        this.set = set;
-        this.size = size;
-        this.packs = packs == null ? Collections.<String>emptyList() : packs;
-        this.models = models == null ? Collections.<OsModel>emptyList() : models;
-        this.validators = validators;
-        this.processor = processor;
-        this.label = label;
-        this.description = description;
-        this.revalidate = revalidate;
-        this.condition = condition;
+        variable = config.getVariable();
+        set = config.getDefaultValue();
+        size = config.getSize();
+        packs = config.getPacks();
+        models = config.getOsModels();
+        validators = config.getValidators();
+        processor = config.getProcessor();
+        label = config.getLabel();
+        description = config.getDescription();
+        this.revalidate = config.getRevalidate();
+        this.condition = config.getCondition();
         this.installData = installData;
 
         if (variable != null)

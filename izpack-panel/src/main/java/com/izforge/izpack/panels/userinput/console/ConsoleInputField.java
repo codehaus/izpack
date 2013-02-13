@@ -67,7 +67,7 @@ public abstract class ConsoleInputField extends ConsoleField
         String value = getConsole().prompt(field.getLabel() + " [" + initialValue + "]", initialValue, null);
         if (value != null)
         {
-            ValidationStatus status = field.validate();
+            ValidationStatus status = validate(value);
             if (!status.isValid())
             {
                 warning(status.getMessage());
@@ -79,5 +79,16 @@ public abstract class ConsoleInputField extends ConsoleField
             }
         }
         return result;
+    }
+
+    /**
+     * Validates a value.
+     *
+     * @param value the value to validate
+     * @return the validation status
+     */
+    protected ValidationStatus validate(String value)
+    {
+        return getField().validate(value);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
@@ -55,16 +55,16 @@ public class AbstractFileField extends Field
     /**
      * Constructs an {@code AbstractFileField}.
      *
-     * @param reader      the reader to get field information from
+     * @param config      the configuration to get field information from
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public AbstractFileField(AbstractFileFieldReader reader, InstallData installData)
+    public AbstractFileField(FileFieldConfig config, InstallData installData)
     {
-        super(reader, installData);
-        fileExtension = reader.getFileExtension();
-        fileExtensionDescription = reader.getFileExtensionDescription();
-        allowEmptyValue = reader.getAllowEmptyValue();
+        super(config, installData);
+        fileExtension = config.getFileExtension();
+        fileExtensionDescription = config.getFileExtensionDescription();
+        allowEmptyValue = config.getAllowEmptyValue();
     }
 
     /**

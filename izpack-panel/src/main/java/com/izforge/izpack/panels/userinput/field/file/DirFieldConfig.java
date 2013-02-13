@@ -4,7 +4,7 @@
  * http://izpack.org/
  * http://izpack.codehaus.org/
  *
- * Copyright 2012 Tim Anderson
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,27 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.panels.userinput.field.combo;
-
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.exception.IzPackException;
-import com.izforge.izpack.panels.userinput.field.Choice;
-import com.izforge.izpack.panels.userinput.field.ChoiceField;
-import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
-
+package com.izforge.izpack.panels.userinput.field.file;
 
 /**
- * Combo field.
+ * Directory field configuration.
  *
  * @author Tim Anderson
  */
-public class ComboField extends ChoiceField<Choice>
+public interface DirFieldConfig extends FileFieldConfig
 {
+    /**
+     * Determines if directories must exist.
+     *
+     * @return {@code true} if the directories must exist
+     */
+    boolean getMustExist();
 
     /**
-     * Constructs a {@code ComboField}.
+     * Determines if directories can be created if they don't exist.
      *
-     * @param config the field configuration
-     * @throws IzPackException if the field cannot be read
+     * @return {@code true} if directories can be created if they don't exist
      */
-    public ComboField(ChoiceFieldConfig<Choice> config, InstallData installData)
-    {
-        super(config, installData);
-    }
+    boolean getCreate();
 
 }
