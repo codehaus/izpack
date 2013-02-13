@@ -1766,11 +1766,11 @@ public class CompilerConfig extends Thread
                 }
                 packsLangURLs.add(url);
             }
-            else if (id.startsWith(UserInputPanel.SPEC_FILE_NAME))
+            else if (id.startsWith(UserInputPanelSpec.SPEC_FILE_NAME))
             {
                 // Check user input panel definitions
                 IXMLElement xml = new XMLParser().parse(url);
-                for (IXMLElement userPanelDef : xml.getChildrenNamed(UserInputPanel.NODE_ID))
+                for (IXMLElement userPanelDef : xml.getChildrenNamed(UserInputPanelSpec.PANEL))
                 {
                     String userPanelId = xmlCompilerHelper.requireAttribute(userPanelDef, "id");
                     if (userInputPanelIds == null)
@@ -1779,8 +1779,7 @@ public class CompilerConfig extends Thread
                     }
                     if (!userInputPanelIds.add(userPanelId))
                     {
-                        assertionHelper.parseError(xml,
-                                "Resource " + UserInputPanel.SPEC_FILE_NAME
+                        assertionHelper.parseError(xml, "Resource " + UserInputPanelSpec.SPEC_FILE_NAME
                                 + ": Duplicate user input panel identifier '"
                                 + userPanelId + "'");
                     }
