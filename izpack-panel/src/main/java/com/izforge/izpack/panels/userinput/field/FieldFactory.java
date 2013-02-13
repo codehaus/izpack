@@ -48,7 +48,6 @@ import com.izforge.izpack.panels.userinput.field.space.Spacer;
 import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.field.statictext.StaticTextFieldReader;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
-import com.izforge.izpack.panels.userinput.field.text.TextFieldReader;
 import com.izforge.izpack.panels.userinput.field.title.TitleField;
 import com.izforge.izpack.panels.userinput.field.title.TitleFieldReader;
 import com.izforge.izpack.util.PlatformModelMatcher;
@@ -159,7 +158,7 @@ public class FieldFactory
                 result = new StaticText(new StaticTextFieldReader(element, config), installData);
                 break;
             case TEXT:
-                result = new TextField(new TextFieldReader(element, config), installData);
+                result = new TextField(new FieldReader(element, config), installData);
                 break;
             case TITLE:
                 result = new TitleField(new TitleFieldReader(element, config), installData);

@@ -64,13 +64,13 @@ public abstract class ConsoleInputField extends ConsoleField
         {
             initialValue = "";
         }
-        String value = getConsole().prompt(field.getLabel() + " [" + initialValue + "]", initialValue, null);
+        String value = getConsole().prompt(field.getLabel() + " [" + initialValue + "] ", initialValue, null);
         if (value != null)
         {
             ValidationStatus status = validate(value);
             if (!status.isValid())
             {
-                warning(status.getMessage());
+                error(status.getMessage());
             }
             else
             {

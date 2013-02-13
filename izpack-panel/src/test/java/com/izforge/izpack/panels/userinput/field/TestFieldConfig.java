@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +50,11 @@ public class TestFieldConfig implements FieldConfig
      * The label.
      */
     private String label;
+
+    /**
+     * The validators.
+     */
+    private List<FieldValidator> validators = new ArrayList<FieldValidator>();
 
 
     /**
@@ -130,7 +136,17 @@ public class TestFieldConfig implements FieldConfig
     @Override
     public List<FieldValidator> getValidators()
     {
-        return Collections.emptyList();
+        return validators;
+    }
+
+    /**
+     * Adds a validator.
+     *
+     * @param validator the validator to add
+     */
+    public void addValidator(FieldValidator validator)
+    {
+        validators.add(validator);
     }
 
     /**

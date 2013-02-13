@@ -172,7 +172,8 @@ public class FieldReader extends ElementReader implements FieldConfig
         for (IXMLElement element : field.getChildrenNamed(VALIDATOR))
         {
             FieldValidatorReader reader = new FieldValidatorReader(element, config);
-            result.add(new FieldValidator(reader, config.getFactory()));
+            result.add(new FieldValidator(reader.getClassName(), reader.getParameters(), reader.getMessage(),
+                                          config.getFactory()));
         }
         return result;
     }

@@ -25,7 +25,6 @@ import static com.izforge.izpack.api.handler.Prompt.Option.OK;
 import static com.izforge.izpack.api.handler.Prompt.Options.OK_CANCEL;
 import static com.izforge.izpack.api.handler.Prompt.Type.WARNING;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -41,21 +40,10 @@ import java.io.IOException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
-import com.izforge.izpack.api.data.AutomatedInstallData;
-import com.izforge.izpack.api.data.LocaleDatabase;
-import com.izforge.izpack.api.handler.Prompt;
-import com.izforge.izpack.api.resource.Locales;
-import com.izforge.izpack.api.rules.RulesEngine;
-import com.izforge.izpack.core.container.DefaultContainer;
-import com.izforge.izpack.core.data.DefaultVariables;
-import com.izforge.izpack.core.rules.ConditionContainer;
-import com.izforge.izpack.core.rules.RulesEngineImpl;
+import com.izforge.izpack.panels.userinput.console.AbstractConsoleFieldTest;
 import com.izforge.izpack.panels.userinput.field.file.DirField;
 import com.izforge.izpack.panels.userinput.field.file.TestDirFieldConfig;
-import com.izforge.izpack.test.util.TestConsole;
-import com.izforge.izpack.util.Platforms;
 import com.izforge.izpack.util.file.FileUtils;
 
 
@@ -64,7 +52,7 @@ import com.izforge.izpack.util.file.FileUtils;
  *
  * @author Tim Anderson
  */
-public class ConsoleDirFieldTest
+public class ConsoleDirFieldTest extends AbstractConsoleFieldTest
 {
 
     /**
@@ -73,37 +61,6 @@ public class ConsoleDirFieldTest
     @Rule
     public TemporaryFolder dir = new TemporaryFolder();
 
-    /**
-     * The install data.
-     */
-    private final AutomatedInstallData installData;
-
-    /**
-     * The console.
-     */
-    private final TestConsole console;
-
-    /**
-     * The prompt.
-     */
-    private final Prompt prompt;
-
-
-    /**
-     * Default constructor.
-     */
-    public ConsoleDirFieldTest()
-    {
-        installData = new AutomatedInstallData(new DefaultVariables(), Platforms.MAC_OSX);
-        installData.setMessages(new LocaleDatabase(getClass().getResourceAsStream
-                ("/com/izforge/izpack/bin/langpacks/installer/eng.xml"),
-                                                   Mockito.mock(Locales.class)));
-        RulesEngine rules = new RulesEngineImpl(new ConditionContainer(new DefaultContainer()),
-                                                installData.getPlatform());
-        console = new TestConsole();
-        prompt = Mockito.mock(Prompt.class);
-        installData.setRules(rules);
-    }
 
     /**
      * Verifies that pressing return enters the default value.
@@ -189,30 +146,6 @@ public class ConsoleDirFieldTest
         assertTrue(file.delete());
         verify(prompt).error("Invalid Directory",
                              "The directory you have chosen either does not exist or is not valid.");
-    }
-
-    /**
-     * Runs the specified script for the field, and ensures its valid.
-     *
-     * @param field  the field
-     * @param script the script to run
-     */
-    private void checkValid(ConsoleDirField field, String... script)
-    {
-        console.addScript("Valid script", script);
-        assertTrue(field.display());
-    }
-
-    /**
-     * Runs the specified script for the field, and ensures its valid.
-     *
-     * @param field  the field
-     * @param script the script to run
-     */
-    private void checkInvalid(ConsoleDirField field, String... script)
-    {
-        console.addScript("Invalid script", script);
-        assertFalse(field.display());
     }
 
     /**

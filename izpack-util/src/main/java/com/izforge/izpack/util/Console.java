@@ -118,7 +118,7 @@ public class Console
      */
     public int prompt(String prompt, int min, int max, int defaultValue, int eof)
     {
-        int result = 0;
+        int result = min - 1;
         try
         {
             do

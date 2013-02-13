@@ -27,23 +27,15 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.factory.ObjectFactory;
-import com.izforge.izpack.api.handler.Prompt;
-import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.container.DefaultContainer;
-import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.core.factory.DefaultObjectFactory;
-import com.izforge.izpack.core.handler.ConsolePrompt;
-import com.izforge.izpack.core.rules.ConditionContainer;
-import com.izforge.izpack.core.rules.RulesEngineImpl;
+import com.izforge.izpack.panels.userinput.console.AbstractConsoleFieldTest;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleFormat;
 import com.izforge.izpack.panels.userinput.field.rule.TestDefaultIPProcessor;
 import com.izforge.izpack.panels.userinput.field.rule.TestRuleFieldConfig;
 import com.izforge.izpack.panels.userinput.processor.Processor;
-import com.izforge.izpack.test.util.TestConsole;
-import com.izforge.izpack.util.Platforms;
 
 
 /**
@@ -51,13 +43,8 @@ import com.izforge.izpack.util.Platforms;
  *
  * @author Tim Anderson
  */
-public class ConsoleRuleFieldTest
+public class ConsoleRuleFieldTest extends AbstractConsoleFieldTest
 {
-
-    /**
-     * The install data.
-     */
-    private final AutomatedInstallData installData;
 
     /**
      * The object factory.
@@ -65,26 +52,10 @@ public class ConsoleRuleFieldTest
     private final ObjectFactory factory;
 
     /**
-     * The console.
-     */
-    private final TestConsole console;
-
-    /**
-     * The prompt.
-     */
-    private final Prompt prompt;
-
-    /**
      * Default constructor.
      */
     public ConsoleRuleFieldTest()
     {
-        installData = new AutomatedInstallData(new DefaultVariables(), Platforms.HP_UX);
-        RulesEngine rules = new RulesEngineImpl(new ConditionContainer(new DefaultContainer()),
-                                                installData.getPlatform());
-        console = new TestConsole();
-        prompt = new ConsolePrompt(console);
-        installData.setRules(rules);
         factory = new DefaultObjectFactory(new DefaultContainer());
     }
 

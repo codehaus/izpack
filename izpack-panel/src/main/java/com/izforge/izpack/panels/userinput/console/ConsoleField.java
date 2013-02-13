@@ -109,13 +109,13 @@ public abstract class ConsoleField extends AbstractFieldView
     }
 
     /**
-     * Displays a warning message.
+     * Displays an error message.
      *
      * @param message the message
      */
-    protected void warning(String message)
+    protected void error(String message)
     {
-        prompt.warn(getMessage("UserInputPanel.error.caption"), message);
+        prompt.error(getMessage("UserInputPanel.error.caption"), message);
     }
 
     /**

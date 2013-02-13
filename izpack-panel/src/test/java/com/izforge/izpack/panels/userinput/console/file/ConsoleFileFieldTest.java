@@ -35,7 +35,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.izforge.izpack.api.data.AutomatedInstallData;
-import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.container.DefaultContainer;
@@ -43,6 +42,7 @@ import com.izforge.izpack.core.data.DefaultVariables;
 import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.core.rules.ConditionContainer;
 import com.izforge.izpack.core.rules.RulesEngineImpl;
+import com.izforge.izpack.panels.userinput.console.AbstractConsoleFieldTest;
 import com.izforge.izpack.panels.userinput.field.file.FileField;
 import com.izforge.izpack.panels.userinput.field.file.TestFileFieldConfig;
 import com.izforge.izpack.test.util.TestConsole;
@@ -55,43 +55,14 @@ import com.izforge.izpack.util.file.FileUtils;
  *
  * @author Tim Anderson
  */
-public class ConsoleFileFieldTest
+public class ConsoleFileFieldTest extends AbstractConsoleFieldTest
 {
-
-    /**
-     * The install data.
-     */
-    private final AutomatedInstallData installData;
-
-    /**
-     * The console.
-     */
-    private final TestConsole console;
-
-    /**
-     * The prompt.
-     */
-    private final Prompt prompt;
 
     /**
      * Test file.
      */
     private File file;
 
-
-    /**
-     * Default constructor.
-     */
-    public ConsoleFileFieldTest()
-    {
-        installData = new AutomatedInstallData(new DefaultVariables(), Platforms.HP_UX);
-        installData.setMessages(Mockito.mock(Messages.class));
-        RulesEngine rules = new RulesEngineImpl(new ConditionContainer(new DefaultContainer()),
-                                                installData.getPlatform());
-        console = new TestConsole();
-        prompt = new ConsolePrompt(console);
-        installData.setRules(rules);
-    }
 
     /**
      * Sets up the test.
@@ -165,30 +136,6 @@ public class ConsoleFileFieldTest
         assertNull(installData.getVariable("file"));
 
         assertTrue(dir.delete());
-    }
-
-    /**
-     * Runs the specified script for the field, and ensures its valid.
-     *
-     * @param field  the field
-     * @param script the script to run
-     */
-    private void checkValid(ConsoleFileField field, String... script)
-    {
-        console.addScript("Valid script", script);
-        assertTrue(field.display());
-    }
-
-    /**
-     * Runs the specified script for the field, and ensures its valid.
-     *
-     * @param field  the field
-     * @param script the script to run
-     */
-    private void checkInvalid(ConsoleFileField field, String... script)
-    {
-        console.addScript("Invalid script", script);
-        assertFalse(field.display());
     }
 
     /**

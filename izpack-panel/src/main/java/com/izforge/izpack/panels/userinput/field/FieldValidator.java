@@ -1,8 +1,10 @@
 /*
- * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2013 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
+ *
+ * Copyright 2013 Tim Anderson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,16 +68,16 @@ public class FieldValidator
      */
     private static final Logger logger = Logger.getLogger(FieldValidator.class.getName());
 
-
     /**
      * Constructs a {@code FieldValidator}.
      *
-     * @param reader  the configuration reader
-     * @param factory the factory to create the validator
+     * @param type    the validator class
+     * @param message the validation error message. May be {@code null}
+     * @param factory the factory for creating the validator
      */
-    public FieldValidator(FieldValidatorReader reader, ObjectFactory factory)
+    public FieldValidator(Class type, String message, ObjectFactory factory)
     {
-        this(reader.getClassName(), reader.getParameters(), reader.getMessage(), factory);
+        this(type.getName(), null, message, factory);
     }
 
     /**
