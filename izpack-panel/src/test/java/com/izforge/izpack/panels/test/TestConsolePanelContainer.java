@@ -20,11 +20,13 @@
  */
 package com.izforge.izpack.panels.test;
 
+import org.mockito.Mockito;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoException;
 import org.picocontainer.injectors.ProviderAdapter;
 
 import com.izforge.izpack.api.exception.ContainerException;
+import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.core.handler.ConsolePrompt;
 import com.izforge.izpack.test.provider.InstallDataMockProvider;
 import com.izforge.izpack.test.util.TestConsole;
@@ -54,6 +56,7 @@ public class TestConsolePanelContainer extends AbstractTestPanelContainer
     {
         super.fillContainer(container);
         addComponent(TestConsole.class);
+        addComponent(Messages.class, Mockito.mock(Messages.class));
         addComponent(ConsolePrompt.class);
         container.addAdapter(new ProviderAdapter(new InstallDataMockProvider()));
     }
