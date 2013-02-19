@@ -33,7 +33,6 @@ import com.izforge.izpack.api.exception.ResourceNotFoundException;
 import com.izforge.izpack.api.exception.WrappedNativeLibException;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.resource.Resources;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 
 /**
@@ -49,7 +48,7 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
     /**
      * The registry handler.
      */
-    private final RegistryDefaultHandler handler;
+    private final RegistryHandler registry;
 
     /**
      * The resources.
@@ -69,13 +68,13 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
     /**
      * Constructs a <tt>RegistryUninstallerListener</tt>.
      *
-     * @param handler   the handler
+     * @param registry  the registry
      * @param resources the resources
      * @param messages  the messages
      */
-    public RegistryUninstallerListener(RegistryDefaultHandler handler, Resources resources, Messages messages)
+    public RegistryUninstallerListener(RegistryHandler registry, Resources resources, Messages messages)
     {
-        this.handler = handler;
+        this.registry = registry;
         this.resources = resources;
         this.messages = messages;
     }
@@ -121,20 +120,18 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
             return;
         }
 
-        try
+        if (registry.isSupported())
         {
-            RegistryHandler registryHandler = handler.getInstance();
-            if (registryHandler == null)
+            try
             {
-                return;
+                registry.activateLogging();
+                registry.setLoggingInfo(actions);
+                registry.rewind();
             }
-            registryHandler.activateLogging();
-            registryHandler.setLoggingInfo(actions);
-            registryHandler.rewind();
-        }
-        catch (NativeLibException e)
-        {
-            throw new WrappedNativeLibException(e, messages);
+            catch (NativeLibException e)
+            {
+                throw new WrappedNativeLibException(e, messages);
+            }
         }
     }
 

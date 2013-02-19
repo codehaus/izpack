@@ -44,7 +44,6 @@ import com.izforge.izpack.api.exception.WrappedNativeLibException;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.installer.data.UninstallData;
 import com.izforge.izpack.installer.unpacker.IUnpacker;
@@ -155,12 +154,12 @@ public class RegistryInstallerListener extends AbstractProgressInstallerListener
      * @param rules         the rules
      * @param resources     the resources
      * @param housekeeper   the housekeeper
-     * @param handler       the registry handler reference
+     * @param registry      the registry
      */
     public RegistryInstallerListener(IUnpacker unpacker, VariableSubstitutor substituter,
                                      InstallData installData, UninstallData uninstallData,
                                      Resources resources, RulesEngine rules, Housekeeper housekeeper,
-                                     RegistryDefaultHandler handler)
+                                     RegistryHandler registry)
     {
         super(installData);
         this.substituter = substituter;
@@ -169,7 +168,7 @@ public class RegistryInstallerListener extends AbstractProgressInstallerListener
         this.resources = resources;
         this.rules = rules;
         this.housekeeper = housekeeper;
-        this.registry = handler.getInstance();
+        this.registry = registry;
         spec = new SpecHelper(resources);
     }
 
@@ -181,12 +180,25 @@ public class RegistryInstallerListener extends AbstractProgressInstallerListener
     @Override
     public void initialise()
     {
-        if (registry != null)
+        if (registry.isSupported())
         {
-            Variables variables = getInstallData().getVariables();
-            String uninstallName = variables.get("APP_NAME") + " " + variables.get("APP_VER");
+            String uninstallName = getUninstallName();
             registry.setUninstallName(uninstallName);
         }
+    }
+
+    /**
+     * Returns the uninstall name, used to initialise the {@link RegistryHandler#setUninstallName(String)}.
+     * <p/>
+     * This implementation returns a concatenation of the <em>APP_NAME</em> and <em>APP_VER</em> variables,
+     * separated by a space.
+     *
+     * @return the uninstall name
+     */
+    protected String getUninstallName()
+    {
+        Variables variables = getInstallData().getVariables();
+        return variables.get("APP_NAME") + " " + variables.get("APP_VER");
     }
 
     /**
@@ -199,7 +211,7 @@ public class RegistryInstallerListener extends AbstractProgressInstallerListener
     @Override
     public void afterPacks(List<Pack> packs, ProgressListener listener)
     {
-        if (registry != null)
+        if (registry.isSupported())
         {
             try
             {
@@ -228,21 +240,35 @@ public class RegistryInstallerListener extends AbstractProgressInstallerListener
 
     public void cleanUp()
     {
-        InstallData installData = getInstallData();
-        if (!installData.isInstallSuccess() && registryModificationLog != null && !registryModificationLog.isEmpty())
+        if (registry.isSupported())
         {
-            // installation was not successful so rewind all registry changes
-            try
+            InstallData installData = getInstallData();
+            if (!installData.isInstallSuccess() && registryModificationLog != null
+                    && !registryModificationLog.isEmpty())
             {
-                registry.activateLogging();
-                registry.setLoggingInfo(registryModificationLog);
-                registry.rewind();
-            }
-            catch (Exception e)
-            {
-                logger.log(Level.SEVERE, e.getMessage(), e);
+                // installation was not successful so rewind all registry changes
+                try
+                {
+                    registry.activateLogging();
+                    registry.setLoggingInfo(registryModificationLog);
+                    registry.rewind();
+                }
+                catch (Exception e)
+                {
+                    logger.log(Level.SEVERE, e.getMessage(), e);
+                }
             }
         }
+    }
+
+    /**
+     * Returns the registry handler.
+     *
+     * @return the registry handler
+     */
+    protected RegistryHandler getRegistry()
+    {
+        return registry;
     }
 
     private void afterPacks(List<Pack> packs) throws NativeLibException, InstallerException

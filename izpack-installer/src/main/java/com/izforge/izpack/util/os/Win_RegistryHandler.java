@@ -367,6 +367,17 @@ public class Win_RegistryHandler extends RegistryHandler
     }
 
     /**
+     * Determines if registry access is supported on the current platform.
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSupported()
+    {
+        return true;
+    }
+
+    /**
      * Returns the registry, creating it if necessary.
      *
      * @return the registry

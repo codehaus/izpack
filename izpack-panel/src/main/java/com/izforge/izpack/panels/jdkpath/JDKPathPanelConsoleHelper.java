@@ -33,7 +33,6 @@ import com.coi.tools.os.win.MSWinConstants;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
@@ -49,12 +48,9 @@ import com.izforge.izpack.util.Platform;
  */
 public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
 {
-    private String minVersion;
-    private String maxVersion;
-    private String variableName;
     private String detectedVersion;
     private final VariableSubstitutor variableSubstitutor;
-    private final RegistryDefaultHandler handler;
+    private final RegistryHandler handler;
 
     /**
      * Constructs a <tt>JDKPathPanelConsoleHelper</tt>.
@@ -62,7 +58,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
      * @param variableSubstitutor the variable substituter
      * @param handler             the registry handler
      */
-    public JDKPathPanelConsoleHelper(VariableSubstitutor variableSubstitutor, RegistryDefaultHandler handler)
+    public JDKPathPanelConsoleHelper(VariableSubstitutor variableSubstitutor, RegistryHandler handler)
     {
         this.variableSubstitutor = variableSubstitutor;
         this.handler = handler;
@@ -100,7 +96,6 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     /**
      * Runs the panel using the specified console.
      *
-     *
      * @param installData the installation data
      * @param console     the console
      * @return <tt>true</tt> if the panel ran successfully, otherwise <tt>false</tt>
@@ -108,11 +103,11 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     @Override
     public boolean runConsole(InstallData installData, Console console)
     {
-        minVersion = installData.getVariable("JDKPathPanel.minVersion");
-        maxVersion = installData.getVariable("JDKPathPanel.maxVersion");
-        variableName = "JDKPath";
+        String minVersion = installData.getVariable("JDKPathPanel.minVersion");
+        String maxVersion = installData.getVariable("JDKPathPanel.maxVersion");
+        String variableName = "JDKPath";
 
-        String strPath = "";
+        String strPath;
         String strDefaultPath = installData.getVariable(variableName);
         if (strDefaultPath == null)
         {
@@ -217,21 +212,19 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         String[] params;
         if (platform.isA(Platform.Name.WINDOWS))
         {
-            String[] paramsp = {
+            params = new String[]{
                     "cmd",
                     "/c",
                     path + File.separator + "bin" + File.separator + "java",
                     "-version"
             };
-            params = paramsp;
         }
         else
         {
-            String[] paramsp = {
+            params = new String[]{
                     path + File.separator + "bin" + File.separator + "java",
                     "-version"
             };
-            params = paramsp;
         }
         String[] output = new String[2];
         FileExecutor fe = new FileExecutor();
@@ -313,8 +306,8 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
             }
             String current = currentTokenizer.nextToken();
             String needed = neededTokenizer.nextToken();
-            int currentValue = 0;
-            int neededValue = 0;
+            int currentValue;
+            int neededValue;
             try
             {
                 currentValue = Integer.parseInt(current);
@@ -362,29 +355,26 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     {
         String retval = "";
         int oldVal = 0;
-        RegistryHandler registryHandler = null;
         Set<String> badRegEntries = new HashSet<String>();
         try
         {
-            // Get the default registry handler.
-            registryHandler = handler.getInstance();
-            if (registryHandler == null)
-            // We are on a os which has no registry or the
-            // needed dll was not bound to this installation. In
-            // both cases we forget the try to get the JDK path from registry.
+            if (!handler.isSupported())
             {
+                // We are on a os which has no registry or the
+                // needed dll was not bound to this installation. In
+                // both cases we forget the try to get the JDK path from registry.
                 return (retval);
             }
-            oldVal = registryHandler.getRoot(); // Only for security...
-            registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
-            String[] keys = registryHandler.getSubkeys(JDKPathPanel.JDK_ROOT_KEY);
+            oldVal = handler.getRoot(); // Only for security...
+            handler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+            String[] keys = handler.getSubkeys(JDKPathPanel.JDK_ROOT_KEY);
             if (keys == null || keys.length == 0)
             {
                 return (retval);
             }
             Arrays.sort(keys);
             int i = keys.length - 1;
-            // We search for the highest allowd version, therefore retrograde
+            // We search for the highest allowed version, therefore retrograde
             while (i > 0)
             {
                 if (max == null || compareVersions(keys[i], max, false, 4, 4, "__NO_NOT_IDENTIFIER_"))
@@ -393,7 +383,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
                     if (min == null || compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
                     {
                         String cv = JDKPathPanel.JDK_ROOT_KEY + "\\" + keys[i];
-                        String path = registryHandler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME).getStringData();
+                        String path = handler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME).getStringData();
                         // Use it only if the path is valid.
                         // Set the path for method pathIsValid ...
                         if (!pathIsValid(path))
@@ -416,11 +406,11 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         }
         finally
         {
-            if (registryHandler != null && oldVal != 0)
+            if (handler.isSupported() && oldVal != 0)
             {
                 try
                 {
-                    registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+                    handler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
                 }
                 catch (NativeLibException e)
                 {

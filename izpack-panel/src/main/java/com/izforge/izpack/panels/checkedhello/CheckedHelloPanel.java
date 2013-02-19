@@ -26,7 +26,7 @@ import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.resource.Resources;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
+import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.gui.log.Log;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
@@ -69,15 +69,15 @@ public class CheckedHelloPanel extends HelloPanel
      * @param parent      the parent frame
      * @param installData the installation data
      * @param resources   the resources
-     * @param handler     the registry handler instance
+     * @param registry    the registry
      * @param log         the log
      * @throws Exception if it cannot be determined if the application is registered
      */
     public CheckedHelloPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, Resources resources,
-                             RegistryDefaultHandler handler, Log log) throws Exception
+                             RegistryHandler registry, Log log) throws Exception
     {
         super(panel, parent, installData, resources, log);
-        registryHelper = new RegistryHelper(handler);
+        registryHelper = new RegistryHelper(registry, installData);
         abortInstallation = isRegistered();
     }
 

@@ -43,7 +43,6 @@ import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.gui.IzPanelLayout;
 import com.izforge.izpack.gui.log.Log;
@@ -51,7 +50,6 @@ import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.panels.path.PathInputPanel;
 import com.izforge.izpack.util.FileExecutor;
-import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.Platform;
 
 /**
@@ -87,11 +85,9 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
 
     private Set<String> badRegEntries = null;
 
-    private final RegistryDefaultHandler handler;
+    private final RegistryHandler registry;
 
     private final VariableSubstitutor replacer;
-
-    private JEditorPane textArea = null;
 
     /**
      * The logger.
@@ -106,18 +102,18 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
      * @param parent      the parent window
      * @param installData the installation data
      * @param resources   the resources
-     * @param handler     the registry handler
+     * @param registry    the registry handler
      * @param replacer    the variable replacer
      * @param log         the log
      */
     public JDKPathPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, Resources resources,
-                        RegistryDefaultHandler handler, VariableSubstitutor replacer, Log log)
+                        RegistryHandler registry, VariableSubstitutor replacer, Log log)
     {
         super(panel, parent, installData, resources, log);
-        this.handler = handler;
+        this.registry = registry;
         this.replacer = replacer;
         setMustExist(true);
-        if (!OsVersion.IS_OSX)
+        if (!installData.getPlatform().isA(Platform.Name.MAC_OSX))
         {
             setExistFiles(JDKPathPanel.testFiles);
         }
@@ -225,7 +221,7 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
         if (msg != null && !msg.isEmpty())
         {
             add(IzPanelLayout.createParagraphGap());
-            textArea = new JEditorPane("text/html; charset=utf-8", replacer.substitute(msg, null));
+            JEditorPane textArea = new JEditorPane("text/html; charset=utf-8", replacer.substitute(msg, null));
             textArea.setCaretPosition(0);
             textArea.setEditable(false);
             textArea.addHyperlinkListener(this);
@@ -239,20 +235,20 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
         // The variable will be exist if we enter this panel
         // second time. We would maintain the previos
         // selected path.
-        if (this.installData.getVariable(getVariableName()) != null)
+        if (installData.getVariable(getVariableName()) != null)
         {
-            chosenPath = this.installData.getVariable(getVariableName());
+            chosenPath = installData.getVariable(getVariableName());
         }
         else
         {
-            if (OsVersion.IS_OSX)
+            if (installData.getPlatform().isA(Platform.Name.MAC_OSX))
             {
                 chosenPath = OSX_JDK_HOME;
             }
             else
             {
                 // Try the JAVA_HOME as child dir of the jdk path
-                chosenPath = (new File(this.installData.getVariable("JAVA_HOME"))).getParent();
+                chosenPath = (new File(installData.getVariable("JAVA_HOME"))).getParent();
             }
         }
         // Set the path for method pathIsValid ...
@@ -289,22 +285,19 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
     {
         String retval = "";
         int oldVal = 0;
-        RegistryHandler registryHandler = null;
         badRegEntries = new HashSet<String>();
         try
         {
-            // Get the default registry handler.
-            registryHandler = handler.getInstance();
-            if (registryHandler == null)
-            // We are on a os which has no registry or the
-            // needed dll was not bound to this installation. In
-            // both cases we forget the try to get the JDK path from registry.
+            if (!registry.isSupported())
             {
+                // We are on a os which has no registry or the
+                // needed dll was not bound to this installation. In
+                // both cases we forget the try to get the JDK path from registry.
                 return (retval);
             }
-            oldVal = registryHandler.getRoot(); // Only for security...
-            registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
-            String[] keys = registryHandler.getSubkeys(JDK_ROOT_KEY);
+            oldVal = registry.getRoot(); // Only for security...
+            registry.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+            String[] keys = registry.getSubkeys(JDK_ROOT_KEY);
             if (keys == null || keys.length == 0)
             {
                 return (retval);
@@ -322,7 +315,7 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
                     if (compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
                     {
                         String cv = JDK_ROOT_KEY + "\\" + keys[i];
-                        String path = registryHandler.getValue(cv, JDK_VALUE_NAME).getStringData();
+                        String path = registry.getValue(cv, JDK_VALUE_NAME).getStringData();
                         // Use it only if the path is valid.
                         // Set the path for method pathIsValid ...
                         pathSelectionPanel.setPath(path);
@@ -347,11 +340,11 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
         }
         finally
         {
-            if (registryHandler != null && oldVal != 0)
+            if (registry.isSupported() && oldVal != 0)
             {
                 try
                 {
-                    registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+                    registry.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
                 }
                 catch (NativeLibException e)
                 {
@@ -383,21 +376,19 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
         String[] params;
         if (installData.getPlatform().isA(Platform.Name.WINDOWS))
         {
-            String[] paramsp = {
+            params = new String[]{
                     "cmd",
                     "/c",
                     pathSelectionPanel.getPath() + File.separator + "bin" + File.separator + "java",
                     "-version"
             };
-            params = paramsp;
         }
         else
         {
-            String[] paramsp = {
+            params = new String[]{
                     pathSelectionPanel.getPath() + File.separator + "bin" + File.separator + "java",
                     "-version"
             };
-            params = paramsp;
         }
         String[] output = new String[2];
         FileExecutor fileExecutor = new FileExecutor();
@@ -492,8 +483,8 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
             }
             String cur = current.nextToken();
             String nee = needed.nextToken();
-            int curVal = 0;
-            int neededVal = 0;
+            int curVal;
+            int neededVal;
             try
             {
                 curVal = Integer.parseInt(cur);

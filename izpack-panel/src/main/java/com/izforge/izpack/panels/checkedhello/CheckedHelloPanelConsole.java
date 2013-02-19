@@ -33,7 +33,7 @@ import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
+import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.panels.hello.HelloPanelConsoleHelper;
 import com.izforge.izpack.util.Console;
 
@@ -68,14 +68,15 @@ public class CheckedHelloPanelConsole extends HelloPanelConsoleHelper
     /**
      * Constructs a <tt>CheckedHelloPanelConsole</tt>.
      *
-     * @param handler the registry handler
-     * @param prompt  the prompt
+     * @param registry    the registry
+     * @param installData the installation data
+     * @param prompt      the prompt
      * @throws NativeLibException for any native library error
      */
-    public CheckedHelloPanelConsole(RegistryDefaultHandler handler, Prompt prompt)
+    public CheckedHelloPanelConsole(RegistryHandler registry, InstallData installData, Prompt prompt)
             throws NativeLibException
     {
-        registryHelper = new RegistryHelper(handler);
+        registryHelper = new RegistryHelper(registry, installData);
         this.prompt = prompt;
         registered = registryHelper.isRegistered();
     }

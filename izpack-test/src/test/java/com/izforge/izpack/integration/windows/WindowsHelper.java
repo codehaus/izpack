@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
 import com.coi.tools.os.win.RegDataContainer;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.exception.NativeLibException;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.util.Librarian;
 import com.izforge.izpack.util.os.ShellLink;
@@ -100,33 +99,32 @@ public class WindowsHelper
     /**
      * Determines if a key exists in the registry.
      *
-     * @param handler the registry handler
-     * @param key     the key to check
+     * @param registry the registry handler
+     * @param key      the key to check
      * @return <tt>true</tt> if the key exists, otherwise <tt>false</tt>
      * @throws NativeLibException for any registry error
      */
-    public static boolean registryKeyExists(RegistryDefaultHandler handler, String key) throws NativeLibException
+    public static boolean registryKeyExists(RegistryHandler registry, String key) throws NativeLibException
     {
-        RegistryHandler registry = handler.getInstance();
-        assertNotNull(registry);
+        assertTrue(registry.isSupported());
         registry.setRoot(RegistryHandler.HKEY_LOCAL_MACHINE);
         return registry.keyExist(key);
     }
-    
+
     /**
      * Asserts that a registry key REG_SZ value exists, and exactly matches the given value.
-     * 
-     * @param handler the registry handler
-     * @param key	  the key to check
-     * @param name	  the name of the value to check
-     * @param expected	  the value to match
+     *
+     * @param registry the registry handler
+     * @param key      the key to check
+     * @param name     the name of the value to check
+     * @param expected the value to match
      * @throws NativeLibException for any registry error
      */
-    public static void registryValueStringEquals(RegistryDefaultHandler handler, String key, String name, String expected) throws NativeLibException
+    public static void registryValueStringEquals(RegistryHandler registry, String key, String name,
+                                                 String expected) throws NativeLibException
     {
-    	//Registry key exists
-    	RegistryHandler registry = handler.getInstance();
-        assertNotNull(registry);
+        //Registry key exists
+        assertTrue(registry.isSupported());
         registry.setRoot(RegistryHandler.HKEY_LOCAL_MACHINE);
         assertTrue(registry.keyExist(key));
         //Value exists as a REG_SZ
@@ -140,13 +138,12 @@ public class WindowsHelper
     /**
      * Deletes an uninstallation registry key.
      *
-     * @param handler the registry handler
-     * @param key     the key to delete
+     * @param registry the registry handler
+     * @param key      the key to delete
      * @throws NativeLibException for any registry error
      */
-    public static void registryDeleteUninstallKey(RegistryDefaultHandler handler, String key) throws NativeLibException
+    public static void registryDeleteUninstallKey(RegistryHandler registry, String key) throws NativeLibException
     {
-        RegistryHandler registry = handler.getInstance();
         assertNotNull(registry);
         if (!key.matches(".*\\\\Uninstall\\\\.+"))
         {

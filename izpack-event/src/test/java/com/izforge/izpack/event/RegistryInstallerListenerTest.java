@@ -54,7 +54,6 @@ import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.data.DefaultVariables;
-import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
 import com.izforge.izpack.installer.data.UninstallData;
@@ -122,11 +121,6 @@ public class RegistryInstallerListenerTest
     private Housekeeper housekeeper;
 
     /**
-     * The registry handler.
-     */
-    private RegistryDefaultHandler handler;
-
-    /**
      * The registry.
      */
     private RegistryHandler registry;
@@ -166,12 +160,10 @@ public class RegistryInstallerListenerTest
         uninstallData = new UninstallData();
         rules = Mockito.mock(RulesEngine.class);
         housekeeper = Mockito.mock(Housekeeper.class);
-        handler = Mockito.mock(RegistryDefaultHandler.class);
         TargetFactory factory = Mockito.mock(TargetFactory.class);
         Mockito.when(factory.getNativeLibraryExtension()).thenReturn("dll");
         Librarian librarian = new TestLibrarian(factory, housekeeper);
         registry = new Win_RegistryHandler(librarian);
-        Mockito.when(handler.getInstance()).thenReturn(registry);
     }
 
     /**
@@ -206,7 +198,7 @@ public class RegistryInstallerListenerTest
 
         // initialise the listener
         RegistryInstallerListener listener = new RegistryInstallerListener(
-                unpacker, replacer, installData, uninstallData, resources, rules, housekeeper, handler);
+                unpacker, replacer, installData, uninstallData, resources, rules, housekeeper, registry);
         listener.initialise();
 
         // run the listener
