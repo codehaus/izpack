@@ -33,6 +33,7 @@ import com.coi.tools.os.win.MSWinConstants;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
@@ -50,7 +51,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
 {
     private String detectedVersion;
     private final VariableSubstitutor variableSubstitutor;
-    private final RegistryHandler handler;
+    private final RegistryDefaultHandler handler;
 
     /**
      * Constructs a <tt>JDKPathPanelConsoleHelper</tt>.
@@ -58,7 +59,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
      * @param variableSubstitutor the variable substituter
      * @param handler             the registry handler
      */
-    public JDKPathPanelConsoleHelper(VariableSubstitutor variableSubstitutor, RegistryHandler handler)
+    public JDKPathPanelConsoleHelper(VariableSubstitutor variableSubstitutor, RegistryDefaultHandler handler)
     {
         this.variableSubstitutor = variableSubstitutor;
         this.handler = handler;
@@ -355,19 +356,22 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     {
         String retval = "";
         int oldVal = 0;
+        RegistryHandler registryHandler = null;
         Set<String> badRegEntries = new HashSet<String>();
         try
         {
-            if (!handler.isSupported())
-            {
+            // Get the default registry handler.
+            registryHandler = handler.getInstance();
+            if (registryHandler == null)
                 // We are on a os which has no registry or the
                 // needed dll was not bound to this installation. In
                 // both cases we forget the try to get the JDK path from registry.
+            {
                 return (retval);
             }
-            oldVal = handler.getRoot(); // Only for security...
-            handler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
-            String[] keys = handler.getSubkeys(JDKPathPanel.JDK_ROOT_KEY);
+            oldVal = registryHandler.getRoot(); // Only for security...
+            registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+            String[] keys = registryHandler.getSubkeys(JDKPathPanel.JDK_ROOT_KEY);
             if (keys == null || keys.length == 0)
             {
                 return (retval);
@@ -383,7 +387,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
                     if (min == null || compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
                     {
                         String cv = JDKPathPanel.JDK_ROOT_KEY + "\\" + keys[i];
-                        String path = handler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME).getStringData();
+                        String path = registryHandler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME).getStringData();
                         // Use it only if the path is valid.
                         // Set the path for method pathIsValid ...
                         if (!pathIsValid(path))
@@ -406,11 +410,11 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         }
         finally
         {
-            if (handler.isSupported() && oldVal != 0)
+            if (registryHandler != null && oldVal != 0)
             {
                 try
                 {
-                    handler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+                    registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
                 }
                 catch (NativeLibException e)
                 {

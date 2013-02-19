@@ -33,6 +33,7 @@ import com.izforge.izpack.api.exception.ResourceNotFoundException;
 import com.izforge.izpack.api.exception.WrappedNativeLibException;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.resource.Resources;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 
 /**
@@ -48,7 +49,7 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
     /**
      * The registry handler.
      */
-    private final RegistryHandler registry;
+    private final RegistryHandler handler;
 
     /**
      * The resources.
@@ -68,13 +69,13 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
     /**
      * Constructs a <tt>RegistryUninstallerListener</tt>.
      *
-     * @param registry  the registry
+     * @param handler   the handler
      * @param resources the resources
      * @param messages  the messages
      */
-    public RegistryUninstallerListener(RegistryHandler registry, Resources resources, Messages messages)
+    public RegistryUninstallerListener(RegistryDefaultHandler handler, Resources resources, Messages messages)
     {
-        this.registry = registry;
+        this.handler = handler.getInstance();
         this.resources = resources;
         this.messages = messages;
     }
@@ -120,13 +121,13 @@ public class RegistryUninstallerListener extends AbstractUninstallerListener
             return;
         }
 
-        if (registry.isSupported())
+        if (handler != null)
         {
             try
             {
-                registry.activateLogging();
-                registry.setLoggingInfo(actions);
-                registry.rewind();
+                handler.activateLogging();
+                handler.setLoggingInfo(actions);
+                handler.rewind();
             }
             catch (NativeLibException e)
             {

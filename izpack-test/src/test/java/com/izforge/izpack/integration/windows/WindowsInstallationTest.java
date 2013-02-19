@@ -42,6 +42,7 @@ import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.compiler.container.TestInstallationContainer;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.event.RegistryInstallerListener;
 import com.izforge.izpack.event.RegistryUninstallerListener;
@@ -98,9 +99,9 @@ public class WindowsInstallationTest extends AbstractDestroyerTest
     private final Librarian librarian;
 
     /**
-     * The registry.
+     * The registry handler.
      */
-    private final RegistryHandler registry;
+    private final RegistryDefaultHandler handler;
 
     /**
      * The house keeper.
@@ -125,18 +126,18 @@ public class WindowsInstallationTest extends AbstractDestroyerTest
      * @param controller  the installer controller
      * @param installData the installation data
      * @param librarian   the librarian
-     * @param registry    the registry
+     * @param handler     the registry handler
      * @param housekeeper the house-keeper
      */
     public WindowsInstallationTest(InstallerFrame frame, InstallerController controller,
                                    AutomatedInstallData installData, Librarian librarian,
-                                   RegistryHandler registry, TestHousekeeper housekeeper)
+                                   RegistryDefaultHandler handler, TestHousekeeper housekeeper)
     {
         super(installData);
         this.frame = frame;
         this.controller = controller;
         this.librarian = librarian;
-        this.registry = registry;
+        this.handler = handler;
         this.housekeeper = housekeeper;
     }
 
@@ -223,7 +224,7 @@ public class WindowsInstallationTest extends AbstractDestroyerTest
         File uninstaller = getUninstallerJar();
 
         // make sure there is an Uninstall entry for the installation
-        assertTrue(registryKeyExists(registry, UNINSTALL_KEY));
+        assertTrue(registryKeyExists(handler, UNINSTALL_KEY));
 
         // make sure a shortcut to the uninstaller exists
         File shortcut = checkShortcut(ShellLink.PROGRAM_MENU, ShellLink.ALL_USERS, "IzPack Windows Installation Test",
@@ -233,7 +234,7 @@ public class WindowsInstallationTest extends AbstractDestroyerTest
         UninstallHelper.guiUninstall(uninstaller);
 
         // make sure the Uninstall entry has been removed
-        assertFalse(registryKeyExists(registry, UNINSTALL_KEY));
+        assertFalse(registryKeyExists(handler, UNINSTALL_KEY));
 
         // verify the shortcut no longer exists
         assertFalse(shortcut.exists());
@@ -247,7 +248,7 @@ public class WindowsInstallationTest extends AbstractDestroyerTest
      */
     private void destroyRegistryEntries() throws NativeLibException
     {
-        registryDeleteUninstallKey(registry, UNINSTALL_KEY);
+        registryDeleteUninstallKey(handler, UNINSTALL_KEY);
     }
 
 }

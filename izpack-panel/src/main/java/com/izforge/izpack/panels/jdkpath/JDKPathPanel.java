@@ -43,6 +43,7 @@ import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.gui.IzPanelLayout;
 import com.izforge.izpack.gui.log.Log;
@@ -85,7 +86,7 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
 
     private Set<String> badRegEntries = null;
 
-    private final RegistryHandler registry;
+    private final RegistryDefaultHandler handler;
 
     private final VariableSubstitutor replacer;
 
@@ -102,15 +103,15 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
      * @param parent      the parent window
      * @param installData the installation data
      * @param resources   the resources
-     * @param registry    the registry handler
+     * @param handler     the registry handler
      * @param replacer    the variable replacer
      * @param log         the log
      */
     public JDKPathPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, Resources resources,
-                        RegistryHandler registry, VariableSubstitutor replacer, Log log)
+                        RegistryDefaultHandler handler, VariableSubstitutor replacer, Log log)
     {
         super(panel, parent, installData, resources, log);
-        this.registry = registry;
+        this.handler = handler;
         this.replacer = replacer;
         setMustExist(true);
         if (!installData.getPlatform().isA(Platform.Name.MAC_OSX))
@@ -285,19 +286,22 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
     {
         String retval = "";
         int oldVal = 0;
+        RegistryHandler registryHandler = null;
         badRegEntries = new HashSet<String>();
         try
         {
-            if (!registry.isSupported())
+            // Get the default registry handler.
+            registryHandler = handler.getInstance();
+            if (registryHandler == null)
+            // We are on a os which has no registry or the
+            // needed dll was not bound to this installation. In
+            // both cases we forget the try to get the JDK path from registry.
             {
-                // We are on a os which has no registry or the
-                // needed dll was not bound to this installation. In
-                // both cases we forget the try to get the JDK path from registry.
                 return (retval);
             }
-            oldVal = registry.getRoot(); // Only for security...
-            registry.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
-            String[] keys = registry.getSubkeys(JDK_ROOT_KEY);
+            oldVal = registryHandler.getRoot(); // Only for security...
+            registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+            String[] keys = registryHandler.getSubkeys(JDK_ROOT_KEY);
             if (keys == null || keys.length == 0)
             {
                 return (retval);
@@ -315,7 +319,7 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
                     if (compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
                     {
                         String cv = JDK_ROOT_KEY + "\\" + keys[i];
-                        String path = registry.getValue(cv, JDK_VALUE_NAME).getStringData();
+                        String path = registryHandler.getValue(cv, JDK_VALUE_NAME).getStringData();
                         // Use it only if the path is valid.
                         // Set the path for method pathIsValid ...
                         pathSelectionPanel.setPath(path);
@@ -340,11 +344,11 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
         }
         finally
         {
-            if (registry.isSupported() && oldVal != 0)
+            if (registryHandler != null && oldVal != 0)
             {
                 try
                 {
-                    registry.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
+                    registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
                 }
                 catch (NativeLibException e)
                 {

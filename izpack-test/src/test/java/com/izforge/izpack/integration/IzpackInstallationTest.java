@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.compiler.container.TestInstallationContainer;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerController;
@@ -64,18 +65,18 @@ public class IzpackInstallationTest
     private InstallerFrame installerFrame;
     private GUIInstallData installData;
     private InstallerController installerController;
-    private RegistryHandler registry;
+    private RegistryDefaultHandler handler;
     private Panels panels;
 
     public IzpackInstallationTest(LanguageDialog languageDialog, InstallerFrame installerFrame,
                                   GUIInstallData installData, InstallerController installerController,
-                                  RegistryHandler registry, Panels panels)
+                                  RegistryDefaultHandler handler, Panels panels)
     {
         this.installerController = installerController;
         this.languageDialog = languageDialog;
         this.installData = installData;
         this.installerFrame = installerFrame;
-        this.registry = registry;
+        this.handler = handler;
         this.panels = panels;
     }
 
@@ -87,7 +88,8 @@ public class IzpackInstallationTest
     @Before
     public void setUp() throws NativeLibException
     {
-        if (registry.isSupported())
+        RegistryHandler registry = handler.getInstance();
+        if (registry != null)
         {
             // remove any existing uninstall key
             String uninstallName = registry.getUninstallName();

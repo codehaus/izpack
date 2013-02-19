@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
+import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.util.IoHelper;
 
@@ -37,7 +38,6 @@ import com.izforge.izpack.util.IoHelper;
 public class RegistryHelper
 {
 
-    private static final String INSTALL_PATH = "$INSTALL_PATH";
     /**
      * The registry handler, or {@code null} if the registry isn't supported on the current platform.
      */
@@ -58,6 +58,11 @@ public class RegistryHelper
      */
     private static final String UNINSTALL_STRING = "UninstallString";
 
+    /**
+     * Install path variable.
+     */
+    private static final String INSTALL_PATH = "$INSTALL_PATH";
+
 
     /**
      * Constructs a {@code RegistryHelper}.
@@ -65,9 +70,9 @@ public class RegistryHelper
      * @param handler     the registry handler
      * @param installData the installation data
      */
-    public RegistryHelper(RegistryHandler handler, InstallData installData)
+    public RegistryHelper(RegistryDefaultHandler handler, InstallData installData)
     {
-        this.handler = handler;
+        this.handler = handler.getInstance();
         this.installData = installData;
     }
 
@@ -81,7 +86,7 @@ public class RegistryHelper
     public boolean isRegistered() throws NativeLibException
     {
         boolean result = false;
-        if (handler.isSupported())
+        if (handler != null)
         {
             String uninstallName = getUninstallName();
             if (uninstallName != null)
@@ -104,7 +109,7 @@ public class RegistryHelper
      */
     public String getUninstallName()
     {
-        return handler.isSupported() ? handler.getUninstallName() : null;
+        return (handler != null) ? handler.getUninstallName() : null;
     }
 
     /**
@@ -168,7 +173,7 @@ public class RegistryHelper
     public String getUninstallCommand() throws NativeLibException
     {
         String result = null;
-        if (handler.isSupported())
+        if (handler != null)
         {
             String uninstallName = handler.getUninstallName();
             if (uninstallName == null)
@@ -199,7 +204,7 @@ public class RegistryHelper
     public String updateUninstallName() throws NativeLibException
     {
         String result = null;
-        if (handler.isSupported())
+        if (handler != null)
         {
             String uninstallName = handler.getUninstallName();
             if (uninstallName == null)

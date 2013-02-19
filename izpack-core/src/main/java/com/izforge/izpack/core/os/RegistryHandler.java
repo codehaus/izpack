@@ -378,14 +378,4 @@ public class RegistryHandler implements MSWinConstants
         uninstallName = name;
     }
 
-    /**
-     * Determines if registry access is supported on the current platform.
-     *
-     * @return {@code true} if registry access is supported, otherwise {@code false}
-     */
-    public boolean isSupported()
-    {
-        return false;
-    }
-
 }
