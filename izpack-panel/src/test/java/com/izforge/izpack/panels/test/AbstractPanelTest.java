@@ -21,6 +21,7 @@
 package com.izforge.izpack.panels.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -31,7 +32,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import com.izforge.izpack.api.data.Panel;
+import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.factory.ObjectFactory;
+import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.resource.ResourceManager;
 import com.izforge.izpack.gui.IconsDatabase;
@@ -189,16 +192,14 @@ public class AbstractPanelTest
      *
      * @param panelClasses the panel classes
      * @return an {@link InstallerFrame} wrapped in a {@link FrameFixture}
-     * @throws Exception for any error
+     * @throws IzPackException for any error
      */
-    protected FrameFixture show(Class... panelClasses) throws Exception
+    protected FrameFixture show(Class... panelClasses)
     {
         List<IzPanelView> panelList = new ArrayList<IzPanelView>();
         for (Class panelClass : panelClasses)
         {
-            Panel panel = new Panel();
-            panel.setClassName(panelClass.getName());
-            panelList.add(createPanelView(panel));
+            panelList.add(createPanelView(panelClass));
         }
         return show(panelList);
     }
@@ -208,28 +209,47 @@ public class AbstractPanelTest
      *
      * @param panelViews the panel views
      * @return an {@link InstallerFrame} wrapped in a {@link FrameFixture}
-     * @throws Exception for any error
+     * @throws IzPackException for any error
+     */
+    protected FrameFixture show(IzPanelView... panelViews)
+    {
+        return show(Arrays.asList(panelViews));
+    }
+
+    /**
+     * Creates an installer that displays the specified panels.
+     *
+     * @param panelViews the panel views
+     * @return an {@link InstallerFrame} wrapped in a {@link FrameFixture}
+     * @throws IzPackException for any error
      */
     protected FrameFixture show(final List<IzPanelView> panelViews)
-            throws Exception
     {
         // create the frame in the event dispatcher thread (mostly to keep substance L&F happy, but also good practice)
         final InstallerFrame[] handle = new InstallerFrame[1];
-        SwingUtilities.invokeAndWait(new Runnable()
+        try
         {
-            @Override
-            public void run()
+            SwingUtilities.invokeAndWait(new Runnable()
             {
-                panels = new IzPanels(panelViews, container, installData);
-                DefaultNavigator navigator = new DefaultNavigator(panels, icons, installData);
-                InstallerFrame frame = new InstallerFrame("A title", installData, rules,
-                                                          icons, panels, uninstallDataWriter, resourceManager,
-                                                          Mockito.mock(UninstallData.class),
-                                                          Mockito.mock(Housekeeper.class), navigator,
-                                                          Mockito.mock(Log.class));
-                handle[0] = frame;
-            }
-        });
+                @Override
+                public void run()
+                {
+                    panels = new IzPanels(panelViews, container, installData);
+                    DefaultNavigator navigator = new DefaultNavigator(panels, icons, installData);
+                    InstallerFrame frame = new InstallerFrame("A title", installData, rules,
+                                                              icons, panels, uninstallDataWriter, resourceManager,
+                                                              Mockito.mock(UninstallData.class),
+                                                              Mockito.mock(Housekeeper.class), navigator,
+                                                              Mockito.mock(Log.class),
+                                                              Mockito.mock(Locales.class));
+                    handle[0] = frame;
+                }
+            });
+        }
+        catch (Exception exception)
+        {
+            throw new IzPackException(exception);
+        }
         InstallerFrame frame = handle[0];
         frameFixture = new FrameFixture(frame);
         container.getContainer().addComponent(frame);
@@ -239,6 +259,19 @@ public class AbstractPanelTest
         controller.buildInstallation();
         controller.launchInstallation();
         return frameFixture;
+    }
+
+    /**
+     * Creates an {@link IzPanelView} for the specified panel class.
+     *
+     * @param panelClass the panel class
+     * @return a new view
+     */
+    protected IzPanelView createPanelView(Class panelClass)
+    {
+        Panel panel = new Panel();
+        panel.setClassName(panelClass.getName());
+        return createPanelView(panel);
     }
 
     /**

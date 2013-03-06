@@ -123,6 +123,8 @@ import com.izforge.izpack.merge.MergeManager;
 import com.izforge.izpack.panels.extendedinstall.ExtendedInstallPanel;
 import com.izforge.izpack.panels.install.InstallPanel;
 import com.izforge.izpack.panels.treepacks.PackValidator;
+import com.izforge.izpack.panels.userinput.UserInputPanel;
+import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.util.FileUtil;
 import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.OsConstraintHelper;
@@ -174,6 +176,12 @@ public class CompilerConfig extends Thread
      * @see #mergePacksLangFiles()
      */
     private Map<String, List<URL>> packsLangUrlMap = new HashMap<String, List<URL>>();
+ 
+    /**
+     * UserInputPanel IDs for cross check whether given user input panel
+     * referred in the installation descriptor are really defined
+     */
+    private Set<String> userInputPanelIds;
     private String unpackerClassname = "com.izforge.izpack.installer.unpacker.Unpacker";
     private String packagerClassname = "com.izforge.izpack.compiler.packager.impl.Packager";
     private CompilerPathResolver pathResolver;
@@ -227,11 +235,12 @@ public class CompilerConfig extends Thread
      *
      * @param compilerData Object containing all informations found in command line
      */
-    public CompilerConfig(CompilerData compilerData, VariableSubstitutor variableSubstitutor, Compiler compiler,
-                          XmlCompilerHelper xmlCompilerHelper, PropertyManager propertyManager,
-                          MergeManager mergeManager, AssertionHelper assertionHelper,
-                          RulesEngine rules, CompilerPathResolver pathResolver, ResourceFinder resourceFinder,
-                          ObjectFactory factory, PlatformModelMatcher constraints, CompilerClassLoader classLoader)
+    public CompilerConfig(CompilerData compilerData, VariableSubstitutor variableSubstitutor,
+                          Compiler compiler, XmlCompilerHelper xmlCompilerHelper,
+                          PropertyManager propertyManager, MergeManager mergeManager,
+                          AssertionHelper assertionHelper, RulesEngine rules, CompilerPathResolver pathResolver,
+                          ResourceFinder resourceFinder, ObjectFactory factory, PlatformModelMatcher constraints,
+                          CompilerClassLoader classLoader)
     {
         this.assertionHelper = assertionHelper;
         this.rules = rules;
@@ -669,10 +678,11 @@ public class CompilerConfig extends Thread
             IXMLElement uninstallInfo = root.getFirstChildNamed("uninstaller");
             if (xmlCompilerHelper.validateYesNoAttribute(uninstallInfo, "write", YES))
             {
-                //REFACTOR Change the way uninstaller are created
+                // REFACTOR Change the way uninstaller are created
                 // Do we still need it on compile time?
-//                URL url = findIzPackResource(propertyManager.getProperty("uninstaller-ext"), "Uninstaller extensions", root);
-//                packager.addResource("IzPack.uninstaller-ext", url);
+                // URL url = findIzPackResource(propertyManager.getProperty("uninstaller-ext"),
+                // "Uninstaller extensions", root);
+                // packager.addResource("IzPack.uninstaller-ext", url);
             }
 
         }
@@ -700,7 +710,8 @@ public class CompilerConfig extends Thread
 
     /**
      * Add packs and their contents to the installer without checking the dependencies and includes.
-     * <p/> Helper method to recursively add more packs from refpack XML packs definitions
+     * <p/>
+     * Helper method to recursively add more packs from refpack XML packs definitions
      *
      * @param data The XML data
      * @throws CompilerException
@@ -939,10 +950,9 @@ public class CompilerConfig extends Thread
                                 File file = new File(fs.getDir(), filePath);
                                 String target = new File(fs.getTargetDir(), filePath).getPath();
                                 logger.info("Adding file: " + file + ", as target file=" + target);
-                                pack.addFile(baseDir, file, target, fs.getOsList(), fs
-                                        .getOverride(), fs.getOverrideRenameTo(), fs.getBlockable(),
-                                             fs.getAdditionals(), fs
-                                        .getCondition());
+                                pack.addFile(baseDir, file, target, fs.getOsList(),
+                                             fs.getOverride(), fs.getOverrideRenameTo(),
+                                             fs.getBlockable(), fs.getAdditionals(), fs.getCondition());
                             }
                         }
                     }
@@ -991,8 +1001,8 @@ public class CompilerConfig extends Thread
             try
             {
                 logger.info("Adding file: " + file + ", as target file=" + target);
-                pack.addFile(baseDir, file, target, osList, override, overrideRenameTo, blockable, additionals,
-                             condition);
+                pack.addFile(baseDir, file, target, osList, override, overrideRenameTo, blockable,
+                             additionals, condition);
             }
             catch (IOException x)
             {
@@ -1064,9 +1074,9 @@ public class CompilerConfig extends Thread
                         if (unpack)
                         {
                             logger.info("Adding content from archive: " + abssrcfile);
-                            addArchiveContent(baseDir, abssrcfile, fs.getTargetDir(), fs.getOsList(), fs.getOverride(),
-                                              fs.getOverrideRenameTo(), fs.getBlockable(), pack, fs.getAdditionals(),
-                                              fs.getCondition());
+                            addArchiveContent(baseDir, abssrcfile, fs.getTargetDir(),
+                                              fs.getOsList(), fs.getOverride(), fs.getOverrideRenameTo(),
+                                              fs.getBlockable(), pack, fs.getAdditionals(), fs.getCondition());
                         }
                         else
                         {
@@ -1074,8 +1084,7 @@ public class CompilerConfig extends Thread
                             logger.info("Adding file: " + abssrcfile + ", as target file=" + target);
                             pack.addFile(baseDir, abssrcfile, target, fs.getOsList(),
                                          fs.getOverride(), fs.getOverrideRenameTo(), fs.getBlockable(),
-                                         fs.getAdditionals(),
-                                         fs.getCondition());
+                                         fs.getAdditionals(), fs.getCondition());
                         }
                     }
                 }
@@ -1259,7 +1268,7 @@ public class CompilerConfig extends Thread
                 int newSize = tokenizer.countTokens();
                 String[] nCont = null;
                 if (containers[j] != null && containers[j].length > 0)
-                { // old container exist; create a new which can hold
+                {   // old container exist; create a new which can hold
                     // all values
                     // and copy the old stuff to the front
                     newSize += containers[j].length;
@@ -1497,15 +1506,24 @@ public class CompilerConfig extends Thread
             panel.setOsConstraints(OsConstraintHelper.getOsList(panelElement));
             String className = xmlCompilerHelper.requireAttribute(panelElement, "classname");
 
-            // add an id
+            // add an id                               
             String id = panelElement.getAttribute("id");
             panel.setPanelId(id);
             String condition = panelElement.getAttribute("condition");
             panel.setCondition(condition);
 
             // note - all jars must be added to the classpath prior to invoking this
-            Class type = classLoader.loadClass(className, IzPanel.class);
-            if (type.equals(ExtendedInstallPanel.class))
+            Class<IzPanel> type = classLoader.loadClass(className, IzPanel.class);
+            if (type.equals(UserInputPanel.class))
+            {
+                if (userInputPanelIds == null || !userInputPanelIds.contains(id))
+                {
+                    assertionHelper.parseError(panelElement, "Referred user input panel '" + id
+                            + "' has not been defined in resource "
+                            + UserInputPanelSpec.SPEC_FILE_NAME);
+                }
+            }
+            else if (type.equals(ExtendedInstallPanel.class))
             {
                 logger.warning(ExtendedInstallPanel.class.getSimpleName() + " is deprecated. Use "
                                        + InstallPanel.class.getSimpleName() + " instead");
@@ -1693,7 +1711,8 @@ public class CompilerConfig extends Thread
                         {
                             is = new BufferedInputStream(originalUrl.openStream());
                         }
-//                        VariableSubstitutor vs = new VariableSubstitutorImpl(compiler.getVariables());
+                        // VariableSubstitutor vs = new
+                        // VariableSubstitutorImpl(compiler.getVariables());
                         variableSubstitutor.substitute(is, os, type, "UTF-8");
                     }
                 }
@@ -1747,7 +1766,25 @@ public class CompilerConfig extends Thread
                 }
                 packsLangURLs.add(url);
             }
-
+            else if (id.startsWith(UserInputPanelSpec.SPEC_FILE_NAME))
+            {
+                // Check user input panel definitions
+                IXMLElement xml = new XMLParser().parse(url);
+                for (IXMLElement userPanelDef : xml.getChildrenNamed(UserInputPanelSpec.PANEL))
+                {
+                    String userPanelId = xmlCompilerHelper.requireAttribute(userPanelDef, "id");
+                    if (userInputPanelIds == null)
+                    {
+                        userInputPanelIds = new HashSet<String>();
+                    }
+                    if (!userInputPanelIds.add(userPanelId))
+                    {
+                        assertionHelper.parseError(xml, "Resource " + UserInputPanelSpec.SPEC_FILE_NAME
+                                + ": Duplicate user input panel identifier '"
+                                + userPanelId + "'");
+                    }
+                }
+            }
         }
         notifyCompilerListener("addResources", CompilerListener.END, data);
     }
@@ -2025,7 +2062,7 @@ public class CompilerConfig extends Thread
     }
 
     /**
-     * Variable declaration is a fragment of the xml file. For example: <p/>
+     * Variable declaration is a fragment of the xml file. For example:
      * <p/>
      * <pre>
      * &lt;p/&gt;
@@ -2042,7 +2079,7 @@ public class CompilerConfig extends Thread
      * &lt;p/&gt;
      * </pre>
      * <p/>
-     * <p/> variable declared in this can be referred to in parsable files.
+     * variable declared in this can be referred to in parsable files.
      *
      * @param data The XML data.
      * @throws CompilerException Description of the Exception
@@ -2072,8 +2109,7 @@ public class CompilerConfig extends Thread
         notifyCompilerListener("addVariables", CompilerListener.END, data);
     }
 
-    private int getConfigFileType(String varname, String type)
-            throws CompilerException
+    private int getConfigFileType(String varname, String type) throws CompilerException
     {
         int filetype = ConfigFileValue.CONFIGFILE_TYPE_OPTIONS;
         if (type != null)
@@ -2159,8 +2195,7 @@ public class CompilerConfig extends Thread
                 String regvalue = var.getAttribute("regvalue");
                 if (dynamicVariable.getValue() == null)
                 {
-                    dynamicVariable.setValue(
-                            new RegistryValue(regroot, value, regvalue));
+                    dynamicVariable.setValue(new RegistryValue(regroot, value, regvalue));
                 }
                 else
                 {
@@ -2466,7 +2501,7 @@ public class CompilerConfig extends Thread
      * &lt;p/&gt;
      * </pre>
      * <p/>
-     * <p/> variable declared in this can be referred to in parsable files.
+     * variable declared in this can be referred to in parsable files.
      *
      * @param data The XML data.
      * @throws CompilerException Description of the Exception
@@ -2637,7 +2672,6 @@ public class CompilerConfig extends Thread
         }
         return result;
     }
-
 
     /**
      * Adds installer and uninstaller listeners.

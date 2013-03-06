@@ -19,21 +19,24 @@
 
 package com.izforge.izpack.panels.shortcut;
 
+import static com.izforge.izpack.util.Platform.Name.UNIX;
+
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.adaptator.IXMLParser;
 import com.izforge.izpack.api.adaptator.impl.XMLElementImpl;
 import com.izforge.izpack.api.adaptator.impl.XMLParser;
-import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Pack;
 import com.izforge.izpack.api.data.binding.OsModel;
@@ -57,7 +60,9 @@ import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.PlatformModelMatcher;
 import com.izforge.izpack.util.StringTool;
 import com.izforge.izpack.util.TargetFactory;
+import com.izforge.izpack.util.file.FileUtils;
 import com.izforge.izpack.util.os.Shortcut;
+import com.izforge.izpack.util.unix.UnixHelper;
 import com.izforge.izpack.util.xml.XMLHelper;
 
 
@@ -151,6 +156,8 @@ public class ShortcutPanelLogic implements CleanupClient
     private static final String SPEC_ATTRIBUTE_STARTUP = "startup";
 
     private static final String SPEC_ATTRIBUTE_PROGRAM_GROUP = "programGroup";
+
+    private static final String SPEC_ATTRIBUTE_RUN_AS_ADMINISTRATOR = "runAsAdministrator";
 
     // ------------------------------------------------------
     // spec file attribute values
@@ -264,7 +271,7 @@ public class ShortcutPanelLogic implements CleanupClient
      * This is set to true if the shortcut spec instructs to simulate running on an operating system
      * that is not supported.
      */
-    private boolean simulteNotSupported = false;
+    private boolean simulateNotSupported = false;
 
     private int userType;
 
@@ -293,7 +300,7 @@ public class ShortcutPanelLogic implements CleanupClient
      * @param matcher       the platform-model matcher
      * @throws Exception for any error
      */
-    public ShortcutPanelLogic(AutomatedInstallData installData, Resources resources, UninstallData uninstallData,
+    public ShortcutPanelLogic(InstallData installData, Resources resources, UninstallData uninstallData,
                               Housekeeper housekeeper, TargetFactory factory, InstallerListeners listeners,
                               PlatformModelMatcher matcher)
             throws Exception
@@ -547,9 +554,9 @@ public class ShortcutPanelLogic implements CleanupClient
      * @return <code>true</code> if we do a shortcut creation simulation otherwise
      *         <code>false</code>
      */
-    public boolean isSimulteNotSupported()
+    public boolean isSimulateNotSupported()
     {
-        return simulteNotSupported;
+        return simulateNotSupported;
     }
 
     /**
@@ -566,7 +573,7 @@ public class ShortcutPanelLogic implements CleanupClient
      */
     public boolean isSupported()
     {
-        return shortcut.supported();
+        return !simulateNotSupported && shortcut.supported();
     }
 
     /**
@@ -769,6 +776,102 @@ public class ShortcutPanelLogic implements CleanupClient
         shortcut.setUserType(this.userType);
     }
 
+    /**
+     * Initialises the user type.
+     *
+     * @return {@code true} if the current user has permissions to write to the All Users programs folder.
+     */
+    public boolean initUserType()
+    {
+        File dir = getProgramsFolder(Shortcut.ALL_USERS);
+
+        logger.fine("All Users Program Folder: '" + dir + "'");
+        boolean writable = isWritable(dir);
+        logger.fine((writable ? "Can" : "Cannot") + " write into '" + dir + "'");
+
+        boolean allUsers = !isDefaultCurrentUserFlag() && writable;
+
+        int type = (allUsers) ? Shortcut.ALL_USERS : Shortcut.CURRENT_USER;
+        setUserType(type);
+        return writable;
+    }
+
+    /**
+     * Determines if the desktop shortcut checkbox is enabled.
+     *
+     * @return {@code true} if the desktop shortcut checkbox is enabled
+     */
+    public boolean isDesktopShortcutCheckboxSelected()
+    {
+        return Boolean.valueOf(installData.getVariable("DesktopShortcutCheckboxEnabled"));
+    }
+
+    /**
+     * Helper to format a message to create shortcuts for the current platform.
+     *
+     * @return a formatted message
+     */
+    public String getCreateShortcutsPrompt()
+    {
+        Messages messages = installData.getMessages();
+        String menuKind = messages.get("ShortcutPanel.regular.StartMenu:Start-Menu");
+
+        if (installData.getPlatform().isA(UNIX) && UnixHelper.kdeIsInstalled())
+        {
+            menuKind = messages.get("ShortcutPanel.regular.StartMenu:K-Menu");
+        }
+
+        return StringTool.replace(messages.get("ShortcutPanel.regular.create"), "StartMenu", menuKind);
+    }
+
+    /**
+     * Helper to return a prompt to create desktop shortcuts.
+     *
+     * @return the desktop shortcut prompt
+     */
+    public String getCreateDesktopShortcutsPrompt()
+    {
+        return installData.getMessages().get("ShortcutPanel.regular.desktop");
+    }
+
+    public String getCreateForUserPrompt()
+    {
+        return installData.getMessages().get("ShortcutPanel.regular.userIntro");
+    }
+
+    public String getCreateForAllUsersPrompt()
+    {
+        return installData.getMessages().get("ShortcutPanel.regular.allUsers");
+    }
+
+    public String getCreateForCurrentUserPrompt()
+    {
+        return installData.getMessages().get("ShortcutPanel.regular.allUsers");
+    }
+
+    /**
+     * Determines if a directory can be written to.
+     *
+     * @param dir the directory
+     * @return {@code true} if the directory can be written to
+     */
+    private boolean isWritable(File dir)
+    {
+        boolean result = false;
+        File test;
+        try
+        {
+            test = File.createTempFile("shortcut", "", dir);
+            FileUtils.delete(test);
+            result = true;
+        }
+        catch (IOException exception)
+        {
+            logger.log(Level.WARNING, "Cannot write to '" + dir + "'", exception);
+        }
+        return result;
+    }
+
     private void addToUninstaller()
     {
         for (String file : files)
@@ -803,7 +906,7 @@ public class ShortcutPanelLogic implements CleanupClient
 
         if (support != null)
         {
-            simulteNotSupported = true;
+            simulateNotSupported = true;
         }
 
         // set flag if 'lateShortcutInstall' element found:
@@ -966,6 +1069,8 @@ public class ShortcutPanelLogic implements CleanupClient
             {
                 data.initialState = Shortcut.NORMAL;
             }
+            data.runAsAdministrator = Boolean.valueOf(shortcutSpec.getAttribute(SPEC_ATTRIBUTE_RUN_AS_ADMINISTRATOR,
+                                                                                "false"));
 
             // LOG System.out.println("installDataGUI.initialState: " +
             // installDataGUI.initialState);
@@ -1121,6 +1226,7 @@ public class ShortcutPanelLogic implements CleanupClient
                 shortcut.setWorkingDirectory(data.workingDirectory);
                 shortcut.setEncoding(data.deskTopEntryLinux_Encoding);
                 shortcut.setMimetype(data.deskTopEntryLinux_MimeType);
+                shortcut.setRunAsAdministrator(data.runAsAdministrator);
 
                 shortcut.setTerminal(data.deskTopEntryLinux_Terminal);
                 shortcut.setTerminalOptions(data.deskTopEntryLinux_TerminalOptions);

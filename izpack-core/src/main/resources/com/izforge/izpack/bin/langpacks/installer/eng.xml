@@ -221,6 +221,7 @@ file we looked for -->
     <str id="UserInputPanel.search.location" txt="Enter location of {0}."/>
     <str id="UserInputPanel.search.location.checkedfile" txt="The existence of {0} is checked."/>
     <str id="UserInputPanel.search.browse" txt="Browse..."/>
+    <str id="UserInputPanel.search.delete" txt="Delete..."/>
     <str id="UserInputPanel.search.wrongselection.message"
          txt="The file or directory you have chosen either does not exist or is not appropriate."/>
     <str id="UserInputPanel.search.wrongselection.caption" txt="Invalid Selection"/>
@@ -282,6 +283,19 @@ file we looked for -->
          txt="This product is already installed on this computer under the path "/>
     <str id="CheckedHelloPanel.productAlreadyExist1" txt="Are you sure you want to install another entity?"/>
     <str id="CheckedHelloPanel.infoOverUninstallKey" txt="The uninstall key will be named: "/>
+
+    <!-- ConsolePrompt strings -->
+    <str id="ConsolePrompt.okCancel" txt="Enter O for OK, C to Cancel: "/>
+    <str id="ConsolePrompt.yesNo" txt="Enter Y for Yes, N for No: "/>
+    <str id="ConsolePrompt.yesNoCancel" txt="Enter Y for Yes, N for No, or C to Cancel: "/>
+    <str id="ConsolePrompt.ok" txt="O"/>
+    <str id="ConsolePrompt.cancel" txt="C"/>
+    <str id="ConsolePrompt.yes" txt="Y"/>
+    <str id="ConsolePrompt.no" txt="N"/>
+
+    <!-- ConsoleInstaller strings -->
+    <str id="ConsoleInstaller.continueQuitRedisplay" txt="Press 1 to continue, 2 to quit, 3 to redisplay"/>
+    <str id="ConsoleInstaller.acceptRejectRedisplay" txt="Press 1 to accept, 2 to reject, 3 to redisplay"/>
 
     <!-- Next Media Strings -->
     <str id="nextmedia.title" txt="Next install media"/>

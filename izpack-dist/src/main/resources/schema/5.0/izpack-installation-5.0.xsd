@@ -24,7 +24,8 @@
            targetNamespace="http://izpack.org/schema/installation"
            xmlns="http://izpack.org/schema/installation">
 
-    <xs:import namespace="http://izpack.org/schema/types" schemaLocation="izpack-types-5.0.xsd"/>
+    <xs:import namespace="http://izpack.org/schema/types"
+               schemaLocation="http://izpack.org/schema/5.0/izpack-types-5.0.xsd"/>
 
     <!--                                                                                                        -->
     <!-- Root element                                                                                           -->
@@ -80,7 +81,7 @@
             <xs:element name="run-privileged" type="runPrivilegedType" minOccurs="0"/>
             <xs:element name="summarylogfilepath" type="xs:string" minOccurs="0"/>
             <xs:element name="uninstaller" type="uninstallerType" minOccurs="0"/>
-            <xs:element name="writeinstallationinformation" type="yesNoTrueFalseType" minOccurs="0"/>
+            <xs:element name="writeinstallationinformation" type="types:yesNoTrueFalseType" minOccurs="0"/>
             <xs:element name="rebootaction" type="rebootActionType" minOccurs="0"/>
         </xs:all>
     </xs:complexType>
@@ -101,7 +102,7 @@
     </xs:complexType>
 
     <xs:complexType name="uninstallerType">
-        <xs:attribute type="yesNoTrueFalseType" name="write" use="optional" default="yes"/>
+        <xs:attribute type="types:yesNoTrueFalseType" name="write" use="optional" default="yes"/>
         <xs:attribute type="xs:string" name="path" use="optional"/>
         <xs:attribute type="xs:string" name="name" use="optional"/>
     </xs:complexType>
@@ -121,12 +122,7 @@
     <!--                                                                                                        -->
     <xs:complexType name="variablesType">
         <xs:sequence>
-            <xs:element name="variable" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:attribute name="name" type="xs:string" use="required"/>
-                    <xs:attribute name="value" type="xs:string" use="required"/>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="variable" type="types:variableType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -233,8 +229,8 @@
                             <xs:attribute name="src" type="xs:string" use="required"/>
                             <xs:attribute name="id" type="xs:string" use="required"/>
                             <xs:attribute name="type" type="substitutionType" default="plain"/>
-                            <xs:attribute name="parse" type="yesNoTrueFalseType" use="optional" default="no"/>
-                            <xs:attribute name="parsexml" type="yesNoTrueFalseType" use="optional" default="no"/>
+                            <xs:attribute name="parse" type="types:yesNoTrueFalseType" use="optional" default="no"/>
+                            <xs:attribute name="parsexml" type="types:yesNoTrueFalseType" use="optional" default="no"/>
                         </xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>
@@ -407,9 +403,9 @@
         </xs:sequence>
         <xs:attribute name="id" type="xs:string"/>
         <xs:attribute name="name" type="xs:string"/>
-        <xs:attribute name="required" type="yesNoTrueFalseType"/>
+        <xs:attribute name="required" type="types:yesNoTrueFalseType"/>
         <xs:attribute name="hidden" type="xs:boolean" default="false"/>
-        <xs:attribute name="preselected" type="yesNoTrueFalseType" use="optional"/>
+        <xs:attribute name="preselected" type="types:yesNoTrueFalseType" use="optional"/>
         <xs:attribute name="loose" type="xs:boolean" use="optional"/>
         <xs:attribute name="condition" type="xs:string" use="optional"/>
     </xs:complexType>
@@ -426,6 +422,8 @@
             <xs:element name="os" type="types:osType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="dir" type="xs:string" use="required"/>
+        <xs:attribute name="includes" type="xs:string" use="optional"/>
+        <xs:attribute name="excludes" type="xs:string" use="optional"/>
         <xs:attribute name="targetdir" type="xs:string" use="required"/>
         <xs:attribute name="override" type="overrideType" use="optional" default="false"/>
         <xs:attribute name="overrideRenameTo" type="xs:string" use="optional"/>
@@ -571,13 +569,5 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="yesNoTrueFalseType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="true"/>
-            <xs:enumeration value="false"/>
-            <xs:enumeration value="yes"/>
-            <xs:enumeration value="no"/>
-        </xs:restriction>
-    </xs:simpleType>
 
 </xs:schema>
