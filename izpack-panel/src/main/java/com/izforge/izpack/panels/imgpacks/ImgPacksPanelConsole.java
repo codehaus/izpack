@@ -20,6 +20,7 @@
  */
 package com.izforge.izpack.panels.imgpacks;
 
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.packs.PacksPanelConsole;
 
 /**
@@ -32,10 +33,13 @@ import com.izforge.izpack.panels.packs.PacksPanelConsole;
 public final class ImgPacksPanelConsole extends PacksPanelConsole {
 
 	/**
+	 * Constructor for {@link ImgPacksPanelConsole}
 	 * 
+	 * @param prompt
+	 *            prompt
 	 */
-	public ImgPacksPanelConsole() {
-		super();
+	public ImgPacksPanelConsole(Prompt prompt) {
+		super(prompt);
 	}
 
 }
