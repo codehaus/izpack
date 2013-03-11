@@ -68,7 +68,7 @@ public class TargetConsolePanelTest
     private final TestConsole console;
 
     /**
-     * Constructs a {@code TargetConsolePanel}.
+     * Constructs a {@code TargetConsolePanelTest}.
      *
      * @param installData the installation data
      * @param console     the console

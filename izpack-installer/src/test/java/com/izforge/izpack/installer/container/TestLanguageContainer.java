@@ -7,6 +7,8 @@ import java.util.Arrays;
 import javax.swing.ImageIcon;
 
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoException;
 import org.picocontainer.injectors.ProviderAdapter;
@@ -59,10 +61,22 @@ public class TestLanguageContainer extends AbstractContainer
         ImageIcon frFlag = new ImageIcon(getClass().getResource("/com/izforge/izpack/bin/langpacks/flags/fra.gif"));
         when(resourceManager.getImageIcon("flag.eng")).thenReturn(engFlag);
         when(resourceManager.getImageIcon("flag.fra")).thenReturn(frFlag);
-        when(resourceManager.getInputStream("langpacks/eng.xml")).thenReturn(
-                getClass().getResourceAsStream("/com/izforge/izpack/bin/langpacks/installer/eng.xml"));
-        when(resourceManager.getInputStream("langpacks/fra.xml")).thenReturn(
-                getClass().getResourceAsStream("/com/izforge/izpack/bin/langpacks/installer/fra.xml"));
+        when(resourceManager.getInputStream("langpacks/eng.xml")).thenAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getClass().getResourceAsStream("/com/izforge/izpack/bin/langpacks/installer/eng.xml");
+            }
+        });
+        when(resourceManager.getInputStream("langpacks/fra.xml")).thenAnswer(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getClass().getResourceAsStream("/com/izforge/izpack/bin/langpacks/installer/fra.xml");
+            }
+        });
 
         DefaultLocales locales = new DefaultLocales(resourceManager);
         container.addComponent(Variables.class, DefaultVariables.class)
