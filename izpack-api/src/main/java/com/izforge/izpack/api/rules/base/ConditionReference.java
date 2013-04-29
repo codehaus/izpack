@@ -17,23 +17,27 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.rules;
+package com.izforge.izpack.api.rules.base;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.xml.bind.annotation.XmlTransient;
 
-public abstract class ConditionWithMultipleOperands extends Condition
+
+@XmlTransient
+public abstract class ConditionReference extends Condition
 {
-    protected List<Condition> nestedConditions = new ArrayList<Condition>();
+    private static final long serialVersionUID = -2118025238727923692L;
 
-    public List<Condition> getOperands()
+    private Condition referencedCondition;
+
+    public Condition getReferencedCondition()
     {
-        return nestedConditions;
+        return referencedCondition;
     }
 
-    public void addOperands(Condition... operands)
+    public void setReferencedCondition(Condition referencedCondition)
     {
-        Collections.addAll(nestedConditions, operands);
+        this.referencedCondition = referencedCondition;
     }
+
+    public abstract void resolveReference();
 }
