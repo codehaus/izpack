@@ -20,15 +20,11 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.rules.base;
-
-import javax.xml.bind.annotation.XmlTransient;
+package com.izforge.izpack.api.rules;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.adaptator.impl.XMLElementImpl;
-import com.izforge.izpack.api.rules.ComparisonOperator;
 
-@XmlTransient
 public abstract class CompareCondition extends Condition
 {
     private static final long serialVersionUID = 5449799513620657114L;

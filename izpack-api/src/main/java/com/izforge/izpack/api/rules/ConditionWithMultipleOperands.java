@@ -17,19 +17,12 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.rules.base;
+package com.izforge.izpack.api.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-
-
-@XmlTransient
-@XmlAccessorType(XmlAccessType.NONE)
 public abstract class ConditionWithMultipleOperands extends Condition
 {
     private static final long serialVersionUID = -947580950752190486L;

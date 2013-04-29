@@ -20,13 +20,9 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.rules.base;
-
-//import java.io.Serializable;
+package com.izforge.izpack.api.rules;
 
 import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlTransient;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
@@ -37,7 +33,6 @@ import com.izforge.izpack.api.data.InstallData;
  *
  * @author Dennis Reil <izpack@reil-online.de>
  */
-@XmlTransient
 public abstract class Condition implements Serializable
 {
     private static final long serialVersionUID = -1294594086621662171L;

@@ -17,12 +17,8 @@
  * limitations under the License.
  */
 
-package com.izforge.izpack.api.rules.base;
+package com.izforge.izpack.api.rules;
 
-import javax.xml.bind.annotation.XmlTransient;
-
-
-@XmlTransient
 public abstract class ConditionReference extends Condition
 {
     private static final long serialVersionUID = -2118025238727923692L;
