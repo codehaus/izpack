@@ -228,7 +228,7 @@ public class LanguageDialog extends JDialog
         okButton.addActionListener(new ActionListener()
         {
             @Override
-            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e)
+            public void actionPerformed(ActionEvent e)
             {
                 onOK();
             }
@@ -303,7 +303,7 @@ public class LanguageDialog extends JDialog
          * @param e the event.
          */
         @Override
-        public void windowClosing(@SuppressWarnings("unused") WindowEvent e)
+        public void windowClosing(WindowEvent e)
         {
             System.exit(0);
         }
@@ -370,8 +370,8 @@ public class LanguageDialog extends JDialog
          * @return a component to render the value
          */
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, @SuppressWarnings("unused") int index,
-                boolean isSelected, @SuppressWarnings("unused") boolean cellHasFocus)
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus)
         {
             String code = (String) value;
             setText(displayNames.get(code));
