@@ -58,8 +58,7 @@ public class TargetPanelHelper
     /**
      * Returns the installation path for the current platform.
      * <p/>
-     * If the installation path was already set then it will be returned.
-     * Otherwise this looks for a variable in the following order:
+     * This looks for a variable in the following order:
      * <ol>
      * <li>{@code TargetPanel.dir.<platform symbolic name>}</li>
      * <li>{@code TargetPanel.dir.<platform name>}. This searches any parent platforms if none is found</li>
@@ -72,17 +71,6 @@ public class TargetPanelHelper
      * @return the default platform path, or {@code null} if none is found
      */
     public static String getPath(InstallData installData)
-    {
-        
-        String installPath = installData.getInstallPath();
-        if (installPath != null) {
-            return installPath;
-        }
-        
-        return getDefaultPath(installData);
-    }
-
-    private static String getDefaultPath(InstallData installData)
     {
         String defaultPath = installData.getDefaultInstallPath();
         if (defaultPath == null)
