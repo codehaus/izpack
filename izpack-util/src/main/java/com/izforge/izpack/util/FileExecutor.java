@@ -1,10 +1,8 @@
 /*
- * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2012 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
  * http://izpack.codehaus.org/
- *
- * Copyright 2002 Olexij Tkatchenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +53,7 @@ public class FileExecutor
 
     private boolean stopThread(Thread t, MonitorInputStream monitorInputStream)
     {
-        monitorInputStream.doStop();
+        monitorInputStream.stop();
         long softTimeout = 1000;
         try
         {
