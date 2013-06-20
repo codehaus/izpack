@@ -48,66 +48,52 @@ public class InstallationGroupPanelAutomationHelper
     {
         GroupData[] rows = (GroupData[]) idata.getAttribute("GroupData");
         HashMap<String, Pack> packsByName = (HashMap) idata.getAttribute("packsByName");
-        
-        IXMLElement xselectedGroup = new XMLElementImpl("selectedInstallGroup", panelRoot);
-        xselectedGroup.setContent(idata.getVariable("INSTALL_GROUP"));
-        panelRoot.addChild(xselectedGroup);
-        logger.fine("Saved selected INSTALL_GROUP");
+        String selectedInstallGroup = idata.getVariable("INSTALL_GROUP");
         
         // Write out the group to pack mappings
         for (GroupData groupData : rows)
         {
-            IXMLElement xgroup = new XMLElementImpl("group", panelRoot);
-            xgroup.setAttribute("name", groupData.name);
-            for (String name : groupData.packNames)
+            if (groupData.name.equals(selectedInstallGroup))
             {
-                Pack pack = packsByName.get(name);
-                int index = idata.getAvailablePacks().indexOf(pack);
-                if (index != -1) {
-                    IXMLElement xpack = new XMLElementImpl("pack", xgroup);
-                    xpack.setContent(name);
-                    xgroup.addChild(xpack);
-                }
+              IXMLElement xgroup = new XMLElementImpl("group", panelRoot);
+              xgroup.setAttribute("name", groupData.name);
+              for (String name : groupData.packNames)
+              {
+                  Pack pack = packsByName.get(name);
+                  IXMLElement xpack = new XMLElementImpl("pack", xgroup);
+                  xpack.setContent(name);
+                  xgroup.addChild(xpack);
+              }
+              panelRoot.addChild(xgroup);
             }
-            panelRoot.addChild(xgroup);
         }
     }
 
     @Override
     public void runAutomated(InstallData idata, IXMLElement panelRoot)
     {
-        String installGroup = panelRoot.getFirstChildNamed("selectedInstallGroup").getContent();
-        logger.fine("INSTALL_GROUP: " + installGroup);
-        if (installGroup != null)
+        IXMLElement group = panelRoot.getFirstChildNamed("group");
+        if (group != null)
         {
-            List<IXMLElement> groups = panelRoot.getChildrenNamed("group");
-            for (IXMLElement group : groups)
+            String name = group.getAttribute("name");
+            idata.getSelectedPacks().clear();
+            List<IXMLElement> packs = group.getChildrenNamed("pack");
+            logger.fine(name + " pack count: " + packs.size());
+            logger.fine("Available pack count: " + idata.getAvailablePacks().size());
+            for (IXMLElement xpack : packs)
             {
-                String name = group.getAttribute("name");
-                logger.fine("Checking INSTALL_GROUP against: " + name);
-                if (name.equalsIgnoreCase(installGroup))
+                String packName = xpack.getContent();
+                for (Pack pack: idata.getAvailablePacks()) 
                 {
-                    logger.fine("Found INSTALL_GROUP match for: " + installGroup);
-                    idata.getSelectedPacks().clear();
-                    List<IXMLElement> packs = group.getChildrenNamed("pack");
-                    logger.fine(name + " pack count: " + packs.size());
-                    logger.fine("Available pack count: " + idata.getAvailablePacks().size());
-                    for (IXMLElement xpack : packs)
+                    if (pack.getName().equals(packName)) 
                     {
-                        String packName = xpack.getContent();
-                        for (Pack pack: idata.getAvailablePacks()) {
-                            if (pack.getName().equals(packName)) {
-                                idata.getSelectedPacks().add(pack);
-                                logger.fine("Added pack: " + pack.getName());
-                                break;
-                            }
-                        }
+                        idata.getSelectedPacks().add(pack);
+                        logger.fine("Added pack: " + pack.getName());
+                        break;
                     }
-                    logger.fine("Set selectedPacks to: " + idata.getSelectedPacks());
-                    break;
                 }
             }
+            logger.fine("Set selectedPacks to: " + idata.getSelectedPacks());
         }
     }
-
 }
