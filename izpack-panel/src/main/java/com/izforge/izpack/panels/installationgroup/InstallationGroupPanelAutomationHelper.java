@@ -48,6 +48,12 @@ public class InstallationGroupPanelAutomationHelper
     {
         GroupData[] rows = (GroupData[]) idata.getAttribute("GroupData");
         HashMap<String, Pack> packsByName = (HashMap) idata.getAttribute("packsByName");
+        
+        IXMLElement xselectedGroup = new XMLElementImpl("selectedInstallGroup", panelRoot);
+        xselectedGroup.setContent(idata.getVariable("INSTALL_GROUP"));
+        panelRoot.addChild(xselectedGroup);
+        logger.fine("Saved selected INSTALL_GROUP");
+        
         // Write out the group to pack mappings
         for (GroupData groupData : rows)
         {
@@ -57,24 +63,20 @@ public class InstallationGroupPanelAutomationHelper
             {
                 Pack pack = packsByName.get(name);
                 int index = idata.getAvailablePacks().indexOf(pack);
-                IXMLElement xpack = new XMLElementImpl("pack", xgroup);
-                xpack.setAttribute("name", name);
-                xpack.setAttribute("index", "" + index);
-                xgroup.addChild(xpack);
+                if (index != -1) {
+                    IXMLElement xpack = new XMLElementImpl("pack", xgroup);
+                    xpack.setContent(name);
+                    xgroup.addChild(xpack);
+                }
             }
             panelRoot.addChild(xgroup);
         }
     }
 
-    /**
-     * TODO Need to add a InstallationGroupPanelAutomationHelper to read the
-     * xml installDataGUI to allow an install group to specify the selected packs.
-     */
     @Override
-    public void runAutomated(InstallData idata,
-                             IXMLElement panelRoot)
+    public void runAutomated(InstallData idata, IXMLElement panelRoot)
     {
-        String installGroup = idata.getVariable("INSTALL_GROUP");
+        String installGroup = panelRoot.getFirstChildNamed("selectedInstallGroup").getContent();
         logger.fine("INSTALL_GROUP: " + installGroup);
         if (installGroup != null)
         {
@@ -92,14 +94,13 @@ public class InstallationGroupPanelAutomationHelper
                     logger.fine("Available pack count: " + idata.getAvailablePacks().size());
                     for (IXMLElement xpack : packs)
                     {
-                        String pname = xpack.getAttribute("name");
-                        String indexStr = xpack.getAttribute("index");
-                        int index = Integer.parseInt(indexStr);
-                        if (index >= 0)
-                        {
-                            Pack pack = idata.getAvailablePacks().get(index);
-                            idata.getSelectedPacks().add(pack);
-                            logger.fine("Added pack: " + pack.getName());
+                        String packName = xpack.getContent();
+                        for (Pack pack: idata.getAvailablePacks()) {
+                            if (pack.getName().equals(packName)) {
+                                idata.getSelectedPacks().add(pack);
+                                logger.fine("Added pack: " + pack.getName());
+                                break;
+                            }
                         }
                     }
                     logger.fine("Set selectedPacks to: " + idata.getSelectedPacks());
