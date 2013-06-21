@@ -144,7 +144,23 @@ public class Packager extends PackagerBase
             installerJar.putNextEntry(entry);
             installerJar.flush(); // flush before we start counting
 
-            ByteCountingOutputStream dos = new ByteCountingOutputStream(outputStream);
+        	// TODO : dirty fix for web installation
+            ByteCountingOutputStream dos;
+            JarOutputStream packJar = null;
+            if (packSeparateJars())
+            {
+            	packJar = new JarOutputStream(
+                	new File(new File(
+                    getInfo().getInstallerBase()).getParentFile(), pack.getName() + "-pack.jar"));
+            	packJar.setEncoding("utf-8");
+            	packJar.putNextEntry(entry);
+            	packJar.flush(); // flush before we start counting
+            	dos = new ByteCountingOutputStream(packJar);
+            }
+            else
+            {
+            	dos = new ByteCountingOutputStream(outputStream);
+            }
             ObjectOutputStream objOut = new ObjectOutputStream(dos);
 
             // We write the actual pack files
@@ -241,15 +257,19 @@ public class Packager extends PackagerBase
             objOut.flush();
             if (!getCompressor().useStandardCompression())
             {
-                outputStream.close();
+            	dos.close();
             }
 
-            installerJar.closeEntry();
 
             // close pack specific jar if required
             if (packSeparateJars())
             {
-                installerJar.closeAlways();
+                packJar.closeEntry();
+                packJar.closeAlways();
+            }
+            else
+            {
+            	installerJar.closeEntry();
             }
 
             IXMLElement child = new XMLElementImpl("pack", root);
