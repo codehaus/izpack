@@ -26,7 +26,6 @@ import static com.izforge.izpack.api.handler.Prompt.Option;
 import static com.izforge.izpack.api.handler.Prompt.Options;
 import static com.izforge.izpack.api.handler.Prompt.Type;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,24 +35,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.jar.Pack200;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-
-import org.apache.tools.ant.taskdefs.Jar;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.OverrideType;
@@ -439,42 +428,7 @@ public abstract class UnpackerBase implements IUnpacker
         ObjectInputStream packInputStream = null;
         try
         {
-        	// TODO : dirty fix for web installation
-        	if (getInstallData().getInfo().getWebDirURL() != null)
-        	{
-        		String packFileName = pack.getName() + "-pack.jar";
-        		URL packURL = new URL(getInstallData().getInfo().getWebDirURL() + packFileName);
-    			JarFile jarFile;
-        		if (packURL.getProtocol().equalsIgnoreCase("file"))
-        		{
-        			jarFile = new JarFile(packURL.getFile());
-        		}
-        		else
-        		{
-        			File localPackFile = new File(System.getProperty("java.io.tmpdir"), packFileName);
-        			System.out.println(localPackFile.getAbsolutePath());
-        			URI packURI = new URI(
-        					packURL.getProtocol(),
-        					packURL.getAuthority(),
-        					packURL.getHost(),
-        					packURL.getPort(),
-        					packURL.getPath(),
-        					packURL.getQuery(),
-        					packURL.getRef());
-        			ReadableByteChannel rbc = Channels.newChannel(packURI.toURL().openStream());
-        			FileOutputStream fos = new FileOutputStream(localPackFile);
-        			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        			rbc.close();
-        			fos.close();
-        			jarFile = new JarFile(localPackFile);
-        		}
-    			ZipEntry entry = jarFile.getEntry("resources/packs/pack-" + pack.getName());
-    			in = jarFile.getInputStream(entry);
-        	}
-        	else
-        	{
-        		in = resources.getPackStream(pack.getName());
-        	}
+            in = resources.getPackStream(pack.getName());
             packInputStream = new ObjectInputStream(in);
 
             int fileCount = packInputStream.readInt();
