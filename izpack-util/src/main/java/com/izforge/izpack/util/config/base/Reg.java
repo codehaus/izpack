@@ -180,7 +180,9 @@ public class Reg extends BasicRegistry implements Registry, Persistable, Configu
         try
         {
             regExport(registryKey, tmp);
-            load(tmp);
+            if( tmp.exists() ) {
+            	load(tmp);
+            } // otherwise, it didn't find the key
         }
         finally
         {
@@ -269,7 +271,12 @@ public class Reg extends BasicRegistry implements Registry, Persistable, Configu
                 int n = in.read(buff);
 
                 in.close();
-                throw new IOException(new String(buff, 0, n).trim());
+                String error = new String(buff, 0, n).trim();
+                System.out.println(error + " - " + args[4]);
+                // this would probably break on different Windows versions and in non-English locales
+//                if( !"ERROR: The system was unable to find the specified registry key or value.".equals(error) ) {
+//                	throw new IOException(error);
+//                }
             }
         }
         catch (InterruptedException x)

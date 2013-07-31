@@ -132,7 +132,8 @@ public class RegistryValue extends ValueImpl implements Serializable
         }
         if (regkey != null)
         {
-            return regkey.get(value);
+        	resolvedValue = regkey.get(value);
+            return resolvedValue;
         }
 
         return null;
@@ -179,7 +180,8 @@ public class RegistryValue extends ValueImpl implements Serializable
             {
                 _value_ = substitutor.substitute(_value_);
             }
-            return regkey.get(_value_);
+            resolvedValue = regkey.get(_value_);
+            return resolvedValue;
         }
 
         return null;
