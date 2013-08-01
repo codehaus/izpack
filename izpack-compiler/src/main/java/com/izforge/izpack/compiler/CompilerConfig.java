@@ -1460,12 +1460,15 @@ public class CompilerConfig extends Thread
 
         }
 
+        // This corrects issues that could arise due to subfolders
+        Collections.sort(allDirList);
         for (String dirName : allDirList)
         {
             File tmp = new File(dirName);
-            if (!tmp.mkdirs() && !tmp.exists())
-            {
-                throw new CompilerException("Failed to create directory: " + tmp);
+            // File.mkdirs() returns false when called on a directory that already exists
+            if (!tmp.exists()) {
+                if (!tmp.mkdirs()) { throw new CompilerException("Failed to create directory: " + tmp); }
+                tmp.deleteOnExit();
             }
             tmp.deleteOnExit();
             String target = targetdir + "/" + dirName;
