@@ -1465,12 +1465,8 @@ public class CompilerConfig extends Thread
         for (String dirName : allDirList)
         {
             File tmp = new File(dirName);
-            // File.mkdirs() returns false when called on a directory that already exists
-            if (!tmp.exists()) {
-                if (!tmp.mkdirs()) { throw new CompilerException("Failed to create directory: " + tmp); }
-                tmp.deleteOnExit();
-            }
-            tmp.deleteOnExit();
+            org.apache.commons.io.FileUtils.forceMkdir(tmp);
+            org.apache.commons.io.FileUtils.forceDeleteOnExit(tmp); 
             String target = targetdir + "/" + dirName;
             logger.info("Adding file: " + tmp + ", as target file=" + target);
             pack.addFile(baseDir, tmp, target, osList,
