@@ -250,7 +250,6 @@ public class JDKPathPanel extends PathInputPanel implements HyperlinkListener
             }
             else
             {
-                // Try the JAVA_HOME as child dir of the jdk path
             	String javaHome = installData.getVariable("JAVA_HOME");
             	if (javaHome != null) {
             		chosenPath = new File(javaHome).getAbsolutePath();
