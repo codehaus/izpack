@@ -347,15 +347,6 @@ public class LanguageDialog extends JDialog
             installData.setMessages(locales.getMessages());
 
             AbstractInstallDataProvider.addCustomLangpack(installData, locales);
-//            try
-//            {
-//                installData.getMessages().add(locales.getMessages("CustomLangPack.xml"));
-//                logger.fine("Found custom langpack for " + installData.getLocaleISO3());
-//            }
-//            catch (ResourceNotFoundException exception)
-//            {
-//                logger.info("No custom langpack for " + installData.getLocaleISO3() + " available");
-//            }
 
             // Configure buttons after locale has been loaded
             installData.configureGuiButtons();
