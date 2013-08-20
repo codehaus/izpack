@@ -52,7 +52,6 @@ import javax.swing.SwingUtilities;
 
 import com.izforge.izpack.api.GuiId;
 import com.izforge.izpack.api.exception.ResourceException;
-import com.izforge.izpack.api.exception.ResourceNotFoundException;
 import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.installer.container.provider.AbstractInstallDataProvider;
