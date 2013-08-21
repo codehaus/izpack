@@ -321,7 +321,7 @@ public class DefaultVariables implements Variables
                 }
                 catch (Exception exception)
                 {
-                    throw new IzPackException("Failed to refresh dynamic variables", exception);
+                    throw new IzPackException("Failed to refresh dynamic variables (" + variable.getName() + ")", exception);
 
                 }
                 if (newValue != null)

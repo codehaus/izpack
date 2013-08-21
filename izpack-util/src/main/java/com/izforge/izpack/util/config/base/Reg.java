@@ -180,7 +180,9 @@ public class Reg extends BasicRegistry implements Registry, Persistable, Configu
         try
         {
             regExport(registryKey, tmp);
-            load(tmp);
+            if( tmp.exists() ) {
+            	load(tmp);
+            } // otherwise, it didn't find the key
         }
         finally
         {
@@ -269,7 +271,12 @@ public class Reg extends BasicRegistry implements Registry, Persistable, Configu
                 int n = in.read(buff);
 
                 in.close();
-                throw new IOException(new String(buff, 0, n).trim());
+                String error = new String(buff, 0, n).trim();
+                System.out.println(error + " - " + args[4]);
+                // this would probably break on different Windows versions and in non-English locales
+//                if( !"ERROR: The system was unable to find the specified registry key or value.".equals(error) ) {
+//                	throw new IOException(error);
+//                }
             }
         }
         catch (InterruptedException x)
@@ -290,12 +297,14 @@ public class Reg extends BasicRegistry implements Registry, Persistable, Configu
     private void regExport(String registryKey, File file) throws IOException
     {
         requireWindows();
+        file.delete();		// reg export hangs if the file already exists
         exec(new String[] { "cmd", "/c", "reg", "export", registryKey, file.getAbsolutePath() });
     }
 
     private void regImport(File file) throws IOException
     {
         requireWindows();
+        file.delete();		// reg export hangs if the file already exists
         exec(new String[] { "cmd", "/c", "reg", "import", file.getAbsolutePath() });
     }
 

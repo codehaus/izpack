@@ -27,17 +27,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
@@ -131,11 +129,6 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
     private String helpUrl = null;
 
     /**
-     * The logger.
-     */
-    private static final Logger logger = Logger.getLogger(IzPanel.class.getName());
-
-    /**
      * Constructs an <tt>IzPanel</tt>.
      *
      * @param panel       the panel meta-data
@@ -181,30 +174,18 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      *
      * @param panel       the panel meta-data
      * @param parent      the parent IzPack installer frame
-     * @param iconName    the Headline icon name
-     * @param installData the installation data
-     * @param resources   the resources
-     */
-    public IzPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, String iconName, Resources resources)
-    {
-        this(panel, parent, installData, iconName, -1, resources);
-    }
-
-    /**
-     * Constructs an <tt>IzPanel</tt>.
-     *
-     * @param panel       the panel meta-data
-     * @param parent      the parent IzPack installer frame
      * @param installData the installation data
      * @param iconName    the Headline icon name
      * @param instance    an instance counter
      * @param resources   the resources
      */
-    public IzPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, String iconName, int instance,
+    @Deprecated
+    // FIXME: This constructor is used just in ShortcutPanel, move it there
+    public IzPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, String iconName,
                    Resources resources)
     {
         this(panel, parent, installData, resources);
-        buildHeadline(iconName, instance);
+        buildHeadline(iconName);
     }
 
     /**
@@ -217,46 +198,27 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      * @param instanceNumber an panel instance
      * @return true if successful build
      */
-    protected boolean buildHeadline(String imageIconName, int instanceNumber)
+    @Deprecated
+    private void buildHeadline(String imageIconName)
     {
-        boolean result = false;
         if (parent.isHeading(this))
         {
-            return (false);
+            return;
         }
 
-        // TODO: proteced instancenumber
-        // TODO: is to be validated
-        // TODO:
-        // TODO: first Test if a Resource for your protected Instance exists.
-        String headline;
-        String headlineSearchBaseKey = getClass().getSimpleName() + DELIMITER + "headline"; // Results for example in
-        // "ShortcutPanel.headline"
-        // :
-
-        if (instanceNumber > -1) // Search for Results for example in "ShortcutPanel.headline.1,
-        // 2, 3 etc." :
+        String headline = null;
+        String searchkey = getMetadata().getPanelId() + DELIMITER + "headline";
+        if (getMetadata().hasPanelId() && installData.getMessages().getMessages().containsKey(searchkey))
         {
-            String instanceSearchKey = headlineSearchBaseKey + DELIMITER + Integer.toString(instanceNumber);
-
-            String instanceHeadline = getString(instanceSearchKey);
-
-            logger.fine("found headline: " + instanceHeadline + DELIMITER + " for instance # "
-                                + instanceNumber);
-            if (!instanceSearchKey.equals(instanceHeadline))
+            headline = getString(getMetadata().getPanelId() + DELIMITER + "headline");
+        }
+        else {
+            searchkey = getClass().getSimpleName() + DELIMITER + "headline";
+            if (installData.getMessages().getMessages().containsKey(searchkey))
             {
-                headline = instanceHeadline;
-            }
-            else
-            {
-                headline = getString(headlineSearchBaseKey);
+                headline = getString(searchkey);
             }
         }
-        else
-        {
-            headline = getString(headlineSearchBaseKey);
-        }
-
         if (headline != null)
         {
             if ((imageIconName != null) && !"".equals(imageIconName))
@@ -289,8 +251,6 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
 
             add(headLineLabel);
         }
-
-        return result;
     }
 
     /**
@@ -479,14 +439,7 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      */
     public String getI18nStringForClass(String subkey)
     {
-        String retval = null;
-        Class<?> clazz = this.getClass();
-        while (retval == null && !clazz.getName().endsWith(".IzPanel"))
-        {
-            retval = getI18nStringForClass(clazz.getName(), subkey, null);
-            clazz = clazz.getSuperclass();
-        }
-        return (retval);
+        return getI18nStringForClass(subkey, null);
     }
 
     /**
@@ -501,40 +454,45 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      */
     public String getI18nStringForClass(String subkey, String alternateClass)
     {
-        return (getI18nStringForClass(getClass().getName(), subkey, alternateClass));
-
-    }
-
-    private String getI18nStringForClass(String curClassName, String subkey, String alternateClass)
-    {
-
-        int nameStart = curClassName.lastIndexOf('.') + 1;
-        curClassName = curClassName.substring(nameStart, curClassName.length());
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(curClassName).append(".").append(subkey);
-        String fullkey = buffer.toString();
-        String panelId = getMetadata().getPanelId();
         String retval = null;
-        if (panelId != null)
+
+        List<String> panelIdParts = new ArrayList<String>();
+        if (getMetadata().hasPanelId())
         {
-            buffer.append(".");
-            buffer.append(panelId);
-            retval = getString(buffer.toString());
+            panelIdParts.add("." + getMetadata().getPanelId());
         }
-        if (retval == null || retval.startsWith(fullkey))
+        panelIdParts.add("");
+
+        for (String panelIdPart : panelIdParts)
         {
-            retval = getString(fullkey);
-        }
-        if (retval == null || retval.startsWith(fullkey))
-        {
-            if (alternateClass == null)
+          Class<?> clazz = this.getClass();
+          while (retval == null && !clazz.equals(IzPanel.class))
+          {
+            // Try <full class name>[.<panel id>].<subkey>
+            String className = alternateClass==null?clazz.getName():alternateClass;
+            String searchkey = className + panelIdPart + "." + subkey;
+            if (installData.getMessages().getMessages().containsKey(searchkey))
             {
-                return (null);
+                retval = getString(searchkey);
             }
-            buffer.delete(0, buffer.length());
-            buffer.append(alternateClass).append(".").append(subkey);
-            retval = getString(buffer.toString());
+            if (retval == null)
+            {
+                // Try <simple class name>[.<panel id>].<subkey>
+                className = alternateClass==null?clazz.getSimpleName():alternateClass;            // Try <simple class name>.<panel id>.<subkey>
+                searchkey = className + panelIdPart + "." + subkey;
+                if (installData.getMessages().getMessages().containsKey(searchkey))
+                {
+                    retval = getString(searchkey);
+                }
+            }
+            if (alternateClass != null)
+            {
+                break;
+            }
+            clazz = clazz.getSuperclass();
+          }
         }
+
         if (retval != null && retval.indexOf('$') > -1)
         {
             retval = installData.getVariables().replace(retval);
