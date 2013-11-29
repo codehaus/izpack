@@ -299,4 +299,24 @@ public class DefaultXmlMerge implements XmlMerge
         root.sortChildren(comparator);
     }
 
+
+    public static void main(String [] args)
+    {
+        DefaultXmlMerge merger = new DefaultXmlMerge();
+        try
+        {
+            File targetFile = new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml.confignew");
+            if (targetFile.exists() && !targetFile.delete())
+            {
+                System.err.println("Delete error");
+            }
+            merger.merge(new File[] { new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml.configbak"),
+                    new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml")}, targetFile);
+        }
+        catch (AbstractXmlMergeException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

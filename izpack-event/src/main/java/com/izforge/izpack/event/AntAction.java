@@ -68,6 +68,8 @@ public class AntAction extends ActionBase
 
     private boolean verbose = false;
 
+    private AntLogLevel logLevel = AntLogLevel.INFO;
+
     private Properties properties = null;
 
     private List<String> targets = null;
@@ -365,6 +367,27 @@ public class AntAction extends ActionBase
     }
 
     /**
+     * Get Ant log priority level the action uses when logging.
+     * @return logLevel
+     * @see org.apache.tools.ant.Project
+     */
+    public AntLogLevel getLogLevel()
+    {
+        return logLevel;
+    }
+
+    /**
+     * Set Ant log priority level the action should use when logging.
+     * Must be on of @TODO
+     * @param logLevel
+     * @see org.apache.tools.ant.Project
+     */
+    public void setLogLevel(AntLogLevel logLevel)
+    {
+        this.logLevel = logLevel;
+    }
+
+    /**
      * Returns the targets.
      *
      * @return the targets
@@ -446,17 +469,16 @@ public class AntAction extends ActionBase
 
     private BuildLogger createLogger()
     {
-        int msgOutputLevel = 2;
         if (verbose)
         {
-            msgOutputLevel = 4;
+            logLevel = AntLogLevel.VERBOSE;
         }
         else if (quiet)
         {
-            msgOutputLevel = 1;
+            logLevel = AntLogLevel.WARNING;
         }
         BuildLogger logger = new DefaultLogger();
-        logger.setMessageOutputLevel(msgOutputLevel);
+        logger.setMessageOutputLevel(logLevel.getLevel());
         if (logFile != null)
         {
             PrintStream printStream;

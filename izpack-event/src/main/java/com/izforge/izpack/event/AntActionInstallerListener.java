@@ -350,6 +350,20 @@ public class AntActionInstallerListener extends AbstractProgressInstallerListene
 
         act.setQuiet(spec.isAttributeYes(el, ActionBase.ANTCALL_QUIET_ATTR, false));
         act.setVerbose(spec.isAttributeYes(el, ActionBase.ANTCALL_VERBOSE_ATTR, false));
+        if (!(act.isQuiet() || act.isVerbose()))
+        {
+            String logLevelAttrValue = el.getAttribute(ActionBase.ANTCALL_LOGLEVEL_ATTR);
+            AntLogLevel logLevel = AntLogLevel.fromName(logLevelAttrValue);
+            if (logLevel == null)
+            {
+                if (logLevelAttrValue != null)
+                {
+                    throw new InstallerException("Bad value for attribute " + ActionBase.ANTCALL_LOGLEVEL_ATTR);
+                }
+                logLevel = AntLogLevel.INFO;
+            }
+            act.setLogLevel(logLevel);
+        }
         buildDir = el.getAttribute(ActionBase.ANTCALL_DIR_ATTR);
         if (buildDir != null)
         {
