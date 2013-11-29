@@ -25,23 +25,18 @@ package com.izforge.izpack.util.xmlmerge.merge;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.DOMBuilder;
-import org.jdom2.input.StAXStreamBuilder;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -165,25 +160,20 @@ public class DefaultXmlMerge implements XmlMerge
     @Override
     public InputStream merge(InputStream[] sources) throws AbstractXmlMergeException
     {
-        StAXStreamBuilder staxBuilder = new StAXStreamBuilder();
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+        // Xerces-specific - see: http://xerces.apache.org/xerces-j/features.html
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-        // to save all XML files as JDOM objects
         Document[] docs = new Document[sources.length];
 
         for (int i = 0; i < sources.length; i++)
         {
             try
             {
-                // ask JDOM to parse the given inputStream
-                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sources[i]);
-                docs[i] = staxBuilder.build(xmlStreamReader);
+                docs[i] = builder.build(sources[i]);
             }
-            catch (JDOMException e)
-            {
-                throw new ParseException(e);
-            }
-            catch (XMLStreamException e)
+            catch (Exception e)
             {
                 throw new ParseException(e);
             }
@@ -214,29 +204,20 @@ public class DefaultXmlMerge implements XmlMerge
     @Override
     public void merge(File[] sources, File target) throws AbstractXmlMergeException
     {
-        StAXStreamBuilder staxBuilder = new StAXStreamBuilder();
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+        // Xerces-specific - see: http://xerces.apache.org/xerces-j/features.html
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-        // to save all XML files as JDOM objects
         Document[] docs = new Document[sources.length];
 
         for (int i = 0; i < sources.length; i++)
         {
             try
             {
-                // ask JDOM to parse the given inputStream
-                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new FileInputStream(sources[i]));
-                docs[i] = staxBuilder.build(xmlStreamReader);
+                docs[i] = builder.build(sources[i]);
             }
-            catch (JDOMException e)
-            {
-                throw new ParseException(e);
-            }
-            catch (XMLStreamException e)
-            {
-                throw new ParseException(e);
-            }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
                 throw new ParseException(e);
             }
@@ -318,4 +299,24 @@ public class DefaultXmlMerge implements XmlMerge
         root.sortChildren(comparator);
     }
 
+
+    public static void main(String [] args)
+    {
+        DefaultXmlMerge merger = new DefaultXmlMerge();
+        try
+        {
+            File targetFile = new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml.confignew");
+            if (targetFile.exists() && !targetFile.delete())
+            {
+                System.err.println("Delete error");
+            }
+            merger.merge(new File[] { new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml.configbak"),
+                    new File("/home/rkrell/gkretail/sm.server/config/sm_client_log4j.xml")}, targetFile);
+        }
+        catch (AbstractXmlMergeException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }
