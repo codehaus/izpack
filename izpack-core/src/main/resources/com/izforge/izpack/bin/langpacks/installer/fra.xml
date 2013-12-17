@@ -46,6 +46,7 @@
     <str id="installer.cancel" txt="Annuler"/>
     <str id="installer.error" txt="Erreur"/>
     <str id="installer.help" txt="Aide"/>
+    <str id="installer.help.close" txt="Fermer"/>
     <str id="installer.step" txt="Etape"/>
     <str id="installer.of" txt="sur"/>
     <str id="installer.Message" txt="Message"/>
@@ -265,6 +266,20 @@
     <str id="CheckedHelloPanel.productAlreadyExist1"
          txt=" . Etes-vous certain de vouloir installer une autre entité ?"/>
     <str id="CheckedHelloPanel.infoOverUninstallKey" txt="La clé de désinstallation sera : "/>
+
+    <!-- ConsolePrompt strings -->
+    <str id="ConsolePrompt.okCancel" txt="Taper O pour OK, A pour Annuler: "/>
+    <str id="ConsolePrompt.yesNo" txt="Taper O pour Oui, N pour Non: "/>
+    <str id="ConsolePrompt.yesNoCancel" txt="Taper O pour Oui, N pour Non, ou A pour Annuler: "/>
+    <str id="ConsolePrompt.ok" txt="O"/>
+    <str id="ConsolePrompt.cancel" txt="A"/>
+    <str id="ConsolePrompt.yes" txt="O"/>
+    <str id="ConsolePrompt.no" txt="N"/>
+
+    <!-- ConsoleInstaller strings -->
+    <str id="ConsoleInstaller.continueQuitRedisplay" txt="Appuyer sur 1 pour continuer, 2 pour quitter, 3 pour réafficher"/>
+    <str id="ConsoleInstaller.acceptRejectRedisplay" txt="Appuyer sur 1 pour accepter, 2 pour refuser, 3 pour réafficher"/>
+    <str id="ConsoleInstaller.redisplayQuit" txt="Appuyer sur 1 pour réafficher, 2 pour quitter"/>
 
     <!-- Next Media Strings -->
     <str id="nextmedia.title" txt="Prochain media d'installation"/>

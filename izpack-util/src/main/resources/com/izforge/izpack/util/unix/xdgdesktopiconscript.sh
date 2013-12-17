@@ -544,7 +544,7 @@ case $action in
 
         for x in $desktop_dir ; do
             mkdir -p $x
-            eval 'cp $desktop_file $x/$basefile'$xdg_redirect_output
+            eval 'cp "$desktop_file" $x/$basefile'$xdg_redirect_output
 # Ubuntu 10.04 needs .desktop files to be executable
             chmod u+x $x/$basefile
         done
