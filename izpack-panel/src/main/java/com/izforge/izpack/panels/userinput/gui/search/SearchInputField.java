@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -226,7 +227,6 @@ public class SearchInputField implements ActionListener
 
         // Checks whether a placeholder item is in the combobox
         // and resolve the paths automatically:
-        // and resolve the pathes automatically:
         // /usr/lib/* searches all folders in usr/lib to find
         // /usr/lib/*/lib/tools.jar
         for (int i = 0; i < pathComboBox.getItemCount(); ++i)
@@ -262,8 +262,8 @@ public class SearchInputField implements ActionListener
                 }
             }
         }
-        // Make the enties in the vector unique
-        items = new ArrayList<String>(new HashSet<String>(items));
+        // Make the entries in the vector unique
+        items = new ArrayList<String>(new LinkedHashSet<String>(items));
 
         // Now clear the combobox and add the items out of the newly
         // generated vector
