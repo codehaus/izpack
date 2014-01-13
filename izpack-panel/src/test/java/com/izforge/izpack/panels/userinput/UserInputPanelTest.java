@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 
@@ -367,7 +368,13 @@ public class UserInputPanelTest extends AbstractPanelTest
         FrameFixture frame = showUserInputPanel("searchinput");
 
         JComboBoxFixture search1 = frame.comboBox("search1");
-        assertEquals(-1, search1.component().getSelectedIndex());
+
+        // make sure the order is preserved
+        ComboBoxModel model = search1.component().getModel();
+        assertEquals(path + File.separator + "dir1", model.getElementAt(0));
+        assertEquals(path + File.separator + "dir2", model.getElementAt(1));
+
+        assertEquals(0, search1.component().getSelectedIndex()); // should default to first dir1
         search1.selectItem(1);
         assertEquals(1, search1.component().getSelectedIndex());
 
