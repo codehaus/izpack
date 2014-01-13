@@ -62,7 +62,7 @@ public class XmlMergeTest
 
         assertNotNull(result);
 
-        final String expectedResult = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        String expectedResult = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<el1 el1_attr1=\"el1_attr1_value_from_patch\">\n" +
                 "  <el2 NAME=\"el2_NAME_value_from_original\" el2_attr2=\"el2_attr2_value_from_original\" />\n" +
                 "  <el2 NAME=\"el2_NAME_value_from_patch\" el2_attr2=\"el2_attr2_value_from_patch\" el2_attr3=\"el2_attr3_value_from_patch\" />\n" +
@@ -70,6 +70,7 @@ public class XmlMergeTest
                 "    <el4 el4_attr1=\"el4_attr1_value_from_original\" el4_attr2=\"el4_attr2_value_from_original\" />\n" +
                 "  </el3>\n" +
                 "</el1>\n";
+        expectedResult = expectedResult.replace("\n", System.getProperty("line.separator"));
         assertEquals(result, expectedResult);
     }
 
