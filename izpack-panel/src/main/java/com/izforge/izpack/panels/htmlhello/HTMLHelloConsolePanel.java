@@ -22,9 +22,9 @@
 package com.izforge.izpack.panels.htmlhello;
 
 import com.izforge.izpack.api.resource.Resources;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.panels.htmlinfo.HTMLInfoConsolePanel;
-import com.izforge.izpack.util.Console;
 
 /**
  * Console implementation of {@link HTMLHelloPanel}.
@@ -34,7 +34,7 @@ import com.izforge.izpack.util.Console;
 public class HTMLHelloConsolePanel extends HTMLInfoConsolePanel
 {
 
-    public HTMLHelloConsolePanel(Resources resources, PanelView<Console> panel)
+    public HTMLHelloConsolePanel(Resources resources, PanelView<ConsolePanel> panel)
     {
         super(panel, resources, "HTMLHelloPanel");
     }

@@ -50,7 +50,8 @@ public class InstallationGroupConsolePanel extends AbstractConsolePanel implemen
     private final PlatformModelMatcher matcher;
 
     @SuppressWarnings("UnusedDeclaration")
-    public InstallationGroupConsolePanel(PanelView<Console> panel, Prompt prompt, AutomatedInstallData automatedInstallData, PlatformModelMatcher matcher)
+    public InstallationGroupConsolePanel(PanelView<ConsolePanel> panel, Prompt prompt,
+                                         AutomatedInstallData automatedInstallData, PlatformModelMatcher matcher)
     {
         super(panel);
         this.prompt = prompt;

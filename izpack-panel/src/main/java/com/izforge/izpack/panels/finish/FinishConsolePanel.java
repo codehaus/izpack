@@ -41,6 +41,7 @@ import com.izforge.izpack.api.handler.Prompt.Type;
 import com.izforge.izpack.installer.automation.AutomatedPanelView;
 import com.izforge.izpack.installer.automation.AutomatedPanels;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.console.ConsolePanelAutomationHelper;
 import com.izforge.izpack.installer.container.provider.AutomatedPanelsProvider;
 import com.izforge.izpack.installer.panel.PanelView;
@@ -68,7 +69,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
      * @param panel the parent panel/view. May be {@code null}
      */
     public FinishConsolePanel(final ObjectFactory factory, final PlatformModelMatcher matcher,
-            Prompt prompt, PanelView<Console> panel)
+            Prompt prompt, PanelView<ConsolePanel> panel)
     {
         super(panel);
         this.prompt = prompt;
@@ -76,7 +77,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
         this.matcher = matcher;
     }
 
-    public FinishConsolePanel(PanelView<Console> panel)
+    public FinishConsolePanel(PanelView<ConsolePanel> panel)
     {
         this(null, null, null, panel);
     }

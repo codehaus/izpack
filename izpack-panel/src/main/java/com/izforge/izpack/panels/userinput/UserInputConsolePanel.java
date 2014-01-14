@@ -34,6 +34,7 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.panels.userinput.console.ConsoleField;
 import com.izforge.izpack.panels.userinput.console.ConsoleFieldFactory;
@@ -101,7 +102,7 @@ public class UserInputConsolePanel extends AbstractConsolePanel
      */
     public UserInputConsolePanel(Resources resources, ObjectFactory factory,
                                  RulesEngine rules, PlatformModelMatcher matcher, Console console, Prompt prompt,
-                                 PanelView<Console> panel)
+                                 PanelView<ConsolePanel> panel)
     {
         super(panel);
         this.resources = resources;

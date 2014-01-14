@@ -56,7 +56,7 @@ public class PacksConsolePanel extends AbstractConsolePanel implements ConsolePa
 
     private final Prompt prompt;
 
-    public PacksConsolePanel(PanelView<Console> panel, Prompt prompt)
+    public PacksConsolePanel(PanelView<ConsolePanel> panel, Prompt prompt)
     {
         super(panel);
         this.prompt = prompt;

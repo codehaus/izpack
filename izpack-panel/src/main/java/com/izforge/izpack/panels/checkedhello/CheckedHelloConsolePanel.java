@@ -34,6 +34,7 @@ import com.izforge.izpack.api.exception.NativeLibException;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.core.os.RegistryDefaultHandler;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.panels.hello.HelloConsolePanel;
 import com.izforge.izpack.util.Console;
@@ -76,7 +77,7 @@ public class CheckedHelloConsolePanel extends HelloConsolePanel
      * @throws NativeLibException for any native library error
      */
     public CheckedHelloConsolePanel(RegistryDefaultHandler handler, InstallData installData, Prompt prompt,
-                                    PanelView<Console> panel)
+                                    PanelView<ConsolePanel> panel)
             throws NativeLibException
     {
         super(panel);

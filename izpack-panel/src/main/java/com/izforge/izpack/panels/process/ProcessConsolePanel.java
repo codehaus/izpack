@@ -35,7 +35,7 @@ public class ProcessConsolePanel extends AbstractConsolePanel implements Console
     private int currentJob = 0;
 
     public ProcessConsolePanel(RulesEngine rules, Resources resources, Prompt prompt, PlatformModelMatcher matcher,
-                               PanelView<Console> panel)
+                               PanelView<ConsolePanel> panel)
     {
         super(panel);
         this.rules = rules;

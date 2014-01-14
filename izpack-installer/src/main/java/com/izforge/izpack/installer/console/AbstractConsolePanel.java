@@ -40,7 +40,7 @@ public abstract class AbstractConsolePanel implements ConsolePanel
     /**
      * The the parent panel/view. May be {@code null}
      */
-    private final PanelView<Console> panel;
+    private final PanelView<ConsolePanel> panel;
 
 
     /**
@@ -48,7 +48,7 @@ public abstract class AbstractConsolePanel implements ConsolePanel
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public AbstractConsolePanel(PanelView<Console> panel)
+    public AbstractConsolePanel(PanelView<ConsolePanel> panel)
     {
         this.panel = panel;
     }

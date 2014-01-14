@@ -32,6 +32,7 @@ import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.util.Console;
 
@@ -73,7 +74,7 @@ public class UserPathConsolePanel extends AbstractConsolePanel
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public UserPathConsolePanel(PanelView<Console> panel)
+    public UserPathConsolePanel(PanelView<ConsolePanel> panel)
     {
         super(panel);
     }
