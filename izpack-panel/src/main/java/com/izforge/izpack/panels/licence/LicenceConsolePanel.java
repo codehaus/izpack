@@ -22,8 +22,8 @@
 package com.izforge.izpack.panels.licence;
 
 import com.izforge.izpack.api.resource.Resources;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
-import com.izforge.izpack.util.Console;
 
 
 /**
@@ -37,7 +37,7 @@ public class LicenceConsolePanel extends AbstractLicenceConsolePanel
      * @param resources the resources
      * @param panel     the parent panel/view. May be {@code null}
      */
-    public LicenceConsolePanel(Resources resources, PanelView<Console> panel)
+    public LicenceConsolePanel(Resources resources, PanelView<ConsolePanel> panel)
     {
         super(panel, resources);
     }

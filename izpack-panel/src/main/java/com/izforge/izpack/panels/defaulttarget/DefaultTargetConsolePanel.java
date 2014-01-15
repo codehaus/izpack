@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.panels.target.TargetPanelHelper;
 import com.izforge.izpack.util.Console;
@@ -43,7 +44,7 @@ public class DefaultTargetConsolePanel extends AbstractConsolePanel
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public DefaultTargetConsolePanel(PanelView<Console> panel)
+    public DefaultTargetConsolePanel(PanelView<ConsolePanel> panel)
     {
         super(panel);
     }

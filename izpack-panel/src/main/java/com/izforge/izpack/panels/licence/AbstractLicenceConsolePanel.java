@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.installer.console.AbstractTextConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.util.Console;
 
@@ -54,7 +55,7 @@ public abstract class AbstractLicenceConsolePanel extends AbstractTextConsolePan
      * @param panel     the parent panel/view. May be {@code null}
      * @param resources the resources
      */
-    public AbstractLicenceConsolePanel(PanelView<Console> panel, Resources resources)
+    public AbstractLicenceConsolePanel(PanelView<ConsolePanel> panel, Resources resources)
     {
         super(panel);
         this.resources = resources;

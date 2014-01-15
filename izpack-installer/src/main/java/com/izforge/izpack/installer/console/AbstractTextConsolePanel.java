@@ -47,7 +47,7 @@ public abstract class AbstractTextConsolePanel extends AbstractConsolePanel
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public AbstractTextConsolePanel(PanelView<Console> panel)
+    public AbstractTextConsolePanel(PanelView<ConsolePanel> panel)
     {
         super(panel);
     }

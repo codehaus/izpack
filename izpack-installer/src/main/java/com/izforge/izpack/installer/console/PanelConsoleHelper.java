@@ -51,7 +51,7 @@ abstract public class PanelConsoleHelper extends AbstractConsolePanel implements
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public PanelConsoleHelper(PanelView<Console> panel)
+    public PanelConsoleHelper(PanelView<ConsolePanel> panel)
     {
         super(panel);
     }

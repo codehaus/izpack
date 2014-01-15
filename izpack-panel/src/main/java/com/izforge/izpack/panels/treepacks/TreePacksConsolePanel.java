@@ -68,7 +68,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      * @param panel  the parent panel/view. May be {@code null}
      * @param prompt the prompt
      */
-    public TreePacksConsolePanel(PanelView<Console> panel, Prompt prompt)
+    public TreePacksConsolePanel(PanelView<ConsolePanel> panel, Prompt prompt)
     {
         super(panel);
         this.prompt = prompt;

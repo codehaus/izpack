@@ -23,8 +23,8 @@ package com.izforge.izpack.panels.info;
 
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.installer.console.AbstractTextConsolePanel;
+import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
-import com.izforge.izpack.util.Console;
 
 /**
  * Console implementation of {@link InfoPanel}.
@@ -45,7 +45,7 @@ public class InfoConsolePanel extends AbstractTextConsolePanel
      * @param resources the resources
      * @param panel     the parent panel/view. May be {@code null}
      */
-    public InfoConsolePanel(Resources resources, PanelView<Console> panel)
+    public InfoConsolePanel(Resources resources, PanelView<ConsolePanel> panel)
     {
         super(panel);
         this.resources = resources;

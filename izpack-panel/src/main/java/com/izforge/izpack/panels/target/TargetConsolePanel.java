@@ -44,7 +44,7 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
      *
      * @param panel the parent panel/view. May be {@code null}
      */
-    public TargetConsolePanel(PanelView<Console> panel)
+    public TargetConsolePanel(PanelView<ConsolePanel> panel)
     {
         super(panel);
     }
