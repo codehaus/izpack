@@ -161,31 +161,36 @@ public class SearchInputField implements ActionListener
             }
             else
             {
-                file = new File(path, filename);                
+                file = new File(path, filename);
             }
 
             if (file.exists())
             {
-                    if (checkFilename == null)
+                if (checkFilename == null)
                 {        
                     return true;        // no file to check for
                 }
 
-                    if( file.isDirectory() ) {
-                            file = new File(file, checkFilename);
-                            if( !file.exists() ) {
-                                    System.out.println( file.getAbsolutePath() + " does not exist");                            
-                                    return false;
-                            }
-                    } else {
-                            // Check that the file's path and name ends with "checkFilename"
-                            if( !file.getAbsolutePath().endsWith( checkFilename.replaceAll("\\\\/", File.separator) ) ) {
-                                    return false;
-                            }
+                if( file.isDirectory() ) 
+                {
+                    file = new File(file, checkFilename);
+                    if( !file.exists() ) 
+                    {
+                        System.out.println( file.getAbsolutePath() + " does not exist");                            
+                        return false;
                     }
-                    
-                    // "file" now points to "checkfilename", but is it the correct type?
-                    return file.isDirectory() == (searchType == SearchType.DIRECTORY);
+                } 
+                else 
+                {
+                    // Check that the file's path and name ends with "checkFilename"
+                    if( !file.getAbsolutePath().endsWith( checkFilename.replaceAll("\\\\/", File.separator) ) ) 
+                    {
+                        return false;
+                    }
+                }
+
+                // "file" now points to "checkfilename", but is it the correct type?
+                return file.isDirectory() == (searchType == SearchType.DIRECTORY);
             }
         }
         return false;
