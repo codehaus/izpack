@@ -155,32 +155,37 @@ public class SearchInputField implements ActionListener
         if (path != null)
         {
             File file;
-
             if (filename == null || searchType == SearchType.DIRECTORY)
             {
                 file = new File(path);
             }
             else
             {
-                file = new File(path, filename);
+                file = new File(path, filename);                
             }
 
             if (file.exists())
             {
-
-                if ((searchType == SearchType.DIRECTORY && file.isDirectory())
-                        || (searchType == SearchType.FILE && file.isFile()))
-                {
-                    // no file to check for
                     if (checkFilename == null)
-                    {
-                        return true;
-                    }
-
-                    file = new File(file, checkFilename);
-                    return file.exists();
+                {        
+                    return true;        // no file to check for
                 }
 
+                    if( file.isDirectory() ) {
+                            file = new File(file, checkFilename);
+                            if( !file.exists() ) {
+                                    System.out.println( file.getAbsolutePath() + " does not exist");                            
+                                    return false;
+                            }
+                    } else {
+                            // Check that the file's path and name ends with "checkFilename"
+                            if( !file.getAbsolutePath().endsWith( checkFilename.replaceAll("\\\\/", File.separator) ) ) {
+                                    return false;
+                            }
+                    }
+                    
+                    // "file" now points to "checkfilename", but is it the correct type?
+                    return file.isDirectory() == (searchType == SearchType.DIRECTORY);
             }
         }
         return false;
