@@ -425,6 +425,23 @@ kfmclient_fix_exit_code()
     return 0
 }
 
+install_desktop_file()
+{
+    if [ ! -z "$1" ]; then
+        mkdir -p "$1"
+        eval 'cp "$desktop_file" "$1/$basefile"'$xdg_redirect_output
+# Ubuntu 10.04 needs .desktop files to be executable
+        chmod u+x "$1/$basefile"
+    fi
+}
+
+uninstall_desktop_file()
+{
+    if [ ! -z "$1" ]; then
+        rm -f "$1/$basefile"
+    fi
+}
+
 [ x"$1" != x"" ] || exit_failure_syntax 
 
 action=
@@ -531,31 +548,28 @@ if [ -n "$desktop_dir_kde" ]; then
         desktop_dir_kde=
     fi
 fi
-desktop_dir="$desktop_dir $desktop_dir_kde $desktop_dir_gnome"
+desktop_dir_list="$desktop_dir $desktop_dir_kde $desktop_dir_gnome"
 
 basefile=`basename "$desktop_file"`
 
-DEBUG 1 "$action $desktop_file in $desktop_dir"
+DEBUG 1 "$action $desktop_file in $desktop_dir_list"
 
 case $action in
     install)
         save_umask=`umask`
         umask $my_umask
 
-        for x in $desktop_dir ; do
-            mkdir -p $x
-            eval 'cp "$desktop_file" $x/$basefile'$xdg_redirect_output
-# Ubuntu 10.04 needs .desktop files to be executable
-            chmod u+x $x/$basefile
-        done
+        install_desktop_file "$desktop_dir"
+        install_desktop_file "$desktop_dir_kde" 
+        install_desktop_file "$desktop_dir_gnome" 
 
         umask $save_umask
         ;;
 
     uninstall)
-        for x in $desktop_dir ; do
-            rm -f $x/$basefile
-        done
+        uninstall_desktop_file "$desktop_dir"
+        uninstall_desktop_file "$desktop_dir_kde" 
+        uninstall_desktop_file "$desktop_dir_gnome" 
 
         ;;
 esac
