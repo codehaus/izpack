@@ -23,9 +23,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -146,6 +146,37 @@ public class SearchInputField implements ActionListener
 
         autodetect();
     }
+    
+    /**
+     * Resolve Windows environment variables
+     * @param path - eg: "%JAVA_HOME%\\bin"
+     * @param env - System.getenv() (or forced config for testing)
+     */
+    static String resolveEnvValue( String path, Map<String, String> env ) {
+    	StringBuilder str = new StringBuilder();
+    	int start = 0, envStart;
+    	
+    	while( (envStart = path.indexOf('%', start)) >= 0 ) {
+    		int end = path.indexOf('%', envStart + 1);
+    		if( end < 0 ) {
+    			break;
+    		}
+    		String envKey = path.substring(envStart + 1, end);
+    		String envValue = env.get(envKey); //System.getenv( envKey );
+
+    		if( envStart > start ) {
+    			str.append( path.substring(start, envStart) );
+    		}
+    		str.append( envValue );
+    		start = end + 1;
+    	}
+    	if( start > 0 ) {
+    		str.append( path.substring(start) );
+    		return str.toString();
+    	}
+    	
+    	return path;
+    }
 
     /**
      * check whether the given path matches
@@ -154,8 +185,9 @@ public class SearchInputField implements ActionListener
     {
         if (path != null)
         {
+        	path = resolveEnvValue(path, System.getenv());
+        	
             File file;
-
             if (filename == null || searchType == SearchType.DIRECTORY)
             {
                 file = new File(path);
@@ -167,20 +199,31 @@ public class SearchInputField implements ActionListener
 
             if (file.exists())
             {
-
-                if ((searchType == SearchType.DIRECTORY && file.isDirectory())
-                        || (searchType == SearchType.FILE && file.isFile()))
-                {
-                    // no file to check for
-                    if (checkFilename == null)
-                    {
-                        return true;
-                    }
-
-                    file = new File(file, checkFilename);
-                    return file.exists();
+                if (checkFilename == null)
+                {        
+                    return true;        // no file to check for
                 }
 
+                if( file.isDirectory() ) 
+                {
+                    file = new File(file, checkFilename);
+                    if( !file.exists() ) 
+                    {
+                        System.out.println( file.getAbsolutePath() + " does not exist");                            
+                        return false;
+                    }
+                } 
+                else 
+                {
+                    // Check that the file's path and name ends with "checkFilename"
+                    if( !file.getAbsolutePath().endsWith( checkFilename.replaceAll("\\\\/", File.separator) ) ) 
+                    {
+                        return false;
+                    }
+                }
+
+                // "file" now points to "checkfilename", but is it the correct type?
+                return file.isDirectory() == (searchType == SearchType.DIRECTORY);
             }
         }
         return false;
