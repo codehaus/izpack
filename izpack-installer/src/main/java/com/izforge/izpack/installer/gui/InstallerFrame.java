@@ -736,6 +736,10 @@ public class InstallerFrame extends JFrame implements InstallerView
         for (int i = 0; i < installdata.getPanels().size(); i++)
         {
             IzPanel panel = installdata.getPanels().get(i);
+            if (!rules.canShowPanel(panel.getMetadata().getPanelId(), variables) ||
+            		(panel.getMetadata().hasCondition() && !rules.isConditionTrue(panel.getMetadata().getCondition(), installdata))) {
+            	continue;
+            }
             panel.makeXMLData(installdata.getXmlData().getChildAtIndex(i));
         }
         writer.write(root);
