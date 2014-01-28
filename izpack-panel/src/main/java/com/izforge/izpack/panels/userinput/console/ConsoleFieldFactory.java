@@ -28,6 +28,7 @@ import com.izforge.izpack.panels.userinput.console.combo.ConsoleComboField;
 import com.izforge.izpack.panels.userinput.console.divider.ConsoleDividerField;
 import com.izforge.izpack.panels.userinput.console.file.ConsoleDirField;
 import com.izforge.izpack.panels.userinput.console.file.ConsoleFileField;
+import com.izforge.izpack.panels.userinput.console.file.ConsoleSearchField;
 import com.izforge.izpack.panels.userinput.console.password.ConsolePasswordGroupField;
 import com.izforge.izpack.panels.userinput.console.radio.ConsoleRadioField;
 import com.izforge.izpack.panels.userinput.console.rule.ConsoleRuleField;
@@ -44,6 +45,7 @@ import com.izforge.izpack.panels.userinput.field.file.FileField;
 import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
 import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
+import com.izforge.izpack.panels.userinput.field.search.SearchField;
 import com.izforge.izpack.panels.userinput.field.space.Spacer;
 import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
@@ -138,6 +140,10 @@ public class ConsoleFieldFactory
         else if (field instanceof TitleField)
         {
             result = new ConsoleTitleField(field, console, prompt);
+        }
+        else if (field instanceof SearchField)
+        {
+            result = new ConsoleSearchField((SearchField)field, console, prompt);
         }
         else
         {
