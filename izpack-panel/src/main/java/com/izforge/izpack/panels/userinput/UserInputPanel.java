@@ -139,7 +139,7 @@ public class UserInputPanel extends IzPanel
     }
 
     /**
-     * Indicates wether the panel has been validated or not. The installer won't let the user go
+     * Indicates whether the panel has been validated or not. The installer won't let the user go
      * further through the installation process until the panel is validated.
      *
      * @return a boolean stating whether the panel has been validated or not.
@@ -184,6 +184,7 @@ public class UserInputPanel extends IzPanel
             else
             {
                 buildUI();
+                addScrollPane();
 
                 Dimension size = getMaximumSize();
                 setSize(size.width, size.height);
@@ -226,7 +227,6 @@ public class UserInputPanel extends IzPanel
     private void init()
     {
         eventsActivated = false;
-        TwoColumnLayout layout;
         super.removeAll();
         views.clear();
 
@@ -238,29 +238,9 @@ public class UserInputPanel extends IzPanel
             spec = readSpec();
         }
 
-        // ----------------------------------------------------
-        // Set the topBuffer from the attribute. topBuffer=0 is useful
-        // if you don't want your panel to be moved up and down during
-        // dynamic validation (showing and hiding components within the
-        // same panel)
-        // ----------------------------------------------------
-        int topbuff = 25;
-        try
-        {
-            topbuff = Integer.parseInt(spec.getAttribute(TOPBUFFER));
-        }
-        catch (Exception ignore)
-        {
-            // do nothing
-        }
-        finally
-        {
-            layout = new TwoColumnLayout(10, 5, 30, topbuff, TwoColumnLayout.LEFT);
-        }
         setLayout(new BorderLayout());
 
         panel = new JPanel();
-        panel.setLayout(layout);
 
         if (spec == null)
         {
@@ -313,44 +293,30 @@ public class UserInputPanel extends IzPanel
     }
 
     /**
-     * Builds the UI and makes it ready for display
+     * Builds the UI and makes it ready for display.
      */
     private void buildUI()
     {
+        // need to recreate the panel as TwoColumnLayout doesn't correctly support component removal
+        panel.removeAll();
+        panel.setLayout(createPanelLayout());
+
         for (GUIField view : views)
         {
             Field field = view.getField();
-            if (FieldHelper.isRequired(field, installData, matcher))
+            if (FieldHelper.isRequired(field, installData, matcher) && field.isConditionTrue())
             {
-                if (!view.isDisplayed())
+                view.setDisplayed(true);
+                for (Component component : view.getComponents())
                 {
-                    view.setDisplayed(true);
-                    for (Component component : view.getComponents())
-                    {
-                        panel.add(component.getComponent(), component.getConstraints());
-                    }
+                    panel.add(component.getComponent(), component.getConstraints());
                 }
             }
             else
             {
-                if (view.isDisplayed())
-                {
-                    view.setDisplayed(false);
-                    for (Component element : view.getComponents())
-                    {
-                        panel.remove(element.getComponent());
-                    }
-                }
+                view.setDisplayed(false);
             }
         }
-
-        JScrollPane scroller = new JScrollPane(panel);
-        Border emptyBorder = BorderFactory.createEmptyBorder();
-        scroller.setBorder(emptyBorder);
-        scroller.setViewportBorder(emptyBorder);
-        scroller.getVerticalScrollBar().setBorder(emptyBorder);
-        scroller.getHorizontalScrollBar().setBorder(emptyBorder);
-        add(scroller, BorderLayout.CENTER);
     }
 
     /**
@@ -365,7 +331,7 @@ public class UserInputPanel extends IzPanel
 
         for (GUIField view : views)
         {
-            if (view.isDisplayed())
+            if (view.isDisplayed() && view.getField().isConditionTrue())
             {
                 if (!view.updateField(prompt))
                 {
@@ -402,9 +368,55 @@ public class UserInputPanel extends IzPanel
             {
                 updateVariables();
                 updateUIElements();
+                buildUI();
+                revalidate();
+                repaint();
             }
             this.eventsActivated = true;
         }
     }
 
+    /**
+     * Creates the panel layout.
+     *
+     * @return a new layout
+     */
+    private TwoColumnLayout createPanelLayout()
+    {
+        TwoColumnLayout layout;
+        // ----------------------------------------------------
+        // Set the topBuffer from the attribute. topBuffer=0 is useful
+        // if you don't want your panel to be moved up and down during
+        // dynamic validation (showing and hiding components within the
+        // same panel)
+        // ----------------------------------------------------
+        int topbuff = 25;
+        try
+        {
+            topbuff = Integer.parseInt(spec.getAttribute(TOPBUFFER));
+        }
+        catch (Exception ignore)
+        {
+            // do nothing
+        }
+        finally
+        {
+            layout = new TwoColumnLayout(10, 5, 30, topbuff, TwoColumnLayout.LEFT);
+        }
+        return layout;
+    }
+
+    /**
+     * Adds a scroll pane to the panel.
+     */
+    private void addScrollPane()
+    {
+        JScrollPane scroller = new JScrollPane(panel);
+        Border emptyBorder = BorderFactory.createEmptyBorder();
+        scroller.setBorder(emptyBorder);
+        scroller.setViewportBorder(emptyBorder);
+        scroller.getVerticalScrollBar().setBorder(emptyBorder);
+        scroller.getHorizontalScrollBar().setBorder(emptyBorder);
+        add(scroller, BorderLayout.CENTER);
+    }
 }

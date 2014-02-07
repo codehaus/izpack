@@ -22,6 +22,7 @@ package com.izforge.izpack.panels.userinput;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 
+import org.fest.swing.exception.ComponentLookupException;
 import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JComboBoxFixture;
@@ -50,6 +52,7 @@ import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.data.DynamicVariableImpl;
 import com.izforge.izpack.core.resource.ResourceManager;
+import com.izforge.izpack.core.rules.process.VariableCondition;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
@@ -318,10 +321,26 @@ public class UserInputPanelTest extends AbstractPanelTest
         // Set the base path in order to pick up com/izforge/izpack/panels/userinput/check/userInputSpec.xml
         getResourceManager().setResourceBasePath("/com/izforge/izpack/panels/userinput/check/");
 
+        RulesEngine rules = getRules();
         InstallData installData = getInstallData();
 
         installData.setVariable("check5", "check5set");
         installData.setVariable("check6", "check6unset");
+
+        // set up some conditions. These determine if the check5text and check6text fields are displayed.
+        // Condition cond.check5set evaluates true when check5 is selected
+        VariableCondition check5set = new VariableCondition("check5", "check5set");
+        check5set.setId("cond.check5set");
+        check5set.setInstallData(getInstallData());
+        rules.addCondition(check5set);
+        assertTrue(check5set.isTrue());
+
+        // Condition cond.check6unset evaluates true when check6 is de-selected
+        VariableCondition check6unset = new VariableCondition("check6", "check6unset");
+        check6unset.setId("cond.check6unset");
+        check6unset.setInstallData(getInstallData());
+        rules.addCondition(check6unset);
+        assertTrue(check6unset.isTrue());
 
         // show the panel
         FrameFixture frame = showUserInputPanel("checkinput");
@@ -331,9 +350,25 @@ public class UserInputPanelTest extends AbstractPanelTest
         checkCheckBox("check3", true, frame);
         checkCheckBox("check4", false, frame);
         checkCheckBox("check5", true, frame);
-        JCheckBox check6 = checkCheckBox("check6", false, frame);
+        checkCheckBox("check6", false, frame);
 
-        check6.setSelected(true);
+        // check5text and check6test should be displayed
+        frame.textBox("check5text").requireVisible();
+        frame.textBox("check6text").requireVisible();
+
+        // check6text should be removed when check6 is selected
+        frame.checkBox("check6").click();
+
+        frame.textBox("check5text").requireVisible();
+        try
+        {
+            frame.textBox("check6text");
+            fail("Expected check6text to not be displayed as its condition should exclude it");
+        }
+        catch (ComponentLookupException expected)
+        {
+            // expected behaviour
+        }
 
         // move to the next panel and verify the variables have updated
         checkNavigateNext(frame);
