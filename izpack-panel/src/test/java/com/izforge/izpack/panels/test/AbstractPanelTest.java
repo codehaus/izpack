@@ -175,6 +175,16 @@ public class AbstractPanelTest
     }
 
     /**
+     * Returns the rules.
+     *
+     * @return the rules
+     */
+    protected RulesEngine getRules()
+    {
+        return rules;
+    }
+
+    /**
      * Returns the uninstallation data writer.
      *
      * @return the uninstallation data writer
