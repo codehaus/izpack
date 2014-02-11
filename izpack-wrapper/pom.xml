@@ -7,8 +7,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>izpack-utils</artifactId>
-    <name>IzPack utilities module</name>
+    <artifactId>izpack-wrapper</artifactId>
+    <name>IzPack wrapper module</name>
 
 
 </project>
