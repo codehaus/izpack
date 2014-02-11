@@ -25,7 +25,6 @@
         <module>izpack-uninstaller</module>
         <module>izpack-panel</module>
         <module>izpack-native-parent</module>
-        <module>izpack-listener</module>
         <module>izpack-installer</module>
         <module>izpack-event</module>
         <module>izpack-test</module>
@@ -216,11 +215,6 @@
                 <artifactId>izpack-installer</artifactId>
                 <groupId>${project.groupId}</groupId>
                 <classifier>tests</classifier>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>izpack-listener</artifactId>
-                <groupId>${project.groupId}</groupId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
