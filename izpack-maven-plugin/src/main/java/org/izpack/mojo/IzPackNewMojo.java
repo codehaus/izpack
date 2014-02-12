@@ -33,7 +33,7 @@ public class IzPackNewMojo extends AbstractMojo
     /**
      * The Maven Project Object
      *
-     * @parameter expression="${project}" default-value="${project}"
+     * @parameter property="project" default-value="${project}"
      * @required
      * @readonly
      */
@@ -91,7 +91,7 @@ public class IzPackNewMojo extends AbstractMojo
     private boolean mkdirs;
 
     /**
-     * Compression level of the installation. Desactivated by default (-1)
+     * Compression level of the installation. Deactivated by default (-1)
      *
      * @parameter default-value="-1"
      */
@@ -124,7 +124,7 @@ public class IzPackNewMojo extends AbstractMojo
     /**
      * Name of the generated JAR.
      *
-     * @parameter alias="jarName" expression="${jar.finalName}" default-value="${project.build.finalName}"
+     * @parameter alias="jarName" property="jar.finalName" default-value="${project.build.finalName}"
      * @required
      */
     private String finalName;
