@@ -184,7 +184,7 @@ public class IzPackNewMojo extends AbstractMojo
         {
             //TODO: This might be enhanced with other exceptions which
             // should be handled like CompilerExecptions
-            throw new MojoFailureException( "Failure during compilation prozess", e );
+            throw new MojoFailureException( "Failure during compilation process", e );
         }
         catch ( Exception e )
         {
