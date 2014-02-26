@@ -13,6 +13,7 @@ import org.apache.maven.project.MavenProjectHelper;
 
 import com.izforge.izpack.api.data.Info;
 import com.izforge.izpack.api.data.binding.IzpackProjectInstaller;
+import com.izforge.izpack.api.exception.CompilerException;
 import com.izforge.izpack.compiler.CompilerConfig;
 import com.izforge.izpack.compiler.container.CompilerContainer;
 import com.izforge.izpack.compiler.data.CompilerData;
@@ -179,9 +180,15 @@ public class IzPackNewMojo extends AbstractMojo
         {
             compilerConfig.executeCompiler();
         }
-        catch (Exception e)
+        catch ( CompilerException e )
         {
-            throw new AssertionError(e);
+            //TODO: This might be enhanced with other exceptions which
+            // should be handled like CompilerExecptions
+            throw new MojoFailureException( "Failure during compilation process", e );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Failure", e );
         }
 
         if (classifier != null && !classifier.isEmpty())
