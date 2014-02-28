@@ -41,127 +41,121 @@ import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.field.file.FileFieldView;
 
-public class FileInputField extends JPanel implements ActionListener
-{
-    private static final long serialVersionUID = 4673684743657328492L;
+public class FileInputField extends JPanel implements ActionListener {
+	private static final long serialVersionUID = 4673684743657328492L;
 
-    private static final transient Logger logger = Logger.getLogger(FileInputField.class.getName());
+	private static final transient Logger logger = Logger
+			.getLogger(FileInputField.class.getName());
 
-    /**
-     * The field view.
-     */
-    private final FileFieldView view;
+	/**
+	 * The field view.
+	 */
+	private final FileFieldView view;
 
-    /**
-     * The field.
-     */
-    private final AbstractFileField field;
+	/**
+	 * The field.
+	 */
+	private final AbstractFileField field;
 
-    InstallerFrame parentFrame;
+	InstallerFrame parentFrame;
 
-    IzPanel parent;
+	IzPanel parent;
 
-    JTextField filetxt;
+	JTextField filetxt;
 
-    JButton browseBtn;
+	JButton browseBtn;
 
-    GUIInstallData installDataGUI;
+	GUIInstallData installDataGUI;
 
-    public FileInputField(FileFieldView view, IzPanel parent, GUIInstallData installDataGUI)
-    {
-        this.view = view;
-        this.field = view.getField();
-        this.parent = parent;
-        this.parentFrame = parent.getInstallerFrame();
-        this.installDataGUI = installDataGUI;
-        this.initialize();
-    }
+	public FileInputField(FileFieldView view, IzPanel parent,
+			GUIInstallData installDataGUI) {
+		this.view = view;
+		this.field = view.getField();
+		this.parent = parent;
+		this.parentFrame = parent.getInstallerFrame();
+		this.installDataGUI = installDataGUI;
+		this.initialize();
+	}
 
-    public void setFile(String filename)
-    {
-        filetxt.setText(filename);
-    }
+	public void setFile(String filename) {
+		filetxt.setText(filename);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent arg0)
-    {
-        if (arg0.getSource() == browseBtn)
-        {
-            logger.fine("Show directory chooser");
-            String initialPath = ".";
-            if (filetxt.getText() != null)
-            {
-                initialPath = filetxt.getText();
-            }
-            JFileChooser filechooser = new JFileChooser(initialPath);
-            prepareFileChooser(filechooser);
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource() == browseBtn) {
+			logger.fine("Show directory chooser");
+			String initialPath = ".";
+			if (filetxt.getText() != null) {
+				initialPath = filetxt.getText();
+			}
+			JFileChooser filechooser = new JFileChooser(initialPath);
+			prepareFileChooser(filechooser);
 
-            if (filechooser.showOpenDialog(parentFrame) == JFileChooser.APPROVE_OPTION)
-            {
-                String selectedFile = filechooser.getSelectedFile().getAbsolutePath();
-                filetxt.setText(selectedFile);
-                logger.fine("Setting current file chooser directory to: " + selectedFile);
-            }
-        }
-    }
+			if (filechooser.showOpenDialog(parentFrame) == JFileChooser.APPROVE_OPTION) {
+				String selectedFile = filechooser.getSelectedFile()
+						.getAbsolutePath();
+				filetxt.setText(selectedFile);
+				logger.fine("Setting current file chooser directory to: "
+						+ selectedFile);
+			}
+		}
+	}
 
-    protected void prepareFileChooser(JFileChooser filechooser)
-    {
-        filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        String fileExtension = field.getFileExtension();
-        String fileExtensionDescription = field.getFileExtensionDescription();
-        if ((fileExtension != null) && (fileExtensionDescription != null))
-        {
-            UserInputFileFilter fileFilter = new UserInputFileFilter();
-            fileFilter.setFileExt(fileExtension);
-            fileFilter.setFileExtDesc(fileExtensionDescription);
-            filechooser.setFileFilter(fileFilter);
-        }
-    }
+	protected void prepareFileChooser(JFileChooser filechooser) {
+		filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		String fileExtension = field.getFileExtension();
+		String fileExtensionDescription = field.getFileExtensionDescription();
+		if ((fileExtension != null) && (fileExtensionDescription != null)) {
+			UserInputFileFilter fileFilter = new UserInputFileFilter();
+			fileFilter.setFileExt(fileExtension);
+			fileFilter.setFileExtDesc(fileExtensionDescription);
+			filechooser.setFileFilter(fileFilter);
+		}
+	}
 
-    public File getSelectedFile()
-    {
-        File result = null;
-        if (filetxt.getText() != null)
-        {
-            result = new File(filetxt.getText());
-        }
-        return result;
-    }
+	public File getSelectedFile() {
+		File result = null;
+		if (filetxt.getText() != null) {
+			result = new File(filetxt.getText());
+		}
+		return result;
+	}
 
-    public boolean validateField()
-    {
-        String path = filetxt.getText();
-        File file = field.getAbsoluteFile(path);
-        filetxt.setText(file.getPath());
-        return view.validate(filetxt.getText());
-    }
+	public boolean validateField() {
+		String path = filetxt.getText();
+		if (path.length() > 0) {
+			File file = field.getAbsoluteFile(path);
+			filetxt.setText(file.getPath());
+		}
+		return view.validate(filetxt.getText());
+	}
 
-    private void initialize()
-    {
-        int size = field.getSize() < 0 ? 0 : field.getSize();
-        filetxt = new JTextField(field.getDefaultValue(), size);
-        filetxt.setName(field.getVariable());
-        filetxt.setCaretPosition(0);
+	private void initialize() {
+		int size = field.getSize() < 0 ? 0 : field.getSize();
+		filetxt = new JTextField(field.getDefaultValue(), size);
+		filetxt.setName(field.getVariable());
+		filetxt.setCaretPosition(0);
 
-        GridBagLayout layout = new GridBagLayout();
-        setLayout(layout);
-        GridBagConstraints fileTextConstraint = new GridBagConstraints();
-        GridBagConstraints fileButtonConstraint = new GridBagConstraints();
-        fileTextConstraint.gridx = 0;
-        fileTextConstraint.gridy = 0;
-        fileTextConstraint.anchor = GridBagConstraints.WEST;
-        fileTextConstraint.insets = new Insets(0, 0, 0, 5);
-        fileButtonConstraint.gridx = 1;
-        fileButtonConstraint.gridy = 0;
-        fileButtonConstraint.anchor = GridBagConstraints.WEST;
+		GridBagLayout layout = new GridBagLayout();
+		setLayout(layout);
+		GridBagConstraints fileTextConstraint = new GridBagConstraints();
+		GridBagConstraints fileButtonConstraint = new GridBagConstraints();
+		fileTextConstraint.gridx = 0;
+		fileTextConstraint.gridy = 0;
+		fileTextConstraint.anchor = GridBagConstraints.WEST;
+		fileTextConstraint.insets = new Insets(0, 0, 0, 5);
+		fileButtonConstraint.gridx = 1;
+		fileButtonConstraint.gridy = 0;
+		fileButtonConstraint.anchor = GridBagConstraints.WEST;
 
-        // TODO: use separate key for button text
-        browseBtn = ButtonFactory.createButton(installDataGUI.getMessages().get("UserInputPanel.search.browse"),
-                                               installDataGUI.buttonsHColor);
-        browseBtn.addActionListener(this);
-        this.add(filetxt, fileTextConstraint);
-        this.add(browseBtn, fileButtonConstraint);
-    }
+		// TODO: use separate key for button text
+		browseBtn = ButtonFactory.createButton(installDataGUI.getMessages()
+				.get("UserInputPanel.search.browse"),
+				installDataGUI.buttonsHColor);
+		browseBtn.addActionListener(this);
+		this.add(filetxt, fileTextConstraint);
+		this.add(browseBtn, fileButtonConstraint);
+	}
 
 }
