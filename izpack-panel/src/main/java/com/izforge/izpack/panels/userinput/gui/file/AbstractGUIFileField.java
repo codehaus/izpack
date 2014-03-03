@@ -28,82 +28,81 @@ import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
-
 /**
  * Common functionality for file field views.
- *
+ * 
  * @author Tim Anderson
  */
-public abstract class AbstractGUIFileField extends GUIField
-{
-    /**
-     * The field view implementation.
-     */
-    private FileInputField fileInput;
+public abstract class AbstractGUIFileField extends GUIField {
+	/**
+	 * The field view implementation.
+	 */
+	private FileInputField fileInput;
 
-    /**
-     * Constructs an {@code AbstractGUIFileField}.
-     *
-     * @param field the field
-     */
-    public AbstractGUIFileField(AbstractFileField field)
-    {
-        super(field);
-    }
+	/**
+	 * Constructs an {@code AbstractGUIFileField}.
+	 * 
+	 * @param field
+	 *            the field
+	 */
+	public AbstractGUIFileField(AbstractFileField field) {
+		super(field);
+	}
 
-    /**
-     * Updates the field from the view.
-     *
-     * @param prompt the prompt to display messages
-     * @return {@code true} if the field was updated, {@code false} if the view is invalid
-     */
-    @Override
-    public boolean updateField(Prompt prompt)
-    {
-        boolean result = false;
-        if (fileInput.validateField())
-        {
-            File selectedFile = fileInput.getSelectedFile();
-            getField().setValue(selectedFile.getAbsolutePath());
-            result = true;
-        }
-        return result;
-    }
+	/**
+	 * Updates the field from the view.
+	 * 
+	 * @param prompt
+	 *            the prompt to display messages
+	 * @return {@code true} if the field was updated, {@code false} if the view
+	 *         is invalid
+	 */
+	@Override
+	public boolean updateField(Prompt prompt) {
+		boolean result = false;
+		if (fileInput.validateField()) {
+			File selectedFile = fileInput.getSelectedFile();
+			if (selectedFile == null) {
+				getField().setValue("");
+			} else {
+				getField().setValue(selectedFile.getAbsolutePath());
+			}
+			result = true;
+		}
+		return result;
+	}
 
-    /**
-     * Updates the view from the field.
-     *
-     * @return {@code true} if the view was updated
-     */
-    @Override
-    public boolean updateView()
-    {
-        boolean result = false;
-        String value = getField().getValue();
-        if (value != null)
-        {
-            fileInput.setFile(value);
-            result = true;
-        }
-        return result;
-    }
+	/**
+	 * Updates the view from the field.
+	 * 
+	 * @return {@code true} if the view was updated
+	 */
+	@Override
+	public boolean updateView() {
+		boolean result = false;
+		String value = getField().getValue();
+		if (value != null) {
+			fileInput.setFile(value);
+			result = true;
+		}
+		return result;
+	}
 
-    /**
-     * Initialises the view with the view implementation.
-     *
-     * @param inputField the view implementation
-     */
-    protected void init(FileInputField inputField)
-    {
-        this.fileInput = inputField;
-        if (getField().getLabel() != null)
-        {
-            addLabel();
-            addComponent(inputField, new TwoColumnConstraints(TwoColumnConstraints.EAST));
-        }
-        else
-        {
-            addComponent(inputField, new TwoColumnConstraints(TwoColumnConstraints.BOTH));
-        }
-    }
+	/**
+	 * Initialises the view with the view implementation.
+	 * 
+	 * @param inputField
+	 *            the view implementation
+	 */
+	protected void init(FileInputField inputField) {
+		this.fileInput = inputField;
+		if (getField().getLabel() != null) {
+			addLabel();
+			addComponent(inputField, new TwoColumnConstraints(
+					TwoColumnConstraints.EAST));
+		} else {
+			addComponent(inputField, new TwoColumnConstraints(
+					TwoColumnConstraints.BOTH));
+		}
+	}
 }

@@ -116,7 +116,7 @@ public class FileInputField extends JPanel implements ActionListener {
 
 	public File getSelectedFile() {
 		File result = null;
-		if (filetxt.getText() != null) {
+		if ((filetxt.getText() != null) && (filetxt.getText().length() > 0)) {
 			result = new File(filetxt.getText());
 		}
 		return result;
