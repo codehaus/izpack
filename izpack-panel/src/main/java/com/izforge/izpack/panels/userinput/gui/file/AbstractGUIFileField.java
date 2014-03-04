@@ -64,7 +64,12 @@ public abstract class AbstractGUIFileField extends GUIField
         if (fileInput.validateField())
         {
             File selectedFile = fileInput.getSelectedFile();
-            getField().setValue(selectedFile.getAbsolutePath());
+            if (selectedFile == null)
+            {
+                getField().setValue("");
+            } else {
+                getField().setValue(selectedFile.getAbsolutePath());
+            }
             result = true;
         }
         return result;

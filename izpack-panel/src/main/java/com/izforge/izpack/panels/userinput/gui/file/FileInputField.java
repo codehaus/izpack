@@ -122,7 +122,7 @@ public class FileInputField extends JPanel implements ActionListener
     public File getSelectedFile()
     {
         File result = null;
-        if (filetxt.getText() != null)
+        if ((filetxt.getText() != null) && (filetxt.getText().length() > 0))
         {
             result = new File(filetxt.getText());
         }
@@ -132,8 +132,11 @@ public class FileInputField extends JPanel implements ActionListener
     public boolean validateField()
     {
         String path = filetxt.getText();
-        File file = field.getAbsoluteFile(path);
-        filetxt.setText(file.getPath());
+        if (path.length() > 0)
+        {
+            File file = field.getAbsoluteFile(path);
+            filetxt.setText(file.getPath());
+        }
         return view.validate(filetxt.getText());
     }
 
