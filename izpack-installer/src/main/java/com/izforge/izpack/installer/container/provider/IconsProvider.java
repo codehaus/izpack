@@ -85,8 +85,8 @@ public class IconsProvider implements Provider
      */
     private void parseXML(InputStream inXML, IconsDatabase icons)
     {
-        URL url;
-        ImageIcon img;// Initialises the parser
+        ImageIcon img;
+        // Initialises the parser
         IXMLParser parser = new XMLParser();
 
         // We get the data
@@ -95,19 +95,46 @@ public class IconsProvider implements Provider
         // We load the icons
         for (IXMLElement icon : data.getChildrenNamed("icon"))
         {
-            url = InstallerFrame.class.getResource(icon.getAttribute("res"));
-            img = new ImageIcon(url);
-            logger.fine("Icon with id found: " + icon.getAttribute("id"));
-            icons.put(icon.getAttribute("id"), img);
+            img = loadIcon(icon);
+            if (img != null)
+            {
+                icons.put(icon.getAttribute("id"), img);
+            }
         }
 
         // We load the Swing-specific icons
         for (IXMLElement icon : data.getChildrenNamed("sysicon"))
         {
-            url = InstallerFrame.class.getResource(icon.getAttribute("res"));
-            img = new ImageIcon(url);
-            UIManager.put(icon.getAttribute("id"), img);
+            img = loadIcon(icon);
+            if (img != null)
+            {
+                UIManager.put(icon.getAttribute("id"), img);
+            }
         }
     }
 
+    /**
+     * Loads an icon declared in an XML file.
+     * 
+     * @param icon
+     *            the XML element that declares the icon
+     * @return the icon or <code>null</icon> if it does not exist
+     */
+    private ImageIcon loadIcon(IXMLElement icon)
+    {
+        ImageIcon img = null;
+        String id = icon.getAttribute("id");
+        String path = icon.getAttribute("res");
+        URL url = InstallerFrame.class.getResource(path);
+        if (url == null)
+        {
+            logger.warning("Icon with id '" + id + "': file '" + path + "' not found");
+        }
+        else
+        {
+            img = new ImageIcon(url);
+            logger.fine("Icon with id '" + id + "' found");
+        }
+        return img;
+    }
 }
