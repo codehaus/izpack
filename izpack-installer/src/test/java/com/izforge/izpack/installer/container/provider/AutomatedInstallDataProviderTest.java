@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -49,6 +50,7 @@ import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.core.data.DefaultVariables;
+import com.izforge.izpack.core.resource.DefaultLocales;
 import com.izforge.izpack.core.resource.ResourceManager;
 import com.izforge.izpack.util.Housekeeper;
 import com.izforge.izpack.util.PlatformModelMatcher;
@@ -104,8 +106,9 @@ public class AutomatedInstallDataProviderTest
         mock(loader, "resources/langpacks/eng.xml", defaultPack);
         mock(loader, "resources/" + AbstractInstallDataProvider.CUSTOM_TRANSLATIONS_RESOURCE_NAME + "_eng", customPack);
 
-        // set up the locale
-        Locales locales = new LocalesProvider().provide(resources);
+        // set up the locale to english because the mock resources contain only a langpack for english
+        Locales locales = new DefaultLocales(resources, Locale.ENGLISH);
+        resources.setLocales(locales);
 
         AutomatedInstallDataProvider provider = new AutomatedInstallDataProvider();
 
