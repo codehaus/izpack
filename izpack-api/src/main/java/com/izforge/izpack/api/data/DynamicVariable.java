@@ -68,6 +68,7 @@ public interface DynamicVariable extends Serializable
 
     String evaluate(VariableSubstitutor... substitutors) throws Exception;
 
+    boolean isCheckonce();
     void setCheckonce(boolean checkonce);
 
     void setIgnoreFailure(boolean ignore);
