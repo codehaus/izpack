@@ -105,10 +105,22 @@ public class RuleField extends Field
     @Override
     public String getInitialValue()
     {
+        String value = getValue();
+
+        if (value != null)
+        {
+            ValidationStatus status = validateFormatted(value);
+            if (status.isValid())
+            {
+                return value;
+            }
+        }
+
         if (hasDefaultValues())
         {
             return format(getDefaultValues());
         }
+
         return null;
     }
 
@@ -121,6 +133,11 @@ public class RuleField extends Field
      */
     public boolean hasDefaultValues()
     {
+        if (defaultValues == null)
+        {
+            return false;
+        }
+
         for (String value : defaultValues)
         {
             if (value != null && !value.equals(""))
@@ -133,12 +150,29 @@ public class RuleField extends Field
 
     /**
      * Returns the default values for each sub-field.
+     * Field validators are not activated here, this method just verifies whether the value matches the layout.
      *
      * @return the default values
      */
     public String[] getDefaultValues()
     {
-        return defaultValues;
+        String value = super.getInitialValue();
+
+        if (hasDefaultValues())
+        {
+            return defaultValues;
+        }
+
+        if (value != null)
+        {
+            ValidationStatus status = layout.validate(value);
+            if (status.isValid())
+            {
+                return status.getValues();
+            }
+        }
+
+        return new String[0];
     }
 
     /**
@@ -327,6 +361,11 @@ public class RuleField extends Field
      */
     private String[] parseSet(String set, ObjectFactory factory)
     {
+        if (set == null)
+        {
+            return null;
+        }
+
         StringTokenizer tokenizer = new StringTokenizer(set);
         String[] result = new String[layout.getFieldSpecs().size()];
 
