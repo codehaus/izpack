@@ -222,6 +222,7 @@ public class DynamicVariableImpl implements DynamicVariable
         }
     }
 
+    @Override
     public boolean isCheckonce()
     {
         return checkonce;

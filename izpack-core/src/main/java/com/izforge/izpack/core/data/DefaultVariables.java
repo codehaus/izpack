@@ -22,6 +22,7 @@
 package com.izforge.izpack.core.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -296,6 +297,8 @@ public class DefaultVariables implements Variables
     @Override
     public synchronized void refresh()
     {
+        Collection<DynamicVariable> removeDynamicVariables = new ArrayList<DynamicVariable>();
+
         for (DynamicVariable variable : dynamicVariables)
         {
             String conditionId = variable.getConditionid();
@@ -331,6 +334,10 @@ public class DefaultVariables implements Variables
                     {
                         logger.fine("Dynamic variable=" + variable.getName() + " set, value=" + newValue);
                     }
+                    if (variable.isCheckonce())
+                    {
+                        removeDynamicVariables.add(variable);
+                    }
                 }
                 else if (log)
                 {
@@ -338,6 +345,9 @@ public class DefaultVariables implements Variables
                 }
             }
         }
+
+        // Cleanup all dynamic variables set 'checkonce' which have been already evaluated.
+        dynamicVariables.removeAll(removeDynamicVariables);
     }
 
     /**

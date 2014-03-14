@@ -24,6 +24,7 @@ package com.izforge.izpack.event;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1221,6 +1222,8 @@ public class ConfigurationInstallerListener extends AbstractProgressInstallerLis
 
         if (dynamicvariables != null)
         {
+            Collection<DynamicVariable> removeDynamicVariables = new ArrayList<DynamicVariable>();
+
             logger.fine("Evaluating configuration variables");
             RulesEngine rules = getInstallData().getRules();
             for (DynamicVariable dynvar : dynamicvariables)
@@ -1256,6 +1259,10 @@ public class ConfigurationInstallerListener extends AbstractProgressInstallerLis
                         {
                             logger.fine("Configuration variable " + name + ": " + newValue);
                             props.setProperty(name, newValue);
+                            if (dynvar.isCheckonce())
+                            {
+                                removeDynamicVariables.add(dynvar);
+                            }
                         }
                         else
                         {
@@ -1268,6 +1275,8 @@ public class ConfigurationInstallerListener extends AbstractProgressInstallerLis
                     }
                 }
             }
+
+            dynamicvariables.removeAll(removeDynamicVariables);
         }
 
         return props;
