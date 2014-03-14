@@ -42,6 +42,8 @@ import com.izforge.izpack.panels.userinput.validator.HostAddressValidator;
 import com.izforge.izpack.panels.userinput.validator.RegularExpressionValidator;
 import com.izforge.izpack.util.Platforms;
 
+import static org.junit.Assert.assertArrayEquals;
+
 
 /**
  * Tests the field validation of {@link RuleField} class instances.
@@ -107,6 +109,30 @@ public class RuleFieldValidatorTest
         RuleField model = new RuleField(config, installData, factory);
         ValidationStatus status = model.validate(new String[] {"127.0.0.1", "1234"});
         assertTrue(status.isValid());
+    }
+
+    @Test
+    public void testDefaultValues()
+    {
+        String layout = "O:15:U : N:5:5"; // host : port format
+        String variable = "server.address";
+        String separator = null;
+        //String defaultValue = "0: 1:";
+
+        TestRuleFieldConfig config = new TestRuleFieldConfig(variable, layout, separator, RuleFormat.DISPLAY_FORMAT);
+        //config.setDefaultValue(defaultValue);
+
+        Map<String, String> regexp = new HashMap<String, String>();
+        regexp.put(RegularExpressionValidator.PATTERN_PARAM, "\\b.*\\:(6553[0-5]|655[0-2]\\d|65[0-4]\\d{2}|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3})\b");
+
+        // Tests, whether the following validator is ignored for just receiving unvalidated default values
+        FieldValidator fieldValidator = new FieldValidator( RegularExpressionValidator.class.getName(), regexp, "Host address validation failed", factory);
+        config.addValidator(fieldValidator);
+
+        installData.setVariable(variable, "@HOST_ADDRESS@:1234");
+        RuleField model = new RuleField(config, installData, factory);
+
+        assertArrayEquals(model.getDefaultValues(), new String[] { "@HOST_ADDRESS@", "1234"});
     }
 
 }
