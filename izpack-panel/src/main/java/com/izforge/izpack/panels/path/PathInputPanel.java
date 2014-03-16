@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
-import com.izforge.izpack.api.data.PanelActionConfiguration;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.gui.IzPanelLayout;
@@ -185,7 +184,8 @@ public class PathInputPanel extends IzPanel implements ActionListener
 
         if (isMustExist())
         {
-            if (!checkExists(file) || !pathIsValid(true) || (modifyInstallation() && !checkInstallationInformation(file)))
+            if (!checkExists(file) || !pathIsValid(true) || (modifyInstallation() && !checkInstallationInformation(
+                    file)))
             {
                 return false;
             }
@@ -393,7 +393,7 @@ public class PathInputPanel extends IzPanel implements ActionListener
      */
     protected boolean checkRequiredFilesExist(String path)
     {
-    	if (existFiles == null || path == null || path.isEmpty())
+        if (existFiles == null || path == null || path.isEmpty())
         {
             return true;
         }
@@ -457,7 +457,7 @@ public class PathInputPanel extends IzPanel implements ActionListener
     {
         return pathIsValid(false);
     }
-    
+
     /**
      * Returns whether the chosen path is valid or not. If existFiles are not null, the existence of
      * it under the chosen path are detected. This method can be also implemented in derived
@@ -467,15 +467,15 @@ public class PathInputPanel extends IzPanel implements ActionListener
      */
     protected boolean pathIsValid(boolean notifyUserIfInvalid)
     {
-    	String pathToBeChecked = getPath();
+        String pathToBeChecked = getPath();
         boolean isValid = checkRequiredFilesExist(pathToBeChecked);
         if (!isValid && notifyUserIfInvalid)
         {
-        	String errMsg = getString(getI18nStringForClass("notValid", "PathInputPanel"));
-        	logger.log(Level.WARNING, String.format("%s: '%s'", errMsg, pathToBeChecked));
-        	emitError(getString("installer.error"), errMsg);
+            String errMsg = getString(getI18nStringForClass("notValid", "PathInputPanel"));
+            logger.log(Level.WARNING, String.format("%s: '%s'", errMsg, pathToBeChecked));
+            emitError(getString("installer.error"), errMsg);
         }
-    	return isValid;
+        return isValid;
     }
 
 }
