@@ -37,7 +37,6 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.DemuxOutputStream;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
-import org.apache.tools.ant.input.DefaultInputHandler;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.util.JavaEnvUtils;
 
@@ -151,7 +150,7 @@ public class AntAction extends ActionBase
             Project antProj = new Project();
             antProj.setName("antcallproject");
             antProj.addBuildListener(createLogger());
-            antProj.setInputHandler(new DefaultInputHandler());
+            antProj.setInputHandler(new AntActionInputHandler());
             antProj.setSystemProperties();
             addProperties(antProj, getProperties());
             addPropertiesFromPropertyFiles(antProj);
