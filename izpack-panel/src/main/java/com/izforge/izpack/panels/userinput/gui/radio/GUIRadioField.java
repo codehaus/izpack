@@ -149,6 +149,27 @@ public class GUIRadioField extends GUIField
         boolean result = false;
         RadioField field = getField();
         String value = field.getValue();
+
+        for (RadioChoiceView view : choices)
+        {
+            if (getField().isConditionTrue())
+            {
+                if (!view.button.isVisible())
+                {
+                    result = true;
+                }
+                view.button.setVisible(true);
+            }
+            else
+            {
+                if (view.button.isVisible())
+                {
+                    result = true;
+                }
+                view.button.setVisible(false);
+            }
+        }
+
         if (value != null)
         {
             for (RadioChoiceView view : choices)
