@@ -106,6 +106,24 @@ public class GUITextField extends GUIField implements FocusListener, DocumentLis
     {
         boolean result = false;
         String value = getField().getValue();
+
+        if (getField().isConditionTrue())
+        {
+            if(!text.isVisible())
+            {
+                result = true;
+            }
+            text.setVisible(true);
+        }
+        else
+        {
+            if(text.isVisible())
+            {
+                result = true;
+            }
+            text.setVisible(false);
+        }
+
         if (value != null)
         {
             text.getDocument().removeDocumentListener(this);
