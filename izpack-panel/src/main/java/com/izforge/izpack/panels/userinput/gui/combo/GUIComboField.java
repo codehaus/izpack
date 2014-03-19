@@ -85,4 +85,23 @@ public class GUIComboField extends GUIField
         getField().setValue(value);
         return true;
     }
+
+    /**
+     * Updates the view from the field.
+     *
+     * @return {@code true} if the view was updated
+     */
+    @Override
+    public boolean updateView()
+    {
+        if (getField().isConditionTrue())
+        {
+            combo.setVisible(true);
+        }
+        else
+        {
+            combo.setVisible(false);
+        }
+        return true;
+    }
 }
