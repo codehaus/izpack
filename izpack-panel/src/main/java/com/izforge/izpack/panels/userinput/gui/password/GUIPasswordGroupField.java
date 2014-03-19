@@ -115,6 +115,27 @@ public class GUIPasswordGroupField extends GUIField
     {
         boolean result = false;
         String value = getField().getValue();
+
+        for (JPasswordField view : passwords)
+        {
+            if (getField().isConditionTrue())
+            {
+                if (!view.isVisible())
+                {
+                    result = true;
+                }
+                view.setVisible(true);
+            }
+            else
+            {
+                if (view.isVisible())
+                {
+                    result = true;
+                }
+                view.setVisible(false);
+            }
+        }
+
         if (value != null)
         {
             for (JPasswordField view : passwords)
