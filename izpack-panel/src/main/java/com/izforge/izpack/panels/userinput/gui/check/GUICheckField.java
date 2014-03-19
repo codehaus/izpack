@@ -118,14 +118,23 @@ public class GUICheckField extends GUIField
     @Override
     public boolean updateView()
     {
+        boolean result = false;
         if (getField().isConditionTrue())
         {
+            if(!checkbox.isVisible())
+            {
+                result = true;
+            }
             checkbox.setVisible(true);
         }
         else
         {
+            if(checkbox.isVisible())
+            {
+                result = true;
+            }
             checkbox.setVisible(false);
         }
-        return true;
+        return result;
     }
 }

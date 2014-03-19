@@ -94,14 +94,23 @@ public class GUIComboField extends GUIField
     @Override
     public boolean updateView()
     {
+        boolean result = false;
         if (getField().isConditionTrue())
         {
+            if (!combo.isVisible())
+            {
+                result = true;
+            }
             combo.setVisible(true);
         }
         else
         {
+            if (combo.isVisible())
+            {
+                result = true;
+            }
             combo.setVisible(false);
         }
-        return true;
+        return result;
     }
 }
