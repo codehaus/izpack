@@ -118,4 +118,31 @@ public class GUIRuleField extends GUIField
         return result;
     }
 
+    /**
+     * Updates the view from the field.
+     *
+     * @return {@code true} if the view was updated
+     */
+    @Override
+    public boolean updateView()
+    {
+        boolean result = false;
+        if (getField().isConditionTrue())
+        {
+            if(!component.isVisible())
+            {
+                result = true;
+            }
+            component.setVisible(true);
+        }
+        else
+        {
+            if(component.isVisible())
+            {
+                result = true;
+            }
+            component.setVisible(false);
+        }
+        return result;
+    }
 }
