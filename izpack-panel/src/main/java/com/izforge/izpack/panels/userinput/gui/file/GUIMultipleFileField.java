@@ -97,6 +97,24 @@ public class GUIMultipleFileField extends GUIField
     {
         boolean result = false;
         String value = getField().getValue();
+
+        if (getField().isConditionTrue())
+        {
+            if (!fileInput.isVisible())
+            {
+                result = true;
+            }
+            fileInput.setVisible(true);
+        }
+        else
+        {
+            if (fileInput.isVisible())
+            {
+                result = true;
+            }
+            fileInput.setVisible(false);
+        }
+
         if (value != null)
         {
             fileInput.clearFiles();
