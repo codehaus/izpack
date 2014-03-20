@@ -359,19 +359,21 @@ public class UserInputPanel extends IzPanel
         variables = userInputModel.updateVariables(spec);
     }
 
+    /**
+     * Called by fields that allow revalidation.
+     */
     private void updateDialog()
     {
         if (this.eventsActivated)
         {
             this.eventsActivated = false;
-            if (readInput(LoggingPrompt.INSTANCE)) // read from the input fields, but don't display a prompt for errors
-            {
-                updateVariables();
-                updateUIElements();
-                buildUI();
-                revalidate();
-                repaint();
-            }
+            readInput(LoggingPrompt.INSTANCE); // read from the input fields, but don't display a prompt for errors
+            updateVariables();
+            updateUIElements();
+            buildUI();
+            revalidate();
+            repaint();
+
             this.eventsActivated = true;
         }
     }
