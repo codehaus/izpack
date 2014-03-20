@@ -88,19 +88,19 @@ public abstract class AbstractGUIFileField extends GUIField
 
         if (getField().isConditionTrue())
         {
-            if (!fileInput.isVisible())
+            if (!isDisplayed())
             {
                 result = true;
             }
-            fileInput.setVisible(true);
+            setDisplayed(true);
         }
         else
         {
-            if (fileInput.isVisible())
+            if (isDisplayed())
             {
                 result = true;
             }
-            fileInput.setVisible(false);
+            setDisplayed(false);
         }
 
 

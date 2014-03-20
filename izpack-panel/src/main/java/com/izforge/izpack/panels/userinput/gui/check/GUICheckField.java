@@ -121,19 +121,19 @@ public class GUICheckField extends GUIField
         boolean result = false;
         if (getField().isConditionTrue())
         {
-            if(!checkbox.isVisible())
+            if(!isDisplayed())
             {
                 result = true;
             }
-            checkbox.setVisible(true);
+            setDisplayed(true);
         }
         else
         {
-            if(checkbox.isVisible())
+            if(isDisplayed())
             {
                 result = true;
             }
-            checkbox.setVisible(false);
+            setDisplayed(false);
         }
         return result;
     }

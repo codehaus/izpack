@@ -66,7 +66,6 @@ public class GUIRadioField extends GUIField
         constraints.indent = true;
         constraints.stretch = true;
 
-        addDescription();
 
         int id = 1;
         ActionListener l = new ActionListener()
@@ -150,24 +149,21 @@ public class GUIRadioField extends GUIField
         RadioField field = getField();
         String value = field.getValue();
 
-        for (RadioChoiceView view : choices)
+        if (getField().isConditionTrue())
         {
-            if (getField().isConditionTrue())
+            if(!isDisplayed())
             {
-                if (!view.button.isVisible())
-                {
-                    result = true;
-                }
-                view.button.setVisible(true);
+                result = true;
             }
-            else
+            setDisplayed(true);
+        }
+        else
+        {
+            if(isDisplayed())
             {
-                if (view.button.isVisible())
-                {
-                    result = true;
-                }
-                view.button.setVisible(false);
+                result = true;
             }
+            setDisplayed(false);
         }
 
         if (value != null)

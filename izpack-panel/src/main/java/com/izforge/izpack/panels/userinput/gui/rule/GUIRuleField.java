@@ -129,20 +129,21 @@ public class GUIRuleField extends GUIField
         boolean result = false;
         if (getField().isConditionTrue())
         {
-            if(!component.isVisible())
+            if(!isDisplayed())
             {
                 result = true;
             }
-            component.setVisible(true);
+            setDisplayed(true);
         }
         else
         {
-            if(component.isVisible())
+            if(isDisplayed())
             {
                 result = true;
             }
-            component.setVisible(false);
+            setDisplayed(false);
         }
+
         return result;
     }
 }

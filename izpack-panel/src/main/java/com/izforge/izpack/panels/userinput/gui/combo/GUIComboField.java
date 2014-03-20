@@ -97,19 +97,19 @@ public class GUIComboField extends GUIField
         boolean result = false;
         if (getField().isConditionTrue())
         {
-            if (!combo.isVisible())
+            if (!isDisplayed())
             {
                 result = true;
             }
-            combo.setVisible(true);
+            setDisplayed(true);
         }
         else
         {
-            if (combo.isVisible())
+            if (isDisplayed())
             {
                 result = true;
             }
-            combo.setVisible(false);
+            setDisplayed(false);
         }
         return result;
     }
