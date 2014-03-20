@@ -195,17 +195,6 @@ public abstract class AbstractInstallDataProvider implements Provider
         installData.setVariable(ScriptParserConstant.IP_ADDRESS, IPAddress);
         installData.setVariable(ScriptParserConstant.HOST_NAME, hostname);
         installData.setVariable(ScriptParserConstant.FILE_SEPARATOR, File.separator);
-
-        Set<String> systemProperties = System.getProperties().stringPropertyNames();
-        for (String varName : systemProperties)
-        {
-            String varValue = System.getProperty(varName);
-            if (varValue != null)
-            {
-                varName = varName.replace('.', '_');
-                installData.setVariable("SYSTEM_" + varName, varValue);
-            }
-        }
     }
 
     /**
