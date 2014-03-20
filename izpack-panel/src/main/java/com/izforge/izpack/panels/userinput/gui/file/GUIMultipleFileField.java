@@ -74,13 +74,14 @@ public class GUIMultipleFileField extends GUIField
      * This implementation simply returns {@code true}.
      *
      * @param prompt the prompt to display messages
+     * @param skipValidation set to true when wanting to save field data without validating
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField(Prompt prompt)
+    public boolean updateField(Prompt prompt, boolean skipValidation)
     {
         boolean result = fileInput.validateField();
-        if (result)
+        if (skipValidation || result)
         {
             getField().setValues(fileInput.getSelectedFiles());
         }

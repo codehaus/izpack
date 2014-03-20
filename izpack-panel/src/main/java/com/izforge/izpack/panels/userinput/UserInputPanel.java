@@ -323,9 +323,10 @@ public class UserInputPanel extends IzPanel
      * Reads the input installDataGUI from all UI elements and sets the associated variables.
      *
      * @param prompt the prompt to display messages
+     * @param skipValidation set to true when wanting to save field data without validating
      * @return {@code true} if the operation is successful, otherwise {@code false}.
      */
-    private boolean readInput(Prompt prompt)
+    private boolean readInput(Prompt prompt, boolean skipValidation)
     {
         delegatingPrompt.setPrompt(prompt);
 
@@ -333,13 +334,28 @@ public class UserInputPanel extends IzPanel
         {
             if (view.isDisplayed() && view.getField().isConditionTrue())
             {
-                if (!view.updateField(prompt))
+                if (skipValidation)
+                {
+                    view.updateField(prompt, skipValidation);
+                }
+                else if (!view.updateField(prompt))
                 {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Reads the input installDataGUI from all UI elements and sets the associated variables.
+     *
+     * @param prompt the prompt to display messages
+     * @return {@code true} if the operation is successful, otherwise {@code false}.
+     */
+    private boolean readInput(Prompt prompt)
+    {
+        return readInput(prompt, false);
     }
 
     /**
@@ -361,19 +377,20 @@ public class UserInputPanel extends IzPanel
 
     /**
      * Called by fields that allow revalidation.
+     * No validation is required since we do not progress through the installer.
      */
     private void updateDialog()
     {
+        boolean skipValidation = true;
         if (this.eventsActivated)
         {
             this.eventsActivated = false;
-            readInput(LoggingPrompt.INSTANCE); // read from the input fields, but don't display a prompt for errors
+            readInput(LoggingPrompt.INSTANCE, skipValidation); // read from the input fields, but don't display a prompt for errors
             updateVariables();
             updateUIElements();
             buildUI();
             revalidate();
             repaint();
-
             this.eventsActivated = true;
         }
     }

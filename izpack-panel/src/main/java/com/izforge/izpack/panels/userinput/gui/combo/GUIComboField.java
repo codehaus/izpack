@@ -75,10 +75,11 @@ public class GUIComboField extends GUIField
      * Updates the field from the view.
      *
      * @param prompt the prompt to display messages
+     * @param skipValidation set to true when wanting to save field data without validating
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField(Prompt prompt)
+    public boolean updateField(Prompt prompt, boolean skipValidation)
     {
         Choice selected = (Choice) combo.getSelectedItem();
         String value = (selected != null) ? selected.getKey() : null;
