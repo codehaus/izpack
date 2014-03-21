@@ -63,6 +63,7 @@ import com.izforge.izpack.util.PlatformModelMatcher;
 public class UserInputPanel extends IzPanel
 {
     private static final String TOPBUFFER = "topBuffer";
+    private static final String RIGID = "rigid";
 
     /**
      * The parsed result from reading the XML specification from the file
@@ -408,8 +409,12 @@ public class UserInputPanel extends IzPanel
         // if you don't want your panel to be moved up and down during
         // dynamic validation (showing and hiding components within the
         // same panel)
+        // Alternativley set the attribute rigid to true and topBuffer will be treated as pixel space
+        // rather than the percentage of the screen
         // ----------------------------------------------------
         int topbuff = 25;
+        boolean rigid = false;
+
         try
         {
             topbuff = Integer.parseInt(spec.getAttribute(TOPBUFFER));
@@ -418,9 +423,17 @@ public class UserInputPanel extends IzPanel
         {
             // do nothing
         }
+        try
+        {
+            rigid = Boolean.parseBoolean(spec.getAttribute(RIGID));
+        }
+        catch (Exception ignore)
+        {
+            // do nothing
+        }
         finally
         {
-            layout = new TwoColumnLayout(10, 5, 30, topbuff, TwoColumnLayout.LEFT);
+            layout = new TwoColumnLayout(10, 5, 30, topbuff, rigid, TwoColumnLayout.LEFT);
         }
         return layout;
     }
