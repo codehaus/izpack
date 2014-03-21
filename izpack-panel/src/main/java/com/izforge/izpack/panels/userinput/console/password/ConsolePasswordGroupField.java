@@ -73,6 +73,11 @@ public class ConsolePasswordGroupField extends ConsoleField
     @Override
     public boolean display()
     {
+        if (!getField().isConditionTrue())
+        {
+            return true;
+        }
+
         boolean result = false;
         printDescription();
         String[] passwords = getPasswords();

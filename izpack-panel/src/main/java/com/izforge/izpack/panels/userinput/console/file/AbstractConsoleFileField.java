@@ -65,6 +65,11 @@ public class AbstractConsoleFileField extends ConsoleField
     @Override
     public boolean display()
     {
+        if (!getField().isConditionTrue())
+        {
+            return true;
+        }
+
         boolean result = false;
         printDescription();
         AbstractFileField field = getField();

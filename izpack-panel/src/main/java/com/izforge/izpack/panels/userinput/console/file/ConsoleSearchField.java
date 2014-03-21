@@ -27,7 +27,13 @@ public class ConsoleSearchField extends ConsoleField { // ConsoleComboField { //
     }
 
     @Override
-    public boolean display() {
+    public boolean display()
+    {
+        if (!getField().isConditionTrue())
+        {
+            return true;
+        }
+
     	SearchField field = (SearchField)getField();
         printDescription();
 

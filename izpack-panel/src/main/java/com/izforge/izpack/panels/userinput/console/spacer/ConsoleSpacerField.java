@@ -53,6 +53,11 @@ public class ConsoleSpacerField extends ConsoleField
     @Override
     public boolean display()
     {
+        if (!getField().isConditionTrue())
+        {
+            return true;
+        }
+
         println("");
         return true;
     }
