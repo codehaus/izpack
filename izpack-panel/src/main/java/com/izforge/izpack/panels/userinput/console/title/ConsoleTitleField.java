@@ -53,11 +53,6 @@ public class ConsoleTitleField extends ConsoleField
     @Override
     public boolean display()
     {
-        if (!getField().isConditionTrue())
-        {
-            return true;
-        }
-
         String title = getField().getLabel();
         if (title != null) {
             println(title);

@@ -67,11 +67,6 @@ public class ConsoleCheckField extends ConsoleField
     @Override
     public boolean display()
     {
-        if (!getField().isConditionTrue())
-        {
-            return true;
-        }
-
         CheckField field = getField();
         boolean selected = field.getInitialSelection();
         printDescription();
