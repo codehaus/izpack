@@ -55,7 +55,20 @@
                                 <xs:documentation>
                                     The percentage of left over vertical space to place on top of the components.
                                     A value of 0 is useful to avoid components moving up and down during
-                                    dynamic validation where components are shown and hidden.
+                                    dynamic validation where components are shown and hidden. The topBuffer may also
+                                    represent the number of pixels to place on top of the components rather than the
+                                    percentage of left over space if the rigid attribute is set to true.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="rigid" type="xs:boolean" use="optional" default="false">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    When set to true, the topBuffer will represent the number of pixels to place on top
+                                    of the components rather than the percentage of left over space to place on top of
+                                    the components. This is useful the avoid components moving up and down during
+                                    dynamic validation where components are shown and hidden, and where you would still
+                                    like a gap to be placed on top of the components.
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:attribute>
