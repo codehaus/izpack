@@ -93,6 +93,7 @@ public class GUIRuleFieldTest
         RuleField model = new RuleField(config, installData, factory);
 
         GUIRuleField field = new GUIRuleField(model);
+        assertFalse(field.updateView());               // should be nothing to update
 
         // check default value
         assertEquals("192.168.0.1", field.getValue());

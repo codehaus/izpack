@@ -285,6 +285,15 @@ public class UserInputPanel extends IzPanel
 
         for (GUIField view : views)
         {
+            Field field = view.getField();
+            if (field.isConditionTrue())
+            {
+                view.setDisplayed(true);
+            }
+            else
+            {
+                view.setDisplayed(false);
+            }
             updated |= view.updateView();
         }
         if (updated)
