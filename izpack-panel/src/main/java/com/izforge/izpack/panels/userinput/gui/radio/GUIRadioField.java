@@ -66,7 +66,6 @@ public class GUIRadioField extends GUIField
         constraints.indent = true;
         constraints.stretch = true;
 
-        addDescription();
 
         int id = 1;
         ActionListener l = new ActionListener()
@@ -121,10 +120,11 @@ public class GUIRadioField extends GUIField
      * Updates the field from the view.
      *
      * @param prompt the prompt to display messages
+     * @param skipValidation set to true when wanting to save field data without validating
      * @return {@code true} if the field was updated, {@code false} if the view is invalid
      */
     @Override
-    public boolean updateField(Prompt prompt)
+    public boolean updateField(Prompt prompt, boolean skipValidation)
     {
         for (RadioChoiceView view : choices)
         {
@@ -149,6 +149,7 @@ public class GUIRadioField extends GUIField
         boolean result = false;
         RadioField field = getField();
         String value = field.getValue();
+
         if (value != null)
         {
             for (RadioChoiceView view : choices)

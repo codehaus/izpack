@@ -78,6 +78,19 @@ public abstract class GUIField extends AbstractFieldView
      */
     public boolean updateField(Prompt prompt)
     {
+        return updateField(prompt, false);
+    }
+
+    /**
+     * Updates the field from the view.
+     * <p/>
+     * This implementation simply returns {@code true}.
+     *
+     * @param prompt the prompt to display messages
+     * @return {@code true} if the field was updated, {@code false} if the view is invalid
+     */
+    public boolean updateField(Prompt prompt, boolean skipValidation)
+    {
         return true;
     }
 

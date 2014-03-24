@@ -63,6 +63,7 @@ import com.izforge.izpack.util.PlatformModelMatcher;
 public class UserInputPanel extends IzPanel
 {
     private static final String TOPBUFFER = "topBuffer";
+    private static final String RIGID = "rigid";
 
     /**
      * The parsed result from reading the XML specification from the file
@@ -284,6 +285,15 @@ public class UserInputPanel extends IzPanel
 
         for (GUIField view : views)
         {
+            Field field = view.getField();
+            if (field.isConditionTrue())
+            {
+                view.setDisplayed(true);
+            }
+            else
+            {
+                view.setDisplayed(false);
+            }
             updated |= view.updateView();
         }
         if (updated)
@@ -323,9 +333,10 @@ public class UserInputPanel extends IzPanel
      * Reads the input installDataGUI from all UI elements and sets the associated variables.
      *
      * @param prompt the prompt to display messages
+     * @param skipValidation set to true when wanting to save field data without validating
      * @return {@code true} if the operation is successful, otherwise {@code false}.
      */
-    private boolean readInput(Prompt prompt)
+    private boolean readInput(Prompt prompt, boolean skipValidation)
     {
         delegatingPrompt.setPrompt(prompt);
 
@@ -333,13 +344,28 @@ public class UserInputPanel extends IzPanel
         {
             if (view.isDisplayed() && view.getField().isConditionTrue())
             {
-                if (!view.updateField(prompt))
+                if (skipValidation)
+                {
+                    view.updateField(prompt, skipValidation);
+                }
+                else if (!view.updateField(prompt))
                 {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Reads the input installDataGUI from all UI elements and sets the associated variables.
+     *
+     * @param prompt the prompt to display messages
+     * @return {@code true} if the operation is successful, otherwise {@code false}.
+     */
+    private boolean readInput(Prompt prompt)
+    {
+        return readInput(prompt, false);
     }
 
     /**
@@ -359,19 +385,22 @@ public class UserInputPanel extends IzPanel
         variables = userInputModel.updateVariables(spec);
     }
 
+    /**
+     * Called by fields that allow revalidation.
+     * No validation is required since we do not progress through the installer.
+     */
     private void updateDialog()
     {
+        boolean skipValidation = true;
         if (this.eventsActivated)
         {
             this.eventsActivated = false;
-            if (readInput(LoggingPrompt.INSTANCE)) // read from the input fields, but don't display a prompt for errors
-            {
-                updateVariables();
-                updateUIElements();
-                buildUI();
-                revalidate();
-                repaint();
-            }
+            readInput(LoggingPrompt.INSTANCE, skipValidation); // read from the input fields, but don't display a prompt for errors
+            updateVariables();
+            updateUIElements();
+            buildUI();
+            revalidate();
+            repaint();
             this.eventsActivated = true;
         }
     }
@@ -389,8 +418,12 @@ public class UserInputPanel extends IzPanel
         // if you don't want your panel to be moved up and down during
         // dynamic validation (showing and hiding components within the
         // same panel)
+        // Alternativley set the attribute rigid to true and topBuffer will be treated as pixel space
+        // rather than the percentage of the screen
         // ----------------------------------------------------
         int topbuff = 25;
+        boolean rigid = false;
+
         try
         {
             topbuff = Integer.parseInt(spec.getAttribute(TOPBUFFER));
@@ -399,9 +432,17 @@ public class UserInputPanel extends IzPanel
         {
             // do nothing
         }
+        try
+        {
+            rigid = Boolean.parseBoolean(spec.getAttribute(RIGID));
+        }
+        catch (Exception ignore)
+        {
+            // do nothing
+        }
         finally
         {
-            layout = new TwoColumnLayout(10, 5, 30, topbuff, TwoColumnLayout.LEFT);
+            layout = new TwoColumnLayout(10, 5, 30, topbuff, rigid, TwoColumnLayout.LEFT);
         }
         return layout;
     }
