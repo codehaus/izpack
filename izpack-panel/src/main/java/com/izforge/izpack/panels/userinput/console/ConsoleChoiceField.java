@@ -70,10 +70,6 @@ public abstract class ConsoleChoiceField<T extends Choice> extends ConsoleField
     @Override
     public boolean display()
     {
-        if (!getField().isConditionTrue())
-        {
-            return true;
-        }
         ChoiceField<T> field = getField();
         printDescription();
 
