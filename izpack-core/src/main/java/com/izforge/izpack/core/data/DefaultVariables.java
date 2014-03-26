@@ -22,7 +22,6 @@
 package com.izforge.izpack.core.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -303,65 +302,71 @@ public class DefaultVariables implements Variables
     {
         logger.fine("Refreshing dynamic variables");
 
-        Collection<DynamicVariable> removeDynamicVariables = new ArrayList<DynamicVariable>();
         Properties setVariables = new Properties();
         Set<String> unsetVariables = new HashSet<String>();
 
         for (DynamicVariable variable : dynamicVariables)
         {
+            String name = variable.getName();
             String conditionId = variable.getConditionid();
             if (conditionId == null || rules.isConditionTrue(conditionId))
             {
-                String newValue;
-                try
+                if (!(variable.isCheckonce() && variable.isChecked()))
                 {
-                    newValue = variable.evaluate(replacer);
-                }
-                catch (IzPackException exception)
-                {
-                    throw exception;
-                }
-                catch (Exception exception)
-                {
-                    throw new IzPackException("Failed to refresh dynamic variables (" + variable.getName() + ")", exception);
-
-                }
-                if (newValue == null)
-                {
-                    unsetVariables.add(variable.getName());
+                    String newValue;
+                    try
+                    {
+                        newValue = variable.evaluate(replacer);
+                    }
+                    catch (IzPackException exception)
+                    {
+                        throw exception;
+                    }
+                    catch (Exception exception)
+                    {
+                        throw new IzPackException("Failed to refresh dynamic variables (" + name + ")", exception);
+                    }
+                    if (newValue == null)
+                    {
+                        // Mark unset if dynamic variable cannot be evaluated and failOnError set
+                        unsetVariables.add(name);
+                    }
+                    else
+                    {
+                        setVariables.put(name, newValue);
+                    }
+                    variable.setChecked();
                 }
                 else
                 {
-                    setVariables.put(variable.getName(), newValue);
-                }
-                if (variable.isCheckonce())
-                {
-                    removeDynamicVariables.add(variable);
+                    String oldvalue = properties.getProperty(name);
+                    if (oldvalue != null)
+                    {
+                        setVariables.put(name, oldvalue);
+                    }
                 }
             }
             else
             {
-                // Unset if condition is not true
-                unsetVariables.add(variable.getName());
+                // Mark unset if condition is not true
+                unsetVariables.add(name);
             }
         }
 
-        for (String name : unsetVariables)
+        for (String key : unsetVariables)
         {
-            // Set values according the current conditions "win" over unset
-            if (!setVariables.containsKey(name))
+            // Don't unset dynamic variable from one definition, which
+            // are set to a value from another one during this refresh
+            if (!setVariables.containsKey(key))
             {
-                set(name, null);
+                set(key, null);
             }
         }
 
-        for (String name : setVariables.stringPropertyNames())
+        for (String key : setVariables.stringPropertyNames())
         {
-            set(name, setVariables.getProperty(name));
+            set(key, setVariables.getProperty(key));
         }
-
-        // Cleanup all dynamic variables set 'checkonce' which have been already evaluated.
-        dynamicVariables.removeAll(removeDynamicVariables);
     }
 
     /**
