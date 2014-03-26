@@ -98,13 +98,6 @@ public interface FieldConfig
     String getLabel();
 
     /**
-     * Determines if field updates trigger re-validation.
-     *
-     * @return {@code true} if the field triggers re-validation
-     */
-    boolean getRevalidate();
-
-    /**
      * Returns the condition that determines if the field is displayed or not.
      *
      * @return the condition. May be {@code null}

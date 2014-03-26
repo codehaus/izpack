@@ -29,9 +29,6 @@ package com.izforge.izpack.panels.userinput.field;
  */
 public class Choice
 {
-
-    private final boolean revalidate = true;
-
     /**
      * The key.
      */
@@ -91,8 +88,4 @@ public class Choice
         return value;
     }
 
-    public boolean getRevalidate()
-    {
-        return true;
-    }
 }

@@ -82,10 +82,8 @@ public class GUIRadioField extends GUIField
             button.setName(variable + "." + id);
             ++id;
             button.setText(choice.getValue());
-            if (choice.getRevalidate())
-            {
-                button.addActionListener(l);
-            }
+            button.addActionListener(l);
+
             String value = choice.getTrueValue();
 
             group.add(button);

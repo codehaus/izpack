@@ -89,11 +89,6 @@ public abstract class Field
     private final String description;
 
     /**
-     * Determines if field updates trigger re-validation.
-     */
-    private final boolean revalidate;
-
-    /**
      * Condition that determines if the field is displayed or not.
      */
     private final String condition;
@@ -126,7 +121,6 @@ public abstract class Field
         processor = config.getProcessor();
         label = config.getLabel();
         description = config.getDescription();
-        this.revalidate = config.getRevalidate();
         this.condition = config.getCondition();
         this.installData = installData;
 
@@ -340,16 +334,6 @@ public abstract class Field
     public String getDescription()
     {
         return description;
-    }
-
-    /**
-     * Determines if the field triggers revalidation on update.
-     *
-     * @return {@code true} if the field triggers revalidation
-     */
-    public boolean getRevalidate()
-    {
-        return revalidate;
     }
 
     /**
