@@ -41,7 +41,7 @@ public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<R
     /**
      * The initial selected index.
      */
-    private int selected = -1;
+    private int selected = 0;
 
     /**
      * Constructs a {@code RadioFieldReader}.
@@ -61,7 +61,7 @@ public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<R
      */
     public List<RadioChoice> getChoices(RulesEngine rules)
     {
-        selected = -1;
+        selected = 0;
         List<RadioChoice> result = new ArrayList<RadioChoice>();
         Config config = getConfig();
         for (IXMLElement choice : getSpec().getChildrenNamed("choice"))

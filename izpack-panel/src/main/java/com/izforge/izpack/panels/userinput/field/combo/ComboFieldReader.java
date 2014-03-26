@@ -52,7 +52,7 @@ public class ComboFieldReader extends FieldReader implements ChoiceFieldConfig<C
     /**
      * The initial selected index.
      */
-    private int selected = -1;
+    private int selected = 0;
 
     /**
      * Constructs a {@code ComboFieldReader}.
@@ -75,7 +75,7 @@ public class ComboFieldReader extends FieldReader implements ChoiceFieldConfig<C
     @Override
     public List<Choice> getChoices(RulesEngine rules)
     {
-        selected = -1;
+        selected = 0;
         List<Choice> result = new ArrayList<Choice>();
         Config config = getConfig();
         String variableValue = installData.getVariable(getVariable());
