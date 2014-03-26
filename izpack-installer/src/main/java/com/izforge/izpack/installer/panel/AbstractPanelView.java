@@ -347,7 +347,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
         }
         catch (Throwable exception)
         {
-            logger.log(Level.WARNING, exception.getMessage(), exception);
+            logger.log(Level.WARNING, "Could not validate dynamic conditions", exception);
             result = false;
         }
         return result;
@@ -361,6 +361,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
      */
     protected boolean validateData()
     {
+        installData.refreshVariables();
         return isValid(validator, installData);
     }
 
@@ -375,7 +376,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
      * @return {@code true} if the validator evaluated successfully, or with a warning that the user chose to skip;
      *         otherwise {@code false}
      */
-    protected boolean isValid(DataValidator validator, InstallData installData)
+    private boolean isValid(DataValidator validator, InstallData installData)
     {
         boolean result = false;
         DataValidator.Status status = validator.validateData(installData);

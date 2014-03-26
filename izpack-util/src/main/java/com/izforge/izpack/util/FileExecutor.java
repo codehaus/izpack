@@ -269,7 +269,7 @@ public class FileExecutor
         }
         catch (InterruptedException e)
         {
-            logger.log(Level.FINE, e.toString(), e);
+            logger.log(Level.FINE, "Command execution interrupted", e);
             stopThread(outMonitorThread, outMonitor);
             stopThread(errMonitorThread, errMonitor);
             output[0] = "";
@@ -277,7 +277,7 @@ public class FileExecutor
         }
         catch (IOException e)
         {
-            logger.log(Level.WARNING, e.toString(), e);
+            logger.log(Level.FINE, "Command execution failed", e);
             output[0] = "";
             output[1] = e.getMessage() + "\n";
         }
