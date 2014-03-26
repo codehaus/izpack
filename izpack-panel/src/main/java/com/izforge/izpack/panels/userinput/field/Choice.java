@@ -55,7 +55,7 @@ public class Choice
     }
 
     /**
-     * Returns the key.
+     * Returns the key, otherwise known as the true value.
      *
      * @return the key
      */
@@ -65,7 +65,7 @@ public class Choice
     }
 
     /**
-     * Returns the 'true' value.
+     * Returns the 'true' value, otherwise known as the key.
      *
      * @return the 'true' value
      */

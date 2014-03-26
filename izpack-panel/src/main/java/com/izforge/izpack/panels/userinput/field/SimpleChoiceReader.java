@@ -1,10 +1,22 @@
 package com.izforge.izpack.panels.userinput.field;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
+import com.izforge.izpack.api.data.InstallData;
+import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.rules.RulesEngine;
+import com.izforge.izpack.panels.userinput.processor.Processor;
 
-abstract public class SimpleChoiceReader extends FieldReader
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+public class SimpleChoiceReader extends FieldReader implements ChoiceFieldConfig
 {
+
+    /**
+     * The installation data.
+     */
+    private InstallData installData;
 
     /**
      * The initial selected index.
@@ -18,9 +30,71 @@ abstract public class SimpleChoiceReader extends FieldReader
      * @param field  the field element to read
      * @param config the configuration
      */
-    public SimpleChoiceReader(IXMLElement field, Config config)
+    public SimpleChoiceReader(IXMLElement field, Config config, InstallData installData)
     {
         super(field, config);
+        this.installData = installData;
+    }
+
+    /**
+     * Returns the choices.
+     *
+     * @return the choices
+     */
+    public List<Choice> getChoices(RulesEngine rules)
+    {
+        selected = 0;
+        List<Choice> result = new ArrayList<Choice>();
+        Config config = getConfig();
+        String variableValue = installData.getVariable(getVariable());
+        for (IXMLElement choice : getSpec().getChildrenNamed("choice"))
+        {
+            String processorClass = choice.getAttribute("processor");
+            String conditionId = config.getString(choice, "conditionid", null);
+
+            if (processorClass != null && !"".equals(processorClass))
+            {
+                String values;
+                try
+                {
+                    Processor processor = config.getFactory().create(processorClass, Processor.class);
+                    values = processor.process(null);
+                }
+                catch (Throwable exception)
+                {
+                    throw new IzPackException("Failed to get choices from processor=" + processorClass + " in "
+                            + config.getContext(choice), exception);
+                }
+                String set = config.getString(choice, "set", null);
+                StringTokenizer tokenizer = new StringTokenizer(values, ":");
+
+                while (tokenizer.hasMoreTokens())
+                {
+                    String token = tokenizer.nextToken();
+                    if (token.equals(set))
+                    {
+                        selected = result.size();
+                    }
+                    if (isDisplayed(rules, conditionId))
+                    {
+                        result.add(new Choice(token, token));
+                    }
+                }
+            }
+            else
+            {
+                String value = config.getAttribute(choice, "value");
+                if (isSelected(value, choice, variableValue))
+                {
+                    selected = result.size();
+                }
+                if (isDisplayed(rules, conditionId))
+                {
+                    result.add(new Choice(value, getText(choice)));
+                }
+            }
+        }
+        return result;
     }
 
     /**
