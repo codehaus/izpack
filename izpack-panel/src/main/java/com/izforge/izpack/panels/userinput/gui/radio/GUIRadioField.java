@@ -32,7 +32,7 @@ import javax.swing.JRadioButton;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
-import com.izforge.izpack.panels.userinput.field.radio.RadioChoice;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
@@ -76,7 +76,7 @@ public class GUIRadioField extends GUIField
                 notifyUpdateListener();
             }
         };
-        for (RadioChoice choice : field.getChoices())
+        for (Choice choice : field.getChoices())
         {
             JRadioButton button = new JRadioButton();
             button.setName(variable + "." + id);
@@ -173,11 +173,11 @@ public class GUIRadioField extends GUIField
      */
     private class RadioChoiceView
     {
-        private RadioChoice choice;
+        private Choice choice;
 
         private JRadioButton button;
 
-        public RadioChoiceView(RadioChoice choice, JRadioButton button)
+        public RadioChoiceView(Choice choice, JRadioButton button)
         {
             this.choice = choice;
             this.button = button;

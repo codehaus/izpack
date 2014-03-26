@@ -30,6 +30,8 @@ package com.izforge.izpack.panels.userinput.field;
 public class Choice
 {
 
+    private final boolean revalidate = true;
+
     /**
      * The key.
      */
@@ -63,6 +65,13 @@ public class Choice
     }
 
     /**
+     * Returns the 'true' value.
+     *
+     * @return the 'true' value
+     */
+    public String getTrueValue() { return getKey(); }
+
+    /**
      * Returns the display value.
      *
      * @return the display value
@@ -82,4 +91,8 @@ public class Choice
         return value;
     }
 
+    public boolean getRevalidate()
+    {
+        return true;
+    }
 }

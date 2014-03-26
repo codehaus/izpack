@@ -43,7 +43,7 @@ public abstract class ConsoleChoiceField<T extends Choice> extends ConsoleField
      * @param console the console
      * @param prompt  the prompt
      */
-    public ConsoleChoiceField(ChoiceField<T> field, Console console, Prompt prompt)
+    public ConsoleChoiceField(ChoiceField field, Console console, Prompt prompt)
     {
         super(field, console, prompt);
     }

@@ -121,22 +121,6 @@ public class ComboFieldReader extends SimpleChoiceReader implements ChoiceFieldC
         return result;
     }
 
-    /**
-     * Returns the index of the selected choice.
-     * <p/>
-     * A choice is selected if:
-     * <ul>
-     * <li>the variable value is the same as the choice "value" attribute; or</li>
-     * <li>the "set" attribute is 'true'</li>
-     * </ul>
-     * <p/>
-     * This is only valid after {@link #getChoices()} is invoked.
-     *
-     * @return the selected index or {@code -1} if no choice is selected
-     */
-    public int getSelectedIndex()
-    {
-        return selected;
-    }
+
 
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.rules.RulesEngine;
+import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.Config;
 import com.izforge.izpack.panels.userinput.field.SimpleChoiceReader;
@@ -37,7 +38,7 @@ import com.izforge.izpack.panels.userinput.field.SimpleChoiceReader;
  *
  * @author Tim Anderson
  */
-public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig<RadioChoice>
+public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig<Choice>
 {
 
     /**
@@ -67,10 +68,10 @@ public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldC
      *
      * @return the choices
      */
-    public List<RadioChoice> getChoices(RulesEngine rules)
+    public List<Choice> getChoices(RulesEngine rules)
     {
         selected = 0;
-        List<RadioChoice> result = new ArrayList<RadioChoice>();
+        List<Choice> result = new ArrayList<Choice>();
         Config config = getConfig();
         String variableValue = installData.getVariable(getVariable());
 
@@ -81,29 +82,15 @@ public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldC
             {
                 selected = result.size();
             }
-            boolean revalidate = config.getBoolean(choice, "revalidate", false);
+
             String conditionId = config.getString(choice, "conditionid", null);
             if (rules == null || conditionId == null || rules.isConditionTrue(conditionId))
             {
-                result.add(new RadioChoice(value, getText(choice), revalidate));
+                result.add(new Choice(value, getText(choice)));
             }
         }
 
         return result;
-    }
-
-    /**
-     * Returns the index of the selected choice.
-     * <p/>
-     * A choice is selected if the "set" attribute is 'true'.
-     * <p/>
-     * This is only valid after {@link #getChoices(RulesEngine)} is invoked.
-     *
-     * @return the selected index or {@code -1} if no choice is selected
-     */
-    public int getSelectedIndex()
-    {
-        return selected;
     }
 
 }
