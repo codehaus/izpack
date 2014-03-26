@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.Config;
@@ -38,6 +39,12 @@ import com.izforge.izpack.panels.userinput.field.FieldReader;
  */
 public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<RadioChoice>
 {
+
+    /**
+     * The installation data.
+     */
+    private InstallData installData;
+
     /**
      * The initial selected index.
      */
@@ -49,9 +56,10 @@ public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<R
      * @param field  the field element
      * @param config the configuration
      */
-    public RadioFieldReader(IXMLElement field, Config config)
+    public RadioFieldReader(IXMLElement field, Config config, InstallData installData)
     {
         super(field, config);
+        this.installData = installData;
     }
 
     /**
@@ -64,10 +72,12 @@ public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<R
         selected = 0;
         List<RadioChoice> result = new ArrayList<RadioChoice>();
         Config config = getConfig();
+        String variableValue = installData.getVariable(getVariable());
+
         for (IXMLElement choice : getSpec().getChildrenNamed("choice"))
         {
             String value = config.getAttribute(choice, "value");
-            if (config.getBoolean(choice, "set", false))
+            if (isSelected(value, choice, variableValue))
             {
                 selected = result.size();
             }
@@ -96,4 +106,34 @@ public class RadioFieldReader extends FieldReader implements ChoiceFieldConfig<R
         return selected;
     }
 
+    /**
+     * Determines if a choice is selected.
+     * <p/>
+     * A choice is selected if:
+     * <ul>
+     * <li>the variable value is the same as the choice "value" attribute; or</li>
+     * <li>the "set" attribute is 'true'</li>
+     * </ul>
+     *
+     * @param value         the choice value
+     * @param choice        the choice element
+     * @param variableValue the variable value. May be {@code null}
+     * @return {@code true} if the choice is selected
+     */
+    private boolean isSelected(String value, IXMLElement choice, String variableValue)
+    {
+        boolean result = false;
+        if (variableValue != null)
+        {
+            if (variableValue.equals(value))
+            {
+                result = true;
+            }
+        }
+        else
+        {
+            result = getConfig().getBoolean(choice, "set", false);
+        }
+        return result;
+    }
 }

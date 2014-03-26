@@ -143,7 +143,7 @@ public class FieldFactory
                 result = new PasswordGroupField(new PasswordGroupFieldReader(element, config), installData);
                 break;
             case RADIO:
-                result = new RadioField(new RadioFieldReader(element, config), installData);
+                result = new RadioField(new RadioFieldReader(element, config, installData), installData);
                 break;
             case RULE:
                 result = new RuleField(new RuleFieldReader(element, config), installData, config.getFactory());
