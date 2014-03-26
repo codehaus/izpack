@@ -154,6 +154,8 @@ public class DynamicVariableImpl implements DynamicVariable
             logger.log(Level.FINE,
                        "Error evaluating dynamic variable '" + getName() + "': " + e,
                        e);
+
+            return null; // unset this variable
         }
 
         return newValue;

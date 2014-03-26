@@ -23,8 +23,10 @@ package com.izforge.izpack.core.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,10 +113,12 @@ public class DefaultVariables implements Variables
         if (value != null)
         {
             properties.setProperty(name, value);
+            logger.fine("Dynamic variable '" + name + "' set to '" + value + "'");
         }
         else
         {
             properties.remove(name);
+            logger.fine("Dynamic variable '" + name + "' unset");
         }
     }
 
@@ -297,21 +301,16 @@ public class DefaultVariables implements Variables
     @Override
     public synchronized void refresh()
     {
+        logger.fine("Refreshing dynamic variables");
+
         Collection<DynamicVariable> removeDynamicVariables = new ArrayList<DynamicVariable>();
+        Properties setVariables = new Properties();
+        Set<String> unsetVariables = new HashSet<String>();
 
         for (DynamicVariable variable : dynamicVariables)
         {
             String conditionId = variable.getConditionid();
-            boolean log = logger.isLoggable(Level.FINE);
-            if (conditionId != null && !rules.isConditionTrue(conditionId))
-            {
-                if (log)
-                {
-                    logger.fine("Refreshing dynamic variable=" + variable.getName()
-                                        + " skipped due to unmet condition=" + conditionId);
-                }
-            }
-            else
+            if (conditionId == null || rules.isConditionTrue(conditionId))
             {
                 String newValue;
                 try
@@ -327,23 +326,38 @@ public class DefaultVariables implements Variables
                     throw new IzPackException("Failed to refresh dynamic variables (" + variable.getName() + ")", exception);
 
                 }
-                if (newValue != null)
+                if (newValue == null)
                 {
-                    set(variable.getName(), newValue);
-                    if (log)
-                    {
-                        logger.fine("Dynamic variable=" + variable.getName() + " set, value=" + newValue);
-                    }
-                    if (variable.isCheckonce())
-                    {
-                        removeDynamicVariables.add(variable);
-                    }
+                    unsetVariables.add(variable.getName());
                 }
-                else if (log)
+                else
                 {
-                    logger.fine("Dynamic variable=" + variable.getName() + " unchanged, value=" + variable.getValue());
+                    setVariables.put(variable.getName(), newValue);
+                }
+                if (variable.isCheckonce())
+                {
+                    removeDynamicVariables.add(variable);
                 }
             }
+            else
+            {
+                // Unset if condition is not true
+                unsetVariables.add(variable.getName());
+            }
+        }
+
+        for (String name : unsetVariables)
+        {
+            // Set values according the current conditions "win" over unset
+            if (!setVariables.containsKey(name))
+            {
+                set(name, null);
+            }
+        }
+
+        for (String name : setVariables.stringPropertyNames())
+        {
+            set(name, setVariables.getProperty(name));
         }
 
         // Cleanup all dynamic variables set 'checkonce' which have been already evaluated.
