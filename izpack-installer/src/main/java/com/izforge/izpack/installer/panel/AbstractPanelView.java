@@ -361,7 +361,6 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
      */
     protected boolean validateData()
     {
-        installData.refreshVariables();
         return isValid(validator, installData);
     }
 
