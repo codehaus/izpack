@@ -41,7 +41,7 @@ import com.izforge.izpack.panels.userinput.processor.Processor;
  *
  * @author Tim Anderson
  */
-public class ComboFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig<Choice>
+public class ComboFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig
 {
 
     /**

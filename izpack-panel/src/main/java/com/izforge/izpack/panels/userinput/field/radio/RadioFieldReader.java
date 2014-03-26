@@ -38,7 +38,7 @@ import com.izforge.izpack.panels.userinput.field.SimpleChoiceReader;
  *
  * @author Tim Anderson
  */
-public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig<Choice>
+public class RadioFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig
 {
 
     /**

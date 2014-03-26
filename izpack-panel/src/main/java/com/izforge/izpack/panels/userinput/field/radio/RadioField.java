@@ -33,7 +33,7 @@ import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
  *
  * @author Tim Anderson
  */
-public class RadioField extends ChoiceField<Choice>
+public class RadioField extends ChoiceField
 {
 
     /**
@@ -43,7 +43,7 @@ public class RadioField extends ChoiceField<Choice>
      * @param installData the installation data
      * @throws IzPackException if the field cannot be read
      */
-    public RadioField(ChoiceFieldConfig<Choice> config, InstallData installData)
+    public RadioField(ChoiceFieldConfig config, InstallData installData)
     {
         super(config, installData);
     }
