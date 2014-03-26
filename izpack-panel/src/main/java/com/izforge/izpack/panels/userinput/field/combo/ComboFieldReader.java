@@ -32,7 +32,7 @@ import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.ChoiceFieldConfig;
 import com.izforge.izpack.panels.userinput.field.Config;
-import com.izforge.izpack.panels.userinput.field.FieldReader;
+import com.izforge.izpack.panels.userinput.field.SimpleChoiceReader;
 import com.izforge.izpack.panels.userinput.processor.Processor;
 
 
@@ -41,7 +41,7 @@ import com.izforge.izpack.panels.userinput.processor.Processor;
  *
  * @author Tim Anderson
  */
-public class ComboFieldReader extends FieldReader implements ChoiceFieldConfig<Choice>
+public class ComboFieldReader extends SimpleChoiceReader implements ChoiceFieldConfig<Choice>
 {
 
     /**
@@ -137,37 +137,6 @@ public class ComboFieldReader extends FieldReader implements ChoiceFieldConfig<C
     public int getSelectedIndex()
     {
         return selected;
-    }
-
-    /**
-     * Determines if a choice is selected.
-     * <p/>
-     * A choice is selected if:
-     * <ul>
-     * <li>the variable value is the same as the choice "value" attribute; or</li>
-     * <li>the "set" attribute is 'true'</li>
-     * </ul>
-     *
-     * @param value         the choice value
-     * @param choice        the choice element
-     * @param variableValue the variable value. May be {@code null}
-     * @return {@code true} if the choice is selected
-     */
-    private boolean isSelected(String value, IXMLElement choice, String variableValue)
-    {
-        boolean result = false;
-        if (variableValue != null)
-        {
-            if (variableValue.equals(value))
-            {
-                result = true;
-            }
-        }
-        else
-        {
-            result = getConfig().getBoolean(choice, "set", false);
-        }
-        return result;
     }
 
 }
