@@ -77,7 +77,7 @@ public class ConsoleRadioFieldTest extends AbstractConsoleFieldTest
         choices.add(new Choice("A", "A Choice"));
         choices.add(new Choice("B", "B Choice"));
         choices.add(new Choice("C", "C Choice"));
-        ChoiceFieldConfig<Choice> config = new TestChoiceFieldConfig<Choice>("radio", choices, selected);
+        ChoiceFieldConfig config = new TestChoiceFieldConfig("radio", choices, selected);
 
         RadioField model = new RadioField(config, installData);
         return new ConsoleRadioField(model, console, prompt);
