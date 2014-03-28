@@ -42,6 +42,13 @@ public interface FieldConfig
     String getVariable();
 
     /**
+     * Returns the summary key associated with the field.
+     *
+     * @return the 'summaryKey' attribute, or {@code null} if the summary attribute is not present
+     */
+    String getSummaryKey();
+
+    /**
      * Returns the packs that this field applies to.
      *
      * @return the list of pack names

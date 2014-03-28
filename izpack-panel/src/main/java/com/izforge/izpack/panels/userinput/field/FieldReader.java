@@ -51,6 +51,11 @@ public class FieldReader extends ElementReader implements FieldConfig
     protected static final String VARIABLE = "variable";
 
     /**
+     * Variable attribute name.
+     */
+    protected static final String SUMMARY_KEY = "summaryKey";
+
+    /**
      * Text size attribute name.
      */
     private static final String TEXT_SIZE = "size";
@@ -112,6 +117,19 @@ public class FieldReader extends ElementReader implements FieldConfig
     public String getVariable()
     {
         return getConfig().getAttribute(getField(), VARIABLE);
+    }
+
+    /**
+     * Returns the summaryKey that the field is associated with.
+     * <p/>
+     *
+     * @return the 'summaryKey' attribute, or {@code null}
+     */
+    @Override
+    public String getSummaryKey()
+    {
+        boolean optional = true;
+        return getConfig().getAttribute(getField(), SUMMARY_KEY, optional);
     }
 
     /**

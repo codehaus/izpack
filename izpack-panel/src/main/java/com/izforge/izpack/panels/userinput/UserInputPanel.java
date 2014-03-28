@@ -20,12 +20,7 @@ package com.izforge.izpack.panels.userinput;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -459,5 +454,43 @@ public class UserInputPanel extends IzPanel
         scroller.getVerticalScrollBar().setBorder(emptyBorder);
         scroller.getHorizontalScrollBar().setBorder(emptyBorder);
         add(scroller, BorderLayout.CENTER);
+    }
+
+    @Override
+    public String getSummaryCaption()
+    {
+        return getMetadata().getPanelId();
+    }
+
+    public String getSummaryBody()
+    {
+        if (getMetadata().hasCondition() && !rules.isConditionTrue(getMetadata().getCondition()))
+        {
+            return null;
+        }
+        else
+        {
+            StringBuilder entries = new StringBuilder();
+            String  associatedVariable, associatedLabel, key, value;
+
+            for (GUIField view : views)
+            {
+                if (view.isDisplayed() && view.getVariable() != null)
+                {
+                    associatedVariable = view.getVariable();
+                    associatedLabel = view.getSummaryKey();
+
+                    if (associatedLabel != null)
+                    {
+                        key = installData.getMessages().get(associatedLabel);
+                        value = installData.getVariable(associatedVariable);
+                        entries.append(key + " " + value+ "<br>");
+                    }
+
+                }
+
+            }
+            return entries.toString();
+        }
     }
 }
