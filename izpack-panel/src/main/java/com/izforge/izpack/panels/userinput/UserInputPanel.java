@@ -57,6 +57,7 @@ import com.izforge.izpack.util.PlatformModelMatcher;
  */
 public class UserInputPanel extends IzPanel
 {
+    private static final String SUMMARY_KEY = "summaryKey";
     private static final String TOPBUFFER = "topBuffer";
     private static final String RIGID = "rigid";
 
@@ -456,12 +457,24 @@ public class UserInputPanel extends IzPanel
         add(scroller, BorderLayout.CENTER);
     }
 
+    /**
+     * @return Caption for the summary panel. Returns null if summaryKey is not specified.
+     */
     @Override
     public String getSummaryCaption()
     {
-        return getMetadata().getPanelId();
+        String associatedLabel;
+        try
+        {
+            associatedLabel = spec.getAttribute(SUMMARY_KEY);
+        }
+        catch (Exception setToNull)
+        {
+            associatedLabel = null;
+        }
+        return installData.getMessages().get(associatedLabel);
     }
-
+    @Override
     public String getSummaryBody()
     {
         if (getMetadata().hasCondition() && !rules.isConditionTrue(getMetadata().getCondition()))

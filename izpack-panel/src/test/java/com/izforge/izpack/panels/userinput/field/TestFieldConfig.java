@@ -79,6 +79,12 @@ public class TestFieldConfig implements FieldConfig
         return variable;
     }
 
+    @Override
+    public String getSummaryKey()
+    {
+        return null;
+    }
+
     /**
      * Returns the packs that this field applies to.
      *
