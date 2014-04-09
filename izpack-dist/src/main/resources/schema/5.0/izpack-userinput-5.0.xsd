@@ -72,6 +72,16 @@
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:attribute>
+                        <xs:attribute name="summaryKey" type="xs:string" use="optional">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The summary key attribute will allow your UserInputPanel to be displayed on the
+                                    SummaryPanel. The value of the summaryKey attribute within the panel tags represents
+                                    the caption/header that will be shown in the SummaryPanel. The value represents the
+                                    key of your string defined in your langpacks.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -216,6 +226,17 @@
             <xs:annotation>
                 <xs:documentation>
                     Used by "title" and "divider" fields
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="summaryKey" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The summary key attribute will allow your UserInputPanel field to be displayed on the
+                    SummaryPanel. The value of the summaryKey attribute within the panel tags represents
+                    the label/key that will be shown in the SummaryPanel. The value represents the
+                    key of your string defined in your langpacks. On the SummaryPanel the label/key will be followed by
+                    a space and the value of the variable you are summarizing.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
