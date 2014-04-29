@@ -20,7 +20,7 @@
         <panel classname="InstallPanel" id="InstallPanel">
             <validator classname="com.izforge.izpack.integration.datavalidator.TestDataValidator"/>
         </panel>
-        <panel classname="SimpleFinishPanel"> <!-- MOTE: validators associated with last panel are ignored -->
+        <panel classname="SimpleFinishPanel"> <!-- NOTE: validators associated with last panel are ignored -->
             <validator classname="com.izforge.izpack.integration.datavalidator.TestDataValidator"/>
         </panel>
     </panels>
