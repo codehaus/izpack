@@ -381,7 +381,7 @@
     <!--                                                                                                        -->
     <xs:complexType name="packsType">
         <xs:sequence>
-            <xs:element name="pack" type="packType" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="pack" type="packType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="refpack" type="refpackType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="refpackset" type="refpackSetType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
