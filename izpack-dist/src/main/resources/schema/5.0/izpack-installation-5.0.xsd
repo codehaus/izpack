@@ -416,7 +416,7 @@
 
     <xs:complexType name="refpackSetType">
         <xs:attribute name="dir" type="xs:string" use="required"/>
-        <xs:attribute name="includes" type="xs:string" use="optional"/>
+        <xs:attribute name="includes" type="xs:string" use="required"/>
     </xs:complexType>
 
     <!--                                                                                                        -->
