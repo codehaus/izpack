@@ -49,6 +49,11 @@ public abstract class Field
     private final String variable;
 
     /**
+     * The variable. May be {@code null}.
+     */
+    private final String summaryKey;
+
+    /**
      * Specifies the default (or set) value for the field.
      */
     private final String set;
@@ -118,6 +123,7 @@ public abstract class Field
     public Field(FieldConfig config, InstallData installData)
     {
         variable = config.getVariable();
+        summaryKey = config.getSummaryKey();
         set = config.getDefaultValue();
         size = config.getSize();
         packs = config.getPacks();
@@ -154,6 +160,16 @@ public abstract class Field
     public List<String> getVariables()
     {
         return variable != null ? Arrays.asList(variable) : Collections.<String>emptyList();
+    }
+
+    /**
+     * Returns the summaryKey.
+     *
+     * @return the summaryKey. May be {@code null}
+     */
+    public String getSummaryKey()
+    {
+        return summaryKey;
     }
 
     /**
