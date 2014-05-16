@@ -72,6 +72,12 @@ public class TargetPanelHelper
      */
     public static String getPath(InstallData installData)
     {
+        String currentPath = installData.getInstallPath();
+        if (currentPath != null)
+        {
+            return currentPath;
+        }
+
         String defaultPath = installData.getDefaultInstallPath();
         if (defaultPath == null)
         {
