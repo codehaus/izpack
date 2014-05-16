@@ -20,12 +20,7 @@ package com.izforge.izpack.panels.userinput;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -62,6 +57,7 @@ import com.izforge.izpack.util.PlatformModelMatcher;
  */
 public class UserInputPanel extends IzPanel
 {
+    private static final String SUMMARY_KEY = "summaryKey";
     private static final String TOPBUFFER = "topBuffer";
     private static final String RIGID = "rigid";
 
@@ -459,5 +455,55 @@ public class UserInputPanel extends IzPanel
         scroller.getVerticalScrollBar().setBorder(emptyBorder);
         scroller.getHorizontalScrollBar().setBorder(emptyBorder);
         add(scroller, BorderLayout.CENTER);
+    }
+
+    /**
+     * @return Caption for the summary panel. Returns null if summaryKey is not specified.
+     */
+    @Override
+    public String getSummaryCaption()
+    {
+        String associatedLabel;
+        try
+        {
+            associatedLabel = spec.getAttribute(SUMMARY_KEY);
+        }
+        catch (Exception setToNull)
+        {
+            associatedLabel = null;
+        }
+        return installData.getMessages().get(associatedLabel);
+    }
+    @Override
+    public String getSummaryBody()
+    {
+        if (getMetadata().hasCondition() && !rules.isConditionTrue(getMetadata().getCondition()))
+        {
+            return null;
+        }
+        else
+        {
+            StringBuilder entries = new StringBuilder();
+            String  associatedVariable, associatedLabel, key, value;
+
+            for (GUIField view : views)
+            {
+                if (view.isDisplayed() && view.getVariable() != null)
+                {
+                    associatedVariable = view.getVariable();
+                    associatedLabel = view.getSummaryKey();
+
+                    if (associatedLabel != null)
+                    {
+                        key = installData.getMessages().get(associatedLabel);
+                        value = installData.getVariable(associatedVariable);
+                        entries.append(key + " " + value+ "<br>");
+                    }
+
+                }
+
+            }
+            return entries.toString();
+        }
     }
 }
