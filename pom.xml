@@ -352,6 +352,25 @@
                 </executions>
             </plugin>
             <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>buildnumber-maven-plugin</artifactId>
+               <version>1.3</version>
+               <executions>
+                 <execution>
+                    <phase>initialize</phase>
+                    <goals>
+                      <goal>create</goal>
+                    </goals>
+                 </execution>
+               </executions>
+               <configuration>
+                  <docheck>false</docheck>
+                  <doupdate>false</doupdate>
+                  <shortrevisionlength>5</shortrevisionlength>
+                  <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat>
+               </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -416,6 +435,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                   <archive>
+                        <!-- will put the entries into META-INF/MANIFEST.MF file -->
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Build>${buildNumber}</Implementation-Build>
+                        </manifestEntries>
+                   </archive>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
