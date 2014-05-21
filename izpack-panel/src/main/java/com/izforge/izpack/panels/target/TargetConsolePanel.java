@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.panels.path.PathInputBase;
 import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.util.Console;
@@ -86,7 +87,11 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
     @Override
     public boolean run(InstallData installData, Console console)
     {
+        File pathFile;
+        String absolutePath;
         String defaultPath = TargetPanelHelper.getPath(installData);
+        PathInputBase.setInstallData(installData);
+
         if (defaultPath == null)
         {
             defaultPath = "";
@@ -100,14 +105,22 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             {
                 path = defaultPath;
             }
-            path = installData.getVariables().replace(path);
 
-            if (TargetPanelHelper.isIncompatibleInstallation(path))
+            path = installData.getVariables().replace(path);
+            pathFile = new File(path);
+            absolutePath = pathFile.getAbsolutePath();
+
+            if (TargetPanelHelper.isIncompatibleInstallation(absolutePath))
             {
                 console.println(getIncompatibleInstallationMsg(installData));
                 return run(installData, console);
             }
-            else if (!path.isEmpty())
+            else if (!PathInputBase.isWritable(pathFile))
+            {
+                System.out.println(installData.getMessages().get("UserPathPanel.notwritable"));
+                return run(installData, console);
+            }
+            else if (!absolutePath.isEmpty())
             {
                 File selectedDir = new File(path);
                 if (selectedDir.exists() && selectedDir.isDirectory() && selectedDir.list().length > 0)
