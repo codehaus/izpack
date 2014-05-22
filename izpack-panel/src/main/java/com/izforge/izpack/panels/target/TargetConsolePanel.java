@@ -109,6 +109,7 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             path = installData.getVariables().replace(path);
             normalizedPath = PathInputBase.normalizePath(path);
             pathFile = new File(normalizedPath);
+
             if (TargetPanelHelper.isIncompatibleInstallation(normalizedPath))
             {
                 console.println(getIncompatibleInstallationMsg(installData));
@@ -121,7 +122,12 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             }
             else if (!normalizedPath.isEmpty())
             {
-                if (pathFile.exists() && pathFile.isDirectory() && pathFile.list().length > 0)
+                if (pathFile.isFile())
+                {
+                    System.out.println(installData.getMessages().get("PathInputPanel.isfile"));
+                    return run(installData, console);
+                }
+                else if (pathFile.isDirectory() && pathFile.list().length > 0)
                 {
                     console.println(installData.getMessages().get("TargetPanel.warn"));
                 }

@@ -21,8 +21,6 @@
 
 package com.izforge.izpack.panels.path;
 
-import static com.izforge.izpack.util.Platform.Name.UNIX;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -167,8 +165,6 @@ public class PathInputPanel extends IzPanel implements ActionListener
             return false;
         }
 
-
-
         pathSelectionPanel.setPath(normalizedPath);
 
         if (isMustExist())
@@ -258,17 +254,6 @@ public class PathInputPanel extends IzPanel implements ActionListener
     public void setExistFiles(String[] strings)
     {
         existFiles = strings;
-    }
-
-    /**
-     * Determines if the specified path can be written to.
-     *
-     * @param path the path
-     * @return {@code true} if the path can be written to
-     */
-    protected boolean isWriteable(File path)
-    {
-        return PathInputBase.isWritable(path);
     }
 
     /**
