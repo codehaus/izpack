@@ -120,18 +120,8 @@ public class PathInputPanel extends IzPanel implements ActionListener
     public String getPath()
     {
         String chosenPath = pathSelectionPanel.getPath();
-        if (chosenPath == null)
-        {
-            chosenPath = "";
-        }
-
-        if (chosenPath.startsWith("~") && installData.getPlatform().isA(UNIX))
-        {
-            // Expand unix home reference
-            String home = System.getProperty("user.home");
-            chosenPath = home + chosenPath.substring(1);
-        }
-        return chosenPath;
+        String normalizedPath = PathInputBase.normalizePath(chosenPath);
+        return normalizedPath;
     }
 
     /**
@@ -168,16 +158,18 @@ public class PathInputPanel extends IzPanel implements ActionListener
     public boolean isValidated()
     {
         String path = getPath();
+        String normalizedPath = PathInputBase.normalizePath(path);
+        File file = new File(normalizedPath).getAbsoluteFile();
 
-        if (path.length() == 0 && !checkEmptyPath())
+        if (normalizedPath.length() == 0 && !checkEmptyPath())
         {
             // Empty path disallowed
             return false;
         }
 
-        // Normalize the path
-        File file = new File(path).getAbsoluteFile();
-        pathSelectionPanel.setPath(file.toString());
+
+
+        pathSelectionPanel.setPath(normalizedPath);
 
         if (isMustExist())
         {

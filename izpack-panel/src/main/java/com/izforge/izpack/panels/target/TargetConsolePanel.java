@@ -88,7 +88,7 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
     public boolean run(InstallData installData, Console console)
     {
         File pathFile;
-        String absolutePath;
+        String normalizedPath;
         String defaultPath = TargetPanelHelper.getPath(installData);
         PathInputBase.setInstallData(installData);
 
@@ -107,27 +107,25 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             }
 
             path = installData.getVariables().replace(path);
-            pathFile = new File(path);
-            absolutePath = pathFile.getAbsolutePath();
-
-            if (TargetPanelHelper.isIncompatibleInstallation(absolutePath))
+            normalizedPath = PathInputBase.normalizePath(path);
+            pathFile = new File(normalizedPath);
+            if (TargetPanelHelper.isIncompatibleInstallation(normalizedPath))
             {
                 console.println(getIncompatibleInstallationMsg(installData));
                 return run(installData, console);
             }
-            else if (!PathInputBase.isWritable(pathFile))
+            else if (!PathInputBase.isWritable(normalizedPath))
             {
                 System.out.println(installData.getMessages().get("UserPathPanel.notwritable"));
                 return run(installData, console);
             }
-            else if (!absolutePath.isEmpty())
+            else if (!normalizedPath.isEmpty())
             {
-                File selectedDir = new File(path);
-                if (selectedDir.exists() && selectedDir.isDirectory() && selectedDir.list().length > 0)
+                if (pathFile.exists() && pathFile.isDirectory() && pathFile.list().length > 0)
                 {
                     console.println(installData.getMessages().get("TargetPanel.warn"));
                 }
-                installData.setInstallPath(path);
+                installData.setInstallPath(normalizedPath);
                 return promptEndPanel(installData, console);
             }
             return run(installData, console);

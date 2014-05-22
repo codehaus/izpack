@@ -3,6 +3,7 @@ package com.izforge.izpack.panels.path;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.util.IoHelper;
+import com.izforge.izpack.util.Platform;
 import com.izforge.izpack.util.Platforms;
 
 import java.io.File;
@@ -25,6 +26,26 @@ public class PathInputBase
     {
         PathInputBase.installData = installData;
     }
+
+    /**
+     * Verify that the given path to a file or directory is writable.
+     * Ex. /home/user/example/test //Check to see if we can write "test" into /home/user/example/
+     *
+     * @param path path to file or directory to be written
+     * @return true if location is writable else false
+     */
+    public static boolean isWritable(String path)
+    {
+        return isWritable(new File(path));
+    }
+
+    /**
+     * Verify that the given path to a file or directory is writable.
+     * Ex. /home/user/example/test //Check to see if we can write "test" into /home/user/example/
+     *
+     * @param path path to file or directory to be written
+     * @return true if location is writable else false
+     */
     public static boolean isWritable(File path)
     {
         boolean result = false;
@@ -56,5 +77,28 @@ public class PathInputBase
             }
         }
         return result;
+    }
+
+    /**
+     * Normalize a path. Compresses consecutive file separators and replace the "~" with the users
+     * home directory if installation is being run on a UNIX platform.
+     *
+     * @param path path to normalize
+     * @return normalized path
+     */
+    public static String normalizePath(String path)
+    {
+        if (path == null)
+        {
+            return "";
+        }
+        else if (path.startsWith("~") && installData.getPlatform().isA(Platform.Name.UNIX))
+        {
+            String home = System.getProperty("user.home");
+            path = home + path.substring(1);
+        }
+
+        String normalizedPath = new File(path).getAbsolutePath();
+        return normalizedPath;
     }
 }
