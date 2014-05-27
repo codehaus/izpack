@@ -24,7 +24,6 @@ package com.izforge.izpack.installer.panel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.izforge.izpack.api.data.Panel;
@@ -403,20 +402,30 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     protected boolean switchPanel(int newIndex)
     {
         boolean result;
-        if (logger.isLoggable(Level.FINE))
-        {
-            logger.fine("Selecting panel=" + newIndex + ", old index=" + index);
-        }
 
         // refresh variables prior to switching panels
         variables.refresh();
 
-        T oldPanel = getPanelView(index);
-        T newPanel = getPanelView(newIndex);
+        T oldPanelView = getPanelView(index);
+        T newPanelView = getPanelView(newIndex);
         int oldIndex = index;
         index = newIndex;
-        if (switchPanel(newPanel, oldPanel))
+        if (switchPanel(newPanelView, oldPanelView))
         {
+
+            if (oldIndex > newIndex)
+            {
+                  // Switches back in a sorted list of panels
+                  // -> set unvisited all panels in order after this one to always keep history information up to date
+                  // -> important for summary panel and generation of auto-install.xml
+                  for (int i = index + 1; i < panelViews.size(); i++)
+                  {
+                      T futurePanelView = panelViews.get(i);
+                      futurePanelView.getPanel().setVisited(false);
+                  }
+            }
+            newPanelView.getPanel().setVisited(true);
+            logger.fine("Switched panel index: " + oldIndex + " -> " + index);
             result = true;
         }
         else
@@ -424,6 +433,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
             index = oldIndex;
             result = false;
         }
+
         return result;
     }
 

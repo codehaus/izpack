@@ -361,18 +361,41 @@ public class RulesEngineImpl implements RulesEngine
      *         condition was not met
      */
     @Override
-    public boolean canShowPanel(String panelid, Variables variables)
+    public boolean canShowPanel(String panelId, Variables variables)
     {
-        if (!this.panelConditions.containsKey(panelid))
+        if (!this.panelConditions.containsKey(panelId))
         {
-            logger.fine("Panel " + panelid + " unconditionally activated");
+            logger.fine("Panel " + panelId + " unconditionally activated");
             return true;
         }
-        Condition condition = getCondition(this.panelConditions.get(panelid));
+        Condition condition = getCondition(this.panelConditions.get(panelId));
         boolean b = condition.isTrue();
-        logger.fine("Panel " + panelid + ": activation depends on condition "
+        logger.fine("Panel " + panelId + ": activation depends on condition "
                             + condition.getId() + " -> " + b);
         return b;
+    }
+
+    @Override
+    public void addPanelCondition(String panelId, Condition newCondition)
+    {
+        Condition panelCond = null;
+        String panelCondString = this.panelConditions.get(panelId);
+        if (panelCondString != null)
+        {
+            panelCond = getCondition(this.panelConditions.get(panelId));
+        }
+
+        if (panelCond != null)
+        {
+            AndCondition andCondition = new AndCondition(this);
+            andCondition.setId(andCondition.toString());
+            andCondition.addOperands(newCondition);
+            andCondition.addOperands(panelCond);
+            newCondition = andCondition;
+        }
+
+        addCondition(newCondition);
+        this.panelConditions.put(panelId, newCondition.getId());
     }
 
     /**

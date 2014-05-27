@@ -70,6 +70,11 @@ public class Panel implements Serializable
     private List<Action> actions;
 
     /**
+     * Whether the panel has been visited for summarizing the installation story
+     */
+    private transient boolean visited = false;
+
+    /**
      * list of all pre panel construction actions
      */
     private List<PanelActionConfiguration> preConstructionActions = null;
@@ -309,5 +314,22 @@ public class Panel implements Serializable
                 ", validator='" + validator + '\'' +
                 ", helps=" + helps +
                 '}';
+    }
+
+    /**
+     * @return Whether the panel has been visited for summarizing the installation story
+     */
+    public boolean isVisited()
+    {
+        return visited;
+    }
+
+    /**
+     * Mark panel visited for summarizing the installation story
+     * @param visited
+     */
+    public void setVisited(boolean visited)
+    {
+        this.visited = visited;
     }
 }
