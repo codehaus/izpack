@@ -42,7 +42,9 @@ public interface RulesEngine
 
     boolean isConditionTrue(Condition cond);
 
-    boolean canShowPanel(String panelid, Variables variables);
+    boolean canShowPanel(String panelId, Variables variables);
+
+    void addPanelCondition(String panelId, Condition newCondition);
 
     boolean canInstallPack(String packid, Variables variables);
 

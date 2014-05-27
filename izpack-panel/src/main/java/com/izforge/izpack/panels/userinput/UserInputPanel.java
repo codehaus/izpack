@@ -29,11 +29,11 @@ import javax.swing.border.Border;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.Panel;
-import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.factory.ObjectFactory;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Resources;
+import com.izforge.izpack.api.rules.Condition;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.gui.TwoColumnLayout;
 import com.izforge.izpack.installer.data.GUIInstallData;
@@ -124,7 +124,7 @@ public class UserInputPanel extends IzPanel
      * @param prompt      the prompt
      */
     public UserInputPanel(Panel panel, InstallerFrame parent, GUIInstallData installData, Resources resources,
-                          RulesEngine rules, ObjectFactory factory, PlatformModelMatcher matcher, Prompt prompt)
+                          RulesEngine rules, ObjectFactory factory, final PlatformModelMatcher matcher, Prompt prompt)
     {
         super(panel, parent, installData, resources);
 
@@ -133,6 +133,16 @@ public class UserInputPanel extends IzPanel
         this.matcher = matcher;
         this.prompt = prompt;
         this.delegatingPrompt = new DelegatingPrompt(prompt);
+
+        spec = readSpec();
+
+        // Prevent activating on certain global conditions
+        ElementReader reader = new ElementReader(userInputModel.getConfig());
+        Condition globalConstraint = reader.getComplexPanelCondition(spec, matcher, installData, rules);
+        if (globalConstraint != null)
+        {
+            rules.addPanelCondition(panel.getPanelId(), globalConstraint);
+        }
     }
 
     /**
@@ -166,27 +176,11 @@ public class UserInputPanel extends IzPanel
         {
             // update UI with current values of associated variables
             updateUIElements();
-
-            ElementReader reader = new ElementReader(userInputModel.getConfig());
-            List<String> forPacks = reader.getPacks(spec);
-            List<String> forUnselectedPacks = reader.getUnselectedPacks(spec);
-            List<OsModel> forOs = reader.getOsModels(spec);
-
-            if (!FieldHelper.isRequiredForPacks(forPacks, installData.getSelectedPacks())
-                    || !FieldHelper.isRequiredForUnselectedPacks(forUnselectedPacks, installData.getSelectedPacks())
-                    || !matcher.matchesCurrentPlatform(forOs))
-            {
-                parent.skipPanel();
-            }
-            else
-            {
-                buildUI();
-                addScrollPane();
-
-                Dimension size = getMaximumSize();
-                setSize(size.width, size.height);
-                validate();
-            }
+            buildUI();
+            addScrollPane();
+            Dimension size = getMaximumSize();
+            setSize(size.width, size.height);
+            validate();
         }
         // Focus the first panel component according to the default traversal
         // policy avoiding forcing the user to click into that field first
@@ -226,14 +220,6 @@ public class UserInputPanel extends IzPanel
         eventsActivated = false;
         super.removeAll();
         views.clear();
-
-        // ----------------------------------------------------
-        // read the specifications
-        // ----------------------------------------------------
-        if (spec == null)
-        {
-            spec = readSpec();
-        }
 
         setLayout(new BorderLayout());
 
