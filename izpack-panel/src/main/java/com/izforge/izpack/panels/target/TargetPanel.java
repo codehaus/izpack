@@ -29,6 +29,8 @@ import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.panels.path.PathInputPanel;
 
+import java.io.File;
+
 /**
  * The target directory selection panel.
  *
@@ -62,12 +64,8 @@ public class TargetPanel extends PathInputPanel
     @Override
     public void panelActivate()
     {
-        // load the default directory info (if present)
-        String path = installData.getInstallPath();
-        if (path == null) 
-        {
-            path = TargetPanelHelper.getPath(installData);
-        }
+       String path = TargetPanelHelper.getPath(installData);
+        
         if (path != null)
         {
             pathSelectionPanel.setPath(path);
@@ -85,9 +83,15 @@ public class TargetPanel extends PathInputPanel
     public boolean isValidated()
     {
         boolean result = false;
+        File targetPathFile = new File(getPath());
         if (TargetPanelHelper.isIncompatibleInstallation(getPath()))
         {
             emitError(getString("installer.error"), getString("TargetPanel.incompatibleInstallation"));
+        }
+        else if (targetPathFile.isFile())
+        {
+            emitError(getString("installer.error"), getString(getI18nStringForClass("isfile", "PathInputPanel")));
+            return false;
         }
         else if (super.isValidated())
         {

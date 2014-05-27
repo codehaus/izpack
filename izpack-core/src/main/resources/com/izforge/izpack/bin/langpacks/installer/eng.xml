@@ -83,6 +83,8 @@
     <str id="InfoPanel.info" txt="Please read the following information: "/>
 
     <!-- PathInputPanel strings -->
+    <str id="PathInputPanel.isfile"
+        txt="You have entered a path to a file. Please select a path to a new or existing directory."/>
     <str id="PathInputPanel.required" txt="The chosen directory should exist."/>
     <str id="PathInputPanel.required.forModificationInstallation" txt="The chosen directory should exist."/>
     <str id="PathInputPanel.notValid"

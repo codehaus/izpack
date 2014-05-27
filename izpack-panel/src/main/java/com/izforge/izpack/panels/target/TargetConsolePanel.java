@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
+import com.izforge.izpack.panels.path.PathInputBase;
 import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.util.Console;
@@ -86,7 +87,11 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
     @Override
     public boolean run(InstallData installData, Console console)
     {
+        File pathFile;
+        String normalizedPath;
         String defaultPath = TargetPanelHelper.getPath(installData);
+        PathInputBase.setInstallData(installData);
+
         if (defaultPath == null)
         {
             defaultPath = "";
@@ -100,21 +105,33 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             {
                 path = defaultPath;
             }
-            path = installData.getVariables().replace(path);
 
-            if (TargetPanelHelper.isIncompatibleInstallation(path))
+            path = installData.getVariables().replace(path);
+            normalizedPath = PathInputBase.normalizePath(path);
+            pathFile = new File(normalizedPath);
+
+            if (TargetPanelHelper.isIncompatibleInstallation(normalizedPath))
             {
                 console.println(getIncompatibleInstallationMsg(installData));
                 return run(installData, console);
             }
-            else if (!path.isEmpty())
+            else if (!PathInputBase.isWritable(normalizedPath))
             {
-                File selectedDir = new File(path);
-                if (selectedDir.exists() && selectedDir.isDirectory() && selectedDir.list().length > 0)
+                System.out.println(installData.getMessages().get("UserPathPanel.notwritable"));
+                return run(installData, console);
+            }
+            else if (!normalizedPath.isEmpty())
+            {
+                if (pathFile.isFile())
+                {
+                    System.out.println(installData.getMessages().get("PathInputPanel.isfile"));
+                    return run(installData, console);
+                }
+                else if (pathFile.isDirectory() && pathFile.list().length > 0)
                 {
                     console.println(installData.getMessages().get("TargetPanel.warn"));
                 }
-                installData.setInstallPath(path);
+                installData.setInstallPath(normalizedPath);
                 return promptEndPanel(installData, console);
             }
             return run(installData, console);
