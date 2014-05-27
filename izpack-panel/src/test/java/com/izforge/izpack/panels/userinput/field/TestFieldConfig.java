@@ -199,17 +199,6 @@ public class TestFieldConfig implements FieldConfig
     }
 
     /**
-     * Determines if field updates trigger re-validation.
-     *
-     * @return {@code true} if the field triggers revalidation
-     */
-    @Override
-    public boolean getRevalidate()
-    {
-        return false;
-    }
-
-    /**
      * Returns the condition that determines if the field is displayed or not.
      *
      * @return the condition. May be {@code null}

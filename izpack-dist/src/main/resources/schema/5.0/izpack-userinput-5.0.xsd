@@ -181,11 +181,6 @@
                     <xs:attribute name="set" type="xs:string" use="optional"/>
                     <xs:attribute name="true" type="xs:string" use="optional"/>
                     <xs:attribute name="txt" type="xs:string" use="optional"/>
-                    <xs:attribute name="revalidate" type="xs:boolean" use="optional">
-                        <xs:annotation>
-                            <xs:documentation>Used by "combo" and "check" fields</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
                 </xs:complexType>
             </xs:element>
             <xs:element name="os" minOccurs="0" maxOccurs="unbounded">
@@ -275,7 +270,6 @@
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="value" type="xs:string" use="optional"/>
-        <xs:attribute name="revalidate" type="xs:boolean" use="optional"/>
     </xs:complexType>
 
     <!--                                                                                                        -->

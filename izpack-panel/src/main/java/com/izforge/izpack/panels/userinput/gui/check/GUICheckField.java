@@ -57,9 +57,7 @@ public class GUICheckField extends GUIField
         checkbox.setName(field.getVariable());
 
         checkbox.setSelected(field.getInitialSelection());
-        if (field.getRevalidate())
-        {
-            checkbox.addActionListener(new ActionListener()
+        checkbox.addActionListener(new ActionListener()
             {
                 @Override
                 public void actionPerformed(ActionEvent e)
@@ -67,7 +65,6 @@ public class GUICheckField extends GUIField
                     notifyUpdateListener();
                 }
             });
-        }
 
         addDescription();
 
