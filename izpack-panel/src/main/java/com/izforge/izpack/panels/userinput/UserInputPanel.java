@@ -141,7 +141,7 @@ public class UserInputPanel extends IzPanel
         Condition globalConstraint = reader.getComplexPanelCondition(spec, matcher, installData, rules);
         if (globalConstraint != null)
         {
-            rules.addPanelCondition(panel.getPanelId(), globalConstraint);
+            rules.addPanelCondition(panel, globalConstraint);
         }
     }
 
