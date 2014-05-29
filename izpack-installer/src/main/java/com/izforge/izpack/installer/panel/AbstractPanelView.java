@@ -21,8 +21,6 @@
 
 package com.izforge.izpack.installer.panel;
 
-import static com.izforge.izpack.data.PanelAction.ActionStage;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,7 +34,9 @@ import com.izforge.izpack.api.factory.ObjectFactory;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.installer.DataValidator;
 import com.izforge.izpack.api.resource.Messages;
+import com.izforge.izpack.api.rules.Condition;
 import com.izforge.izpack.data.PanelAction;
+import com.izforge.izpack.data.PanelAction.ActionStage;
 
 
 /**
@@ -78,9 +78,9 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
     private boolean visible = true;
 
     /**
-     * The data validator. May be {@code null}.
+     * Ordered list of panel data validators
      */
-    private DataValidator validator;
+    private List<DataValidator> validators = new ArrayList<DataValidator>();
 
     /**
      * The installation data.
@@ -187,10 +187,11 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
         {
             executePreConstructionActions();
             view = createView(panel, viewClass);
-            String dataValidator = panel.getValidator();
-            if (dataValidator != null)
+
+            List<String> dataValidatorClassNames = panel.getValidators();
+            for (String dataValidatorClassName : dataValidatorClassNames)
             {
-                validator = factory.create(dataValidator, DataValidator.class, panel, view);
+                validators.add(factory.create(dataValidatorClassName, DataValidator.class, panel, view));
             }
 
             addActions(panel.getPreActivationActions(), preActivationActions, ActionStage.preactivate);
@@ -239,7 +240,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
         List<DynamicInstallerRequirementValidator> conditions = installData.getDynamicInstallerRequirements();
         if (conditions == null || validateDynamicConditions())
         {
-            result = validator == null || validateData();
+            result = validators.size() == 0 || validateData();
         }
 
         executePostValidationActions();
@@ -347,7 +348,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
         }
         catch (Throwable exception)
         {
-            logger.log(Level.WARNING, "Could not validate dynamic conditions", exception);
+            logger.log(Level.WARNING, "Panel " + getPanelId() + ": Could not validate dynamic conditions", exception);
             result = false;
         }
         return result;
@@ -361,6 +362,45 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
      */
     protected boolean validateData()
     {
+        boolean result = true;
+        DataValidator[] validatorArray = validators.toArray(new DataValidator[] {});
+        for (int i = 0; i < validatorArray.length; i++)
+        {
+            DataValidator validator = validatorArray[i];
+            if (!isValid(validator, i, installData))
+            {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Evaluates a validator.
+     * <p/>
+     * If the validator returns a warning status, then a prompt will be displayed asking the user to skip the
+     * validation or not.
+     *
+     * @param validator   the validator to evaluate
+     * @param index   the index in the list of validators for finding its appropriate validator condition
+     * @param installData the installation data
+     * @return {@code true} if the validator evaluated successfully, or with a warning that the user chose to skip;
+     *         otherwise {@code false}
+     */
+    private boolean isValid(DataValidator validator, Integer index, InstallData installData)
+    {
+        String dataValidatorConditionId = panel.getValidatorCondition(index);
+        if (dataValidatorConditionId != null)
+        {
+            Condition dataValidatorCondition = installData.getRules().getCondition(dataValidatorConditionId);
+            if (!dataValidatorCondition.isTrue())
+            {
+                // Skip panel validation
+                logger.fine("Panel " + getPanelId() + ": Skip validation (" + validator.getClass().getName() +")");
+                return true;
+            }
+        }
         return isValid(validator, installData);
     }
 
@@ -371,6 +411,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
      * validation or not.
      *
      * @param validator   the validator to evaluate
+     * @param index   the index in the list of validators for finding its appropriate validator condition
      * @param installData the installation data
      * @return {@code true} if the validator evaluated successfully, or with a warning that the user chose to skip;
      *         otherwise {@code false}
@@ -378,8 +419,9 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
     private boolean isValid(DataValidator validator, InstallData installData)
     {
         boolean result = false;
+
         DataValidator.Status status = validator.validateData(installData);
-        logger.fine("Data validation status=" + status + ", for validator=" + validator.getClass().getName());
+        logger.fine("Panel " + getPanelId() + ": Data validation status=" + status + " (" + validator.getClass().getName() + ")");
 
         if (status == DataValidator.Status.OK)
         {
@@ -392,7 +434,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
                 String message = getMessage(validator.getWarningMessageId(), true);
                 if (message == null)
                 {
-                    logger.warning("No warning message for validator=" + validator.getClass().getName());
+                    logger.warning("Panel " + getPanelId() + ": No warning message for validator " + validator.getClass().getName());
                 }
                 result = isWarningValid(message, validator.getDefaultAnswer());
             }
@@ -401,7 +443,7 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
                 String message = getMessage(validator.getErrorMessageId(), true);
                 if (message == null)
                 {
-                    logger.warning("No error message for validator=" + validator.getClass().getName());
+                    logger.warning("Panel " + getPanelId() + ": No error message for validator " + validator.getClass().getName());
                     message = "Validation error";
                 }
                 getHandler().emitError(getMessage("data.validation.error.title"), message);
@@ -425,12 +467,12 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
             if (getHandler().emitWarning(getMessage("data.validation.warning.title"), message))
             {
                 result = true;
-                logger.fine("User decided to skip validation warning");
+                logger.fine("Panel " + getPanelId() + ": User decided to skip validation warning");
             }
         }
         else
         {
-            logger.fine("No warning message available, using default answer=" + defaultAnswer);
+            logger.fine("Panel " + getPanelId() + ": No warning message available, using default answer=" + defaultAnswer);
             result = defaultAnswer;
         }
         return result;
