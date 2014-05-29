@@ -1375,8 +1375,8 @@ public class CompilerConfig extends Thread
 
         // Now checked the loaded XML file for basic syntax
         // We check it
-        if (! (  "izpack:installation".equalsIgnoreCase(refXMLData.getName())  // normally with the namespace prefix 
-        	  || "installation".equalsIgnoreCase(refXMLData.getName())))       // optional without
+        if (! (  "izpack:installation".equalsIgnoreCase(refXMLData.getName())  // normally with the namespace prefix
+            || "installation".equalsIgnoreCase(refXMLData.getName())))       // optional without
         {
             assertionHelper.parseError(refXMLData, "this is not an IzPack XML installation file");
         }
@@ -1545,14 +1545,15 @@ public class CompilerConfig extends Thread
             }
 
             // adding validator
-            IXMLElement validatorElement = panelElement.getFirstChildNamed(DataValidator.DATA_VALIDATOR_TAG);
-            if (validatorElement != null)
+            List<IXMLElement> validatorElements = panelElement.getChildrenNamed(DataValidator.DATA_VALIDATOR_TAG);
+            for (IXMLElement validatorElement : validatorElements)
             {
-                String validator = validatorElement.getAttribute(DataValidator.DATA_VALIDATOR_CLASSNAME_TAG);
+                String validator = validatorElement.getAttribute(DataValidator.DATA_VALIDATOR_CLASSNAME_ATTR);
                 if (!"".equals(validator))
                 {
+                    String validatorCondition = validatorElement.getAttribute(DataValidator.DATA_VALIDATOR_CONDITION_ATTR);
                     Class<DataValidator> validatorType = classLoader.loadClass(validator, DataValidator.class);
-                    panel.setValidator(validatorType.getName());
+                    panel.addValidator(validatorType.getName(), validatorCondition);
                 }
             }
             // adding helps
