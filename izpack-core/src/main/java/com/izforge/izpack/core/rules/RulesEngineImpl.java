@@ -36,6 +36,7 @@ import com.izforge.izpack.api.adaptator.impl.XMLElementImpl;
 import com.izforge.izpack.api.adaptator.impl.XMLWriter;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Pack;
+import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.data.Variables;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.rules.Condition;
@@ -376,25 +377,21 @@ public class RulesEngineImpl implements RulesEngine
     }
 
     @Override
-    public void addPanelCondition(String panelId, Condition newCondition)
+    public void addPanelCondition(Panel panel, Condition newCondition)
     {
-        Condition panelCond = null;
-        String panelCondString = this.panelConditions.get(panelId);
+        String panelId = panel.getPanelId();
+        String panelCondString = panel.getCondition();
         if (panelCondString != null)
-        {
-            panelCond = getCondition(this.panelConditions.get(panelId));
-        }
-
-        if (panelCond != null)
         {
             AndCondition andCondition = new AndCondition(this);
             andCondition.setId(andCondition.toString());
             andCondition.addOperands(newCondition);
-            andCondition.addOperands(panelCond);
+            andCondition.addOperands(getCondition(panelCondString));
             newCondition = andCondition;
         }
 
         addCondition(newCondition);
+        panel.setCondition(newCondition.getId());
         this.panelConditions.put(panelId, newCondition.getId());
     }
 
