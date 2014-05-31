@@ -299,15 +299,10 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         return (true);
     }
 
-    /**
-     * Asks to make the XML panel installDataGUI.
-     *
-     * @param panelRoot The XML tree to write the installDataGUI in.
-     */
     @Override
-    public void makeXMLData(IXMLElement panelRoot)
+    public void createInstallationRecord(IXMLElement panelRoot)
     {
-        new ImgPacksPanelAutomationHelper().makeXMLData(this.installData, panelRoot);
+        new ImgPacksPanelAutomationHelper().createInstallationRecord(this.installData, panelRoot);
     }
 
 

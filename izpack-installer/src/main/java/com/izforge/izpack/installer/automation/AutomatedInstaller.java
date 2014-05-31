@@ -24,7 +24,7 @@ package com.izforge.izpack.installer.automation;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.List;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.adaptator.IXMLParser;
@@ -34,6 +34,7 @@ import com.izforge.izpack.api.data.Info;
 import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.installer.base.InstallerBase;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
+import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.installer.requirement.RequirementsChecker;
 import com.izforge.izpack.util.Housekeeper;
 
@@ -78,12 +79,6 @@ public class AutomatedInstaller extends InstallerBase
     private final Housekeeper housekeeper;
 
     /**
-     * The logger.
-     */
-    private static final Logger logger = Logger.getLogger(AutomatedInstaller.class.getName());
-
-
-    /**
      * Constructs an <tt>AutomatedInstaller</tt>.
      *
      * @param panels              the panels
@@ -115,11 +110,9 @@ public class AutomatedInstaller extends InstallerBase
     public void init(String inputFilename, String mediaPath) throws Exception
     {
         File input = new File(inputFilename);
-        // Loads the xml data
-        installData.setXmlData(getXMLData(input));
-
-        // Loads the langpack
-        String code = installData.getXmlData().getAttribute("langpack", "eng");
+        IXMLElement installRecord = getXMLData(input);
+        installData.setInstallationRecord(installRecord);
+        String code = installRecord.getAttribute("langpack", "eng");
         locales.setLocale(code);
         installData.setMessages(locales.getMessages());
         installData.setLocale(locales.getLocale(), locales.getISOCode());
@@ -145,26 +138,27 @@ public class AutomatedInstaller extends InstallerBase
 
         // TODO: i18n
         System.out.println("[ Starting automated installation ]");
-        logger.info("[ Starting automated installation ]");
 
         try
         {
-            while (panels.hasNext())
+            List<IXMLElement> panelRoots = installData.getInstallationRecord().getChildren();
+            for (IXMLElement panelRoot : panelRoots)
             {
-                success = panels.next();
+                int panelIndex = Integer.valueOf(panelRoot.getAttribute(PanelView.AUTOINSTALL_PANELROOT_ATTR_INDEX));
+                success = panels.switchPanel(panelIndex, true);
                 if (!success)
                 {
                     break;
                 }
             }
+
             if (success)
             {
                 success = panels.isValid();// last panel needs to be validated
-            }
-
-            if (success && uninstallDataWriter.isUninstallRequired())
-            {
-                success = uninstallDataWriter.write();
+                if (uninstallDataWriter.isUninstallRequired())
+                {
+                    success = uninstallDataWriter.write();
+                }
             }
         }
         catch (Exception e)

@@ -20,7 +20,12 @@ package com.izforge.izpack.panels.userinput;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -189,13 +194,11 @@ public class UserInputPanel extends IzPanel
     }
 
     /**
-     * Asks the panel to set its own XML installDataGUI that can be brought back for an automated installation
-     * process. Use it as a blackbox if your panel needs to do something even in automated mode.
-     *
-     * @param panelRoot The XML root element of the panels blackbox tree.
+     * Creates an installation record for unattended installations on {@link UserInputPanel},
+     * created during GUI installations.
      */
     @Override
-    public void makeXMLData(IXMLElement panelRoot)
+    public void createInstallationRecord(IXMLElement rootElement)
     {
         Map<String, String> entryMap = new HashMap<String, String>();
 
@@ -212,7 +215,7 @@ public class UserInputPanel extends IzPanel
             }
         }
 
-        new UserInputPanelAutomationHelper(entryMap).makeXMLData(installData, panelRoot);
+        new UserInputPanelAutomationHelper(entryMap).createInstallationRecord(installData, rootElement);
     }
 
     private void init()

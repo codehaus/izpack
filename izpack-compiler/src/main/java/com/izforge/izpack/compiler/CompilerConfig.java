@@ -92,6 +92,7 @@ import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.compiler.data.CompilerData;
 import com.izforge.izpack.compiler.data.PropertyManager;
 import com.izforge.izpack.compiler.helper.AssertionHelper;
+import com.izforge.izpack.compiler.helper.CompilerHelper;
 import com.izforge.izpack.compiler.helper.TargetFileSet;
 import com.izforge.izpack.compiler.helper.XmlCompilerHelper;
 import com.izforge.izpack.compiler.listener.CompilerListener;
@@ -1508,7 +1509,12 @@ public class CompilerConfig extends Thread
 
             // add an id
             String id = panelElement.getAttribute("id");
+            if (id == null)
+            {
+                id = className + "_" + Integer.valueOf(panelCounter - 1);
+            }
             panel.setPanelId(id);
+
             String condition = panelElement.getAttribute("condition");
             panel.setCondition(condition);
 
