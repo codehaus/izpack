@@ -13,9 +13,6 @@ import com.izforge.izpack.api.installer.DataValidator;
  */
 public interface PanelView<T>
 {
-    public static final String AUTOINSTALL_PANELROOT_ATTR_INDEX = "index";
-    public static final String AUTOINSTALL_PANELROOT_ATTR_ID = "id";
-
     /**
      * Returns the panel identifier.
      *

@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.adaptator.impl.XMLElementImpl;
+import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.data.DynamicInstallerRequirementValidator;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
@@ -589,11 +590,10 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
     protected final IXMLElement createPanelRootRecord()
     {
         IXMLElement panelRoot = new XMLElementImpl(panel.getClassName(), installData.getInstallationRecord());
-        panelRoot.setAttribute(AUTOINSTALL_PANELROOT_ATTR_INDEX, Integer.toString(getIndex()));
         String panelId = panel.getPanelId();
         if (panelId != null)
         {
-            panelRoot.setAttribute(AUTOINSTALL_PANELROOT_ATTR_ID, panelId);
+            panelRoot.setAttribute(AutomatedInstallData.AUTOINSTALL_PANELROOT_ATTR_ID, panelId);
         }
         return panelRoot;
     }

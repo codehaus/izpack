@@ -34,7 +34,6 @@ import com.izforge.izpack.api.data.Info;
 import com.izforge.izpack.api.resource.Locales;
 import com.izforge.izpack.installer.base.InstallerBase;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
-import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.installer.requirement.RequirementsChecker;
 import com.izforge.izpack.util.Housekeeper;
 
@@ -144,8 +143,15 @@ public class AutomatedInstaller extends InstallerBase
             List<IXMLElement> panelRoots = installData.getInstallationRecord().getChildren();
             for (IXMLElement panelRoot : panelRoots)
             {
-                int panelIndex = Integer.valueOf(panelRoot.getAttribute(PanelView.AUTOINSTALL_PANELROOT_ATTR_INDEX));
-                success = panels.switchPanel(panelIndex, true);
+                String panelId = panelRoot.getAttribute(AutomatedInstallData.AUTOINSTALL_PANELROOT_ATTR_ID);
+                for (AutomatedPanelView panelView : panels.getPanelViews())
+                {
+                    if (panelView.getPanelId().equals(panelId))
+                    {
+                        success = panels.switchPanel(panelView.getIndex(), true);
+                        break;
+                    }
+                }
                 if (!success)
                 {
                     break;
