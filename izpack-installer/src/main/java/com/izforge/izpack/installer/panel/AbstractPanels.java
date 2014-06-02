@@ -22,10 +22,17 @@
 package com.izforge.izpack.installer.panel;
 
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.izforge.izpack.api.adaptator.IXMLElement;
+import com.izforge.izpack.api.adaptator.IXMLWriter;
+import com.izforge.izpack.api.adaptator.impl.XMLWriter;
+import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.data.Variables;
 
@@ -46,6 +53,11 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      * The panel views.
      */
     private final List<T> panelViews;
+
+    /**
+     * The installation data.
+     */
+    private final InstallData installData;
 
     /**
      * The variables.
@@ -78,11 +90,12 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      * @param panels    the panels
      * @param variables the variables. These are refreshed prior to each panel switch
      */
-    public AbstractPanels(List<T> panels, Variables variables)
+    public AbstractPanels(List<T> panels, InstallData installData)
     {
         this.panels = new ArrayList<Panel>();
         this.panelViews = panels;
-        this.variables = variables;
+        this.installData = installData;
+        this.variables = installData.getVariables();
         nextEnabled = !panels.isEmpty();
         int index = 0;
         for (T panelView : panels)
@@ -227,16 +240,12 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     public boolean next(boolean validate)
     {
         boolean result = false;
-        T panel = getPanelView();
-        boolean isValid = panel == null || executeValidationActions(panel, validate);
-        if (isValid && isNextEnabled())     // NOTE: actions may change isNextEnabled() status
+        int newIndex = getNext(index, false);
+        if (newIndex != -1)
         {
-            int newIndex = getNext(index, false);
-            if (newIndex != -1)
-            {
-                result = switchPanel(newIndex);
-            }
+            result = switchPanel(newIndex, validate);
         }
+
         return result;
     }
 
@@ -300,7 +309,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
             int newIndex = getPrevious(index, true);
             if (newIndex != -1)
             {
-                result = switchPanel(newIndex);
+                result = switchPanel(newIndex, false);
             }
         }
         return result;
@@ -383,14 +392,42 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     public int getVisible()
     {
         int result = 0;
-        for (PanelView panel : panelViews)
+        for (T panelView : panelViews)
         {
-            if (panel.isVisible())
+            if (panelView.isVisible())
             {
                 ++result;
             }
         }
         return result;
+    }
+
+    @Override
+    public void writeInstallationRecord(File file) throws Exception
+    {
+        FileOutputStream out = new FileOutputStream(file);
+        BufferedOutputStream outBuff = new BufferedOutputStream(out);
+
+        try
+        {
+            IXMLWriter writer = new XMLWriter(out);
+            IXMLElement panelsRoot = installData.getInstallationRecord();
+            for (T panelView : panelViews)
+            {
+                Panel panel = panelView.getPanel();
+                if (panel.isVisited())
+                {
+                    IXMLElement panelRoot = panelView.createPanelRootRecord();
+                    panelView.createInstallationRecord(panelRoot);
+                    panelsRoot.addChild(panelRoot);
+                }
+            }
+            writer.write(panelsRoot);
+        }
+        finally
+        {
+            outBuff.close();
+        }
     }
 
     /**
@@ -399,9 +436,17 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      * @param newIndex the index of the new panel
      * @return {@code true} if the switch was successful
      */
-    protected boolean switchPanel(int newIndex)
+    public boolean switchPanel(int newIndex, boolean validate)
     {
         boolean result;
+
+        T panel = getPanelView();
+        if (!(panel == null || executeValidationActions(panel, validate)))
+            return false;
+
+        if ((newIndex > index) && !isNextEnabled()) // NOTE: actions may change isNextEnabled() status
+            return false;
+
 
         // refresh variables prior to switching panels
         variables.refresh();

@@ -21,6 +21,8 @@
 
 package com.izforge.izpack.panels.target;
 
+import java.io.File;
+
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.resource.Resources;
@@ -28,8 +30,6 @@ import com.izforge.izpack.gui.log.Log;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.panels.path.PathInputPanel;
-
-import java.io.File;
 
 /**
  * The target directory selection panel.
@@ -65,7 +65,7 @@ public class TargetPanel extends PathInputPanel
     public void panelActivate()
     {
        String path = TargetPanelHelper.getPath(installData);
-        
+
         if (path != null)
         {
             pathSelectionPanel.setPath(path);
@@ -74,11 +74,6 @@ public class TargetPanel extends PathInputPanel
         super.panelActivate();
     }
 
-    /**
-     * Indicates whether the panel has been validated or not.
-     *
-     * @return Whether the panel has been validated or not.
-     */
     @Override
     public boolean isValidated()
     {
@@ -102,27 +97,16 @@ public class TargetPanel extends PathInputPanel
         return result;
     }
 
-    /**
-     * Asks to make the XML panel installDataGUI.
-     *
-     * @param panelRoot The tree to put the installDataGUI in.
-     */
     @Override
-    public void makeXMLData(IXMLElement panelRoot)
+    public void createInstallationRecord(IXMLElement panelRoot)
     {
-        new TargetPanelAutomation().makeXMLData(installData, panelRoot);
+        new TargetPanelAutomation().createInstallationRecord(installData, panelRoot);
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.izforge.izpack.installer.IzPanel#getSummaryBody()
-     */
 
     @Override
     public String getSummaryBody()
     {
-        return (this.installData.getInstallPath());
+        return (installData.getInstallPath());
     }
 
 }

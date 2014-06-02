@@ -29,6 +29,7 @@ import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.installer.panel.AbstractPanels;
+import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.installer.panel.Panels;
 
 
@@ -59,7 +60,7 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
      */
     public AutomatedPanels(List<AutomatedPanelView> panels, InstallData installData)
     {
-        super(panels, installData.getVariables());
+        super(panels, installData);
         this.installData = installData;
     }
 
@@ -77,7 +78,7 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
         if (newPanel.getViewClass() == null)
         {
             // panel has no view. This is apparently OK - not all panels have/need automation support.
-            logger.warning("AutomationHelper class not found for panel: " + newPanel.getPanel().getClassName());
+            logger.warning("AutomationHelper class not found for panel class: " + newPanel.getPanel().getClassName());
             result = executeValidationActions(newPanel, true);
         }
         else
@@ -92,7 +93,7 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
             }
             else
             {
-                logger.log(Level.SEVERE, "No configuration for panel: " + newPanel.getPanel().getClassName());
+                logger.log(Level.SEVERE, "No configuration for panel: " + newPanel.getPanel().getPanelId());
                 result = false;
             }
         }
@@ -105,31 +106,21 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
      * @param panel the panel
      * @return the panel's XML configuration, or {@code null} if it cannot be found
      */
-    private IXMLElement getPanelXML(AutomatedPanelView panel)
+    private IXMLElement getPanelXML(AutomatedPanelView panelView)
     {
         IXMLElement result = null;
-        String className = panel.getPanel().getClassName();
-        List<IXMLElement> panelRoots = installData.getXmlData().getChildrenNamed(className);
-        if (!panelRoots.isEmpty())
+
+        Panel panel = panelView.getPanel();
+        List<IXMLElement> panelRoots = installData.getInstallationRecord().getChildrenNamed(panel.getClassName());
+        for (IXMLElement panelRoot : panelRoots)
         {
-            int index = 0;
-            for (AutomatedPanelView panelView : getPanelViews())
+            if (Integer.valueOf(panelRoot.getAttribute(PanelView.AUTOINSTALL_PANELROOT_ATTR_INDEX)) == panelView.getIndex())
             {
-                Panel p = panelView.getPanel();
-                if (panel.getPanel().equals(p))
-                {
-                    break;
-                }
-                if (p.getClassName().equals(className))
-                {
-                    ++index;
-                }
-            }
-            if (index < panelRoots.size())
-            {
-                result = panelRoots.get(index);
+                result = panelRoot;
+                break;
             }
         }
+
         return result;
     }
 

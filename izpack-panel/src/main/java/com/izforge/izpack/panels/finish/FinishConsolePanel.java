@@ -51,7 +51,7 @@ import com.izforge.izpack.util.file.FileUtils;
 
 /**
  * Console implementation of the {@link FinishPanel}.
- * 
+ *
  * @author Mounir el hajj
  */
 public class FinishConsolePanel extends AbstractConsolePanel
@@ -62,10 +62,10 @@ public class FinishConsolePanel extends AbstractConsolePanel
     private final Prompt prompt;
     private final ObjectFactory factory;
     private final PlatformModelMatcher matcher;
-    
+
     /**
      * Constructs an {@code FinishConsolePanel}.
-     * 
+     *
      * @param panel the parent panel/view. May be {@code null}
      */
     public FinishConsolePanel(final ObjectFactory factory, final PlatformModelMatcher matcher,
@@ -84,7 +84,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
 
     /**
      * Runs the panel using the supplied properties.
-     * 
+     *
      * @param installData the installation data
      * @param properties the properties
      * @return <tt>true</tt>
@@ -97,7 +97,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
 
     /**
      * Runs the panel using the specified console.
-     * 
+     *
      * @param installData the installation data
      * @param console the console
      * @return <tt>true</tt>
@@ -184,7 +184,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
             writer = new XMLWriter(outputStream);
 
             IXMLElement root;
-            root = installData.getXmlData();
+            root = installData.getInstallationRecord();
 
             AutomatedPanels automatedPanels;
             automatedPanels = getAutomatedPanels(installData);
@@ -230,7 +230,7 @@ public class FinishConsolePanel extends AbstractConsolePanel
     {
         try
         {
-            panelView.getView().makeXMLData(installData, root);
+            panelView.getView().createInstallationRecord(installData, root);
 
         }
         catch (Exception e)

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import org.picocontainer.injectors.Provider;
 
+import com.izforge.izpack.api.adaptator.impl.XMLElementImpl;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.data.DynamicInstallerRequirementValidator;
 import com.izforge.izpack.api.data.DynamicVariable;
@@ -413,6 +414,7 @@ public abstract class AbstractInstallDataProvider implements Provider
         Locale locale = locales.getLocale();
         if (locale != null)
         {
+            installData.setInstallationRecord(new XMLElementImpl("AutomatedInstallation"));
             installData.setLocale(locale, locales.getISOCode());
             installData.setMessages(locales.getMessages());
         }

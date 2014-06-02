@@ -64,7 +64,7 @@ public class IzPanels extends AbstractPanels<IzPanelView, IzPanel>
      */
     public IzPanels(List<IzPanelView> panels, Container container, GUIInstallData installData)
     {
-        super(panels, installData.getVariables());
+        super(panels, installData);
         this.container = container;
         this.installData = installData;
     }

@@ -128,10 +128,6 @@ public class Panel implements Serializable
 
     public String getPanelId()
     {
-        if (panelId == null)
-        {
-            return "UNKNOWN (" + className + ")";
-        }
         return panelId;
     }
 

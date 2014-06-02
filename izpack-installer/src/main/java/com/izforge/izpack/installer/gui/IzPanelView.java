@@ -24,6 +24,7 @@ package com.izforge.izpack.installer.gui;
 import java.awt.Component;
 import java.awt.Cursor;
 
+import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.factory.ObjectFactory;
@@ -132,5 +133,11 @@ public class IzPanelView extends AbstractPanelView<IzPanel>
         {
             component.setCursor(current);
         }
+    }
+
+    @Override
+    public void createInstallationRecord(IXMLElement panelRoot)
+    {
+        getView().createInstallationRecord(panelRoot);
     }
 }

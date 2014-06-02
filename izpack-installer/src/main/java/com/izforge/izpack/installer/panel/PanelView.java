@@ -1,5 +1,6 @@
 package com.izforge.izpack.installer.panel;
 
+import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.DynamicInstallerRequirementValidator;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Panel;
@@ -12,6 +13,9 @@ import com.izforge.izpack.api.installer.DataValidator;
  */
 public interface PanelView<T>
 {
+    public static final String AUTOINSTALL_PANELROOT_ATTR_INDEX = "index";
+    public static final String AUTOINSTALL_PANELROOT_ATTR_ID = "id";
+
     /**
      * Returns the panel identifier.
      *
@@ -91,4 +95,12 @@ public interface PanelView<T>
      * @return {@code true} if the panel can be shown
      */
     boolean canShow();
+
+    /**
+     * Creates an installation record for unattended installations and adds it to a XML root element.
+     *
+     * @param rootElement the root to add child elements to
+     */
+    void createInstallationRecord(IXMLElement rootElement);
+
 }

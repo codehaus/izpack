@@ -324,9 +324,9 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
      * @param panelRoot The XML tree to write the installDataGUI in.
      */
     @Override
-    public void makeXMLData(IXMLElement panelRoot)
+    public void createInstallationRecord(IXMLElement panelRoot)
     {
-        new PacksPanelAutomationHelper().makeXMLData(this.installData, panelRoot);
+        new PacksPanelAutomationHelper().createInstallationRecord(this.installData, panelRoot);
     }
 
     @Override
