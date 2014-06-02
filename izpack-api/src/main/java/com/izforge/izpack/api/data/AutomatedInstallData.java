@@ -39,6 +39,10 @@ import com.izforge.izpack.util.Platform;
  */
 public class AutomatedInstallData implements InstallData
 {
+    /**
+     * The attribute for a panel ID in the auto-install.xml record
+     */
+    public static final String AUTOINSTALL_PANELROOT_ATTR_ID = "id";
 
     private RulesEngine rules;
 
@@ -136,6 +140,11 @@ public class AutomatedInstallData implements InstallData
      * The attributes used by the panels
      */
     private Map<String, Object> attributes;
+
+    /**
+     * Index that maps panel IDs to their XML root from the auto-install.xml record
+     */
+    private HashMap<String, IXMLElement> panelRootXml;
 
     /**
      * The default install path
@@ -565,8 +574,20 @@ public class AutomatedInstallData implements InstallData
         return xmlData;
     }
 
+    public IXMLElement getInstallationRecordPanelRoot(String panelId)
+    {
+        return panelRootXml.get(panelId);
+    }
+
     public void setInstallationRecord(IXMLElement xmlData)
     {
+        panelRootXml = new HashMap<String, IXMLElement>();
+        List<IXMLElement> panelRoots = xmlData.getChildren();
+        for (IXMLElement panelRoot : panelRoots)
+        {
+            panelRootXml.put(panelRoot.getAttribute(AUTOINSTALL_PANELROOT_ATTR_ID), panelRoot);
+        }
+
         this.xmlData = xmlData;
     }
 

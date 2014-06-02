@@ -26,10 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
-import com.izforge.izpack.api.data.InstallData;
-import com.izforge.izpack.api.data.Panel;
+import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.installer.panel.AbstractPanels;
-import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.installer.panel.Panels;
 
 
@@ -44,7 +42,7 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
     /**
      * The installation data.
      */
-    private final InstallData installData;
+    private final AutomatedInstallData installData;
 
     /**
      * The logger.
@@ -58,7 +56,7 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
      * @param panels      the panels
      * @param installData the installation data
      */
-    public AutomatedPanels(List<AutomatedPanelView> panels, InstallData installData)
+    public AutomatedPanels(List<AutomatedPanelView> panels, AutomatedInstallData installData)
     {
         super(panels, installData);
         this.installData = installData;
@@ -85,7 +83,8 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
         {
             newPanel.executePreActivationActions();
             PanelAutomation view = newPanel.getView();
-            IXMLElement xml = getPanelXML(newPanel);
+
+            IXMLElement xml = installData.getInstallationRecordPanelRoot(newPanel.getPanelId());
             if (xml != null)
             {
                 view.runAutomated(installData, xml);
@@ -99,29 +98,4 @@ public class AutomatedPanels extends AbstractPanels<AutomatedPanelView, PanelAut
         }
         return result;
     }
-
-    /**
-     * Returns the XML configuration for a panel.
-     *
-     * @param panel the panel
-     * @return the panel's XML configuration, or {@code null} if it cannot be found
-     */
-    private IXMLElement getPanelXML(AutomatedPanelView panelView)
-    {
-        IXMLElement result = null;
-
-        Panel panel = panelView.getPanel();
-        List<IXMLElement> panelRoots = installData.getInstallationRecord().getChildrenNamed(panel.getClassName());
-        for (IXMLElement panelRoot : panelRoots)
-        {
-            if (Integer.valueOf(panelRoot.getAttribute(PanelView.AUTOINSTALL_PANELROOT_ATTR_INDEX)) == panelView.getIndex())
-            {
-                result = panelRoot;
-                break;
-            }
-        }
-
-        return result;
-    }
-
 }
