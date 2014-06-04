@@ -98,12 +98,12 @@ public class PacksModel extends AbstractTableModel
         {
             // installation shall be modified
             // load installation information
-
+            ObjectInputStream oin = null;
             try
             {
                 FileInputStream fin = new FileInputStream(new File(
                         idata.getInstallPath() + File.separator + InstallData.INSTALLATION_INFORMATION));
-                ObjectInputStream oin = new ObjectInputStream(fin);
+                oin = new ObjectInputStream(fin);
                 List<Pack> packsinstalled = (List<Pack>) oin.readObject();
                 for (Pack installedpack : packsinstalled)
                 {
@@ -118,7 +118,6 @@ public class PacksModel extends AbstractTableModel
                 {
                     idata.setVariable((String) key, (String) variables.get(key));
                 }
-                fin.close();
             }
             catch (FileNotFoundException e)
             {
@@ -134,6 +133,14 @@ public class PacksModel extends AbstractTableModel
             {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            }
+            finally
+            {
+                if (oin != null)
+                {
+                    try { oin.close(); }
+                    catch (IOException e) {}
+                }
             }
         }
         this.rules = rules;
@@ -712,6 +719,7 @@ public class PacksModel extends AbstractTableModel
 
 
     /**
+     * Get previously installed packs on modifying a pre-installed application
      * @return the installedpacks
      */
     public Map<String, Pack> getInstalledpacks()
@@ -726,5 +734,4 @@ public class PacksModel extends AbstractTableModel
     {
         return this.modifyinstallation;
     }
-
 }
