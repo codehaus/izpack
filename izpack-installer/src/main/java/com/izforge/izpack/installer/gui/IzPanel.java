@@ -295,6 +295,11 @@ public abstract class IzPanel extends JPanel implements AbstractUIHandler, Layou
         return true;
     }
 
+    protected void saveData()
+    {
+        //Save Data
+    }
+
     public boolean panelValidated()
     {
         return isValidated();

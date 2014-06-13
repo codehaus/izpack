@@ -62,6 +62,15 @@ public class IzPanelView extends AbstractPanelView<IzPanel>
     }
 
     /**
+     * Saves the contents of the panel into install data.
+     */
+    @Override
+    public void saveData()
+    {
+        getView().saveData();
+    }
+
+    /**
      * Returns a handler to prompt the user.
      *
      * @return the handler

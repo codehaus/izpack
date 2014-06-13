@@ -511,6 +511,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
             variables.refresh();
             panel.executePreValidationActions();
             panel.executePostValidationActions();
+            panel.saveData();
             result = true;
         }
         return result;

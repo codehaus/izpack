@@ -163,6 +163,11 @@ public class UserInputPanel extends IzPanel
     }
 
     /**
+     * Save visible contents of the this panel into install data.
+     */
+    @Override
+    public void saveData() { readInput(prompt, true); }
+    /**
      * This method is called when the panel becomes active.
      */
     @Override
