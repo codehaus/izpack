@@ -119,10 +119,7 @@ public class GUIPasswordGroupField extends GUIField
 
         if (value != null)
         {
-            for (JPasswordField view : passwords)
-            {
-                view.setText(replaceVariables(value));
-            }
+            passwords.get(0).setText(replaceVariables(value));
             result = true;
         }
         return result;

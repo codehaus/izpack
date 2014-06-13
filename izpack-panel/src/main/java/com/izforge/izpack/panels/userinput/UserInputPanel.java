@@ -148,6 +148,14 @@ public class UserInputPanel extends IzPanel
         {
             rules.addPanelCondition(panel, globalConstraint);
         }
+
+        init();
+        addScrollPane();
+        Dimension size = getMaximumSize();
+        setSize(size.width, size.height);
+        buildUI();
+        updateUIElements();
+        validate();
     }
 
     /**
@@ -173,8 +181,6 @@ public class UserInputPanel extends IzPanel
     @Override
     public void panelActivate()
     {
-        this.init();
-
         if (spec == null)
         {
             // TODO: translate
@@ -184,13 +190,8 @@ public class UserInputPanel extends IzPanel
         }
         else
         {
-            // update UI with current values of associated variables
+            //Here just to update dynamic variables
             updateUIElements();
-            buildUI();
-            addScrollPane();
-            Dimension size = getMaximumSize();
-            setSize(size.width, size.height);
-            validate();
         }
         // Focus the first panel component according to the default traversal
         // policy avoiding forcing the user to click into that field first
@@ -223,6 +224,9 @@ public class UserInputPanel extends IzPanel
         new UserInputPanelAutomationHelper(entryMap).createInstallationRecord(installData, rootElement);
     }
 
+    /**
+     * Initialize the panel.
+     */
     private void init()
     {
         eventsActivated = false;
@@ -269,6 +273,9 @@ public class UserInputPanel extends IzPanel
         eventsActivated = true;
     }
 
+    /**
+     * Set elements to be visible or not.
+     */
     protected void updateUIElements()
     {
         boolean updated = false;
