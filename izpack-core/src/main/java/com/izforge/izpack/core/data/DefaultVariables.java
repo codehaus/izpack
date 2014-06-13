@@ -311,7 +311,7 @@ public class DefaultVariables implements Variables
             String conditionId = variable.getConditionid();
             if (conditionId == null || rules.isConditionTrue(conditionId))
             {
-                if (!(variable.isCheckonce() && variable.isChecked()))
+                if (!(variable.isCheckonce() && variable.isChecked() ) && !variable.isUpdated(replacer))
                 {
                     String newValue;
                     try
@@ -334,7 +334,9 @@ public class DefaultVariables implements Variables
                     else
                     {
                         setVariables.put(name, newValue);
+                        variable.setCachedValue(newValue);
                     }
+
                     variable.setChecked();
                 }
                 else

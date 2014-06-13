@@ -68,10 +68,13 @@ public interface DynamicVariable extends Serializable
 
     String evaluate(VariableSubstitutor... substitutors) throws Exception;
 
+
     boolean isCheckonce();
+
     void setCheckonce(boolean checkonce);
 
     boolean isChecked();
+
     void setChecked();
 
     void setIgnoreFailure(boolean ignore);
@@ -79,5 +82,27 @@ public interface DynamicVariable extends Serializable
     void addFilter(ValueFilter filter);
 
     List<ValueFilter> getFilters();
+
+    /**
+     * Informs weather this variable is in its updated state or not.
+     *
+     * @param substitutors Variable substitutor to substitute ${XXXX} with installData.getVariable("XXX")
+     * @return true if this variable is in its updated state, false otherwise
+     */
+    boolean isUpdated(VariableSubstitutor... substitutors);
+
+    /**
+     * The update trigger refers to a variable in install data.
+     * Whenever the update trigger changes, we flag this dynamic varaible as needing an update.
+     *
+     * @param variable
+     */
+    void setUpdateTrigger(String variable);
+
+    /**
+     * Stores the value of the update trigger since it was last updated.
+     * @param cachedValue value of previously known update trigger
+     */
+    void setCachedValue(String cachedValue);
 }
 

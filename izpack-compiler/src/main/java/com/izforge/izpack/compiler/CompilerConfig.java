@@ -2354,6 +2354,12 @@ public class CompilerConfig extends Thread
                 dynamicVariable.setCheckonce(Boolean.valueOf(value));
             }
 
+            value = var.getAttribute("updateTrigger");
+            if (value != null)
+            {
+                dynamicVariable.setUpdateTrigger(value);
+            }
+
             // Check whether evaluation failures of the dynamic variable should be ignored
             value = var.getAttribute("ignorefailure");
             if (value != null)

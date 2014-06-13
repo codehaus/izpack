@@ -43,6 +43,7 @@ public class DynamicVariableImpl implements DynamicVariable
     private String name;
 
     private Value value;
+    private String cachedValue;
 
     private String conditionid;
 
@@ -54,6 +55,8 @@ public class DynamicVariableImpl implements DynamicVariable
 
     private transient String currentValue;
     private transient boolean checked = false;
+
+    private String updateTrigger = null;
 
     public DynamicVariableImpl() {}
 
@@ -276,6 +279,41 @@ public class DynamicVariableImpl implements DynamicVariable
     @Override
     public void setChecked()
     {
-        checked = true;    }
+        checked = true;
+    }
+
+    @Override
+    public void setCachedValue(String cachedValue)
+    {
+        this.cachedValue = cachedValue;
+    }
+
+    @Override
+    public boolean isUpdated(VariableSubstitutor... substitutors)
+    {
+        if (this.updateTrigger == null || cachedValue == null)
+        {
+            return false;
+        }
+        else
+        {
+            try
+            {
+                return this.evaluate(substitutors).equals(cachedValue);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void setUpdateTrigger(String variable)
+    {
+        this.updateTrigger = variable;
+        this.cachedValue = null;
+    }
 
 }

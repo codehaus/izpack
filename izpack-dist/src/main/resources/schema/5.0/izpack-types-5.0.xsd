@@ -128,6 +128,7 @@
         </xs:sequence>
         <xs:attribute type="xs:string" name="name" use="required"/>
         <xs:attribute type="xs:boolean" name="checkonce" use="optional" default="false"/>
+        <xs:attribute type="xs:boolean" name="updateTrigger" use="optional" />
         <xs:attribute type="xs:string" name="condition" use="optional"/>
         <!-- plain -->
         <xs:attribute type="xs:string" name="value" use="optional"/>
