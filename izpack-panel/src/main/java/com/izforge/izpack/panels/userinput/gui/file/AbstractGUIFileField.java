@@ -62,7 +62,12 @@ public abstract class AbstractGUIFileField extends GUIField
     public boolean updateField(Prompt prompt, boolean skipValidation)
     {
         boolean result = false;
-        if (skipValidation || fileInput.validateField())
+        if (skipValidation)
+        {
+            getField().setValue(fileInput.filetxt.getText());
+            result = true;
+        }
+        else if (fileInput.validateField())
         {
             File selectedFile = fileInput.getSelectedFile();
             if (selectedFile == null)
