@@ -31,8 +31,6 @@ import java.util.Properties;
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Pack;
 import com.izforge.izpack.api.handler.Prompt;
-import com.izforge.izpack.api.handler.Prompt.Option;
-import com.izforge.izpack.api.handler.Prompt.Options;
 import com.izforge.izpack.api.handler.Prompt.Type;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
 import com.izforge.izpack.installer.console.ConsolePanel;
@@ -49,19 +47,20 @@ import com.izforge.izpack.util.Console;
  */
 public class TreePacksConsolePanel extends AbstractConsolePanel implements ConsolePanel
 {
-
     private final Prompt prompt;
 
-    private HashMap<String, Pack> idToPack;
-    private HashMap<String, List<String>> treeData;
+    private static final int SELECTED = 1;
+    private static final int DESELECTED = 0;
 
     private static final String REQUIRED = "required";
-    private static final String NOT_SELECTED = "Not Selected";
-    private static final String ALREADY_SELECTED = "Already Selected";
     private static final String DONE = "Done!";
-    private static final String SPACE = " ";
 
-
+    private static final String CONFIRM = "TreePacksPanel.confirm";
+    private static final String NUMBER = "TreePacksPanel.no.number";
+    private static final String PROMPT = "TreePacksPanel.prompt";
+    private static final String INVALID = "TreePacksPanel.invalid";
+    private static final String REQUIRED_SPACE = "TreePacksPanel.space.required";
+    
     /**
      * Constructs a {@code TreePacksConsolePanel}.
      *
@@ -95,14 +94,10 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      */
     public boolean run(InstallData installData, Console console)
     {
-        List<Pack> selectedPacks = new LinkedList<Pack>();
-        createTreeData(installData);
-        out(Type.INFORMATION, "");
+        List<Pack> selectedPacks;
+        HashMap<String, List<String>> treeData = createTreeData(installData);
 
-        for (String key : treeData.keySet())
-        {
-            drawHelper(treeData, selectedPacks, installData, idToPack, key, true, "\t");
-        }
+        selectedPacks = selectPacks(treeData, installData);
         out(Type.INFORMATION, DONE);
 
         installData.setSelectedPacks(selectedPacks);
@@ -116,14 +111,18 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         return promptEndPanel(installData, console);
     }
 
-    private void createTreeData(InstallData installData)
+    /**
+     * Get information on the children each parent pack has.
+     *
+     * @param installData
+     * @return Map that contains information on the parent pack and its children
+     */
+    private HashMap<String, List<String>> createTreeData(InstallData installData)
     {
-        treeData = new HashMap<String, List<String>>();
-        idToPack = new HashMap<String, Pack>();
+        HashMap<String, List<String>> treeData = new HashMap<String, List<String>>();
 
         for (Pack pack : getAvailableShowablePacks(installData))
         {
-            idToPack.put(pack.getName(), pack);
             if (pack.getParent() != null)
             {
                 List<String> kids;
@@ -139,6 +138,8 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
                 treeData.put(pack.getParent(), kids);
             }
         }
+
+        return treeData;
     }
 
     private void out(Type type, String message)
@@ -146,121 +147,139 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         prompt.message(type, message);
     }
 
-
     /**
-     * It is used to "draw" the appropriate tree-like structure of the packs and ask if you want to install
-     * the pack. The pack will automatically be selected if it is required; otherwise you will be prompted if
-     * you want to install that pack. If a pack is not selected, then their child packs won't be installed as
-     * well and you won't be prompted to install them.
+     * Helper method to ask/check if the pack can/needs to be installed
+     * If top-level pack, square brackets will be placed in between
+     * the pack id.
      *
-     * @param treeData      - Map that contains information on the parent pack and its children
-     * @param selectedPacks - the packs that are selected by the user are added there
-     * @param installData   - Database of izpack
-     * @param idToPack      - Map that mapds the id of the available packs to the actual Pack object
-     * @param packParent    - The current "parent" pack to process
-     * @param packMaster    - boolean to know if packParent is a top-level pack
-     * @param indent        - String to know by how much the child packs should be indented
+     * It asks the user if it wants to install the pack if:
+     * 1. the pack is not required
+     * 2. the pack has no condition string
+     *
+     * @param treeData          - Map that contains information on the parent pack and its children
+     * @param installData       - Database of izpack
      */
-    private void drawHelper(final Map<String, List<String>> treeData, final List<Pack> selectedPacks,
-                            final InstallData installData,
-                            final Map<String, Pack> idToPack, final String packParent, boolean packMaster,
-                            final String indent)
+    private List<Pack> selectPacks(final Map<String, List<String>> treeData, final InstallData installData)
     {
-        Pack p;
+        java.io.Console console = System.console();
 
-        /*
-         * If that packParent contains children,
-         * then run recursively and ask whether
-         * you want to install the child packs·
-         * too [if parent pack selected]
+        List<Pack> packs = new ArrayList<Pack>();
+        List<Pack> selectedPacks = new LinkedList<Pack>();
+
+        for(Pack pack : getAvailableShowablePacks(installData))
+        {
+            packs.add(pack);
+        }
+
+        int mapChoiceToSelection[] = new int[packs.size()];
+        int selected[] = new int[packs.size()];
+        int choiceCount = 0;
+        Map<String, Integer> idPos = new HashMap<String, Integer>();
+
+        /**
+         * Generate mapping from choice to selection.
+         * Figure out which packs are already selected.
          */
-        if (treeData.containsKey(packParent))
+        for (int i = 0; i < packs.size(); i++)
         {
-            p = idToPack.get(packParent);
+            Pack pack = packs.get(i);
+            Boolean conditionSatisfied = checkCondition(installData, pack);
+            idPos.put(pack.getName(), i);
 
-            // If the pack is a top-level pack and that top-level pack was not·
-            // selected, then return. This will avoid prompting the user to
-            // install the child packs.
-            if (packMaster && !selectHelper(treeData, selectedPacks, installData, idToPack, p, packMaster, indent))
+            if (pack.hasCondition() && conditionSatisfied)
             {
-                return;
+                selected[i] = SELECTED;
             }
-            // Now iterate through the child packs of the parent pack.
-            for (String id : treeData.get(packParent))
+            else if (pack.isPreselected())
             {
-                p = idToPack.get(id);
-                selectHelper(treeData, selectedPacks, installData, idToPack, p, false, indent);
+                selected[i] = SELECTED;
+            }
+
+            if (!pack.isHidden())
+            {
+                mapChoiceToSelection[choiceCount] = i;
+                choiceCount++;
             }
         }
-    }
 
-    private boolean selectHelper(final Map<String, List<String>> treeData, final List<Pack> selectedPacks,
-                                 final InstallData installData,
-                                 final Map<String, Pack> idToPack, final Pack p, boolean packMaster,
-                                 final String indent)
-    {
-        Boolean conditionSatisfied = checkCondition(installData, p);
-        Boolean conditionExists = !(conditionSatisfied == null);
-        String packName = p.getName();
+        int packNum = printPackMenu(installData, packs, selected, mapChoiceToSelection);
 
-        // If a condition is set to that pack
-        if (conditionExists)
+        //Allow user to select/deselect packs
+        while (true)
         {
-            if (conditionSatisfied)
-            {
-                out(Type.INFORMATION, (packMaster ? "[" + packName + "]" : indent + packName) + SPACE
-                        + ALREADY_SELECTED);
+            int choice = -1;
 
-                selectedPacks.add(p);
-                // we call drawHelper again to check if that pack has child packs
-                // If that pack is a top-level pack, then don't run drawHelper as
-                // it will create an infinite loop·
-                if (!packMaster)
+            try
+            {
+                choice = (Integer.parseInt(console.readLine())) -1;
+            }
+            catch(NumberFormatException e)
+            {
+                out(Type.WARNING, installData.getMessages().get(NUMBER));
+                continue;
+            }
+
+            if (choice < packNum && choice >= 0)
+            {
+                choice = mapChoiceToSelection[choice];
+                if (packs.get(choice).isRequired())
                 {
-                    drawHelper(treeData, selectedPacks, installData, idToPack, packName, packMaster,
-                               indent + indent);
+                    out(Type.WARNING, installData.getMessages().get(INVALID));
                 }
-                return true;
+                else
+                {
+                    //Toggle between selected and unselected
+                    selected[choice] = (selected[choice] + 1) % 2;
+
+                    //Check if what the user selected is a parent
+                    if (treeData.containsKey(packs.get(choice).getName()))
+                    {
+                        // If parent selected select/deselect all its children
+                        for (String child : treeData.get(packs.get(choice).getName()))
+                        {
+                            selected[idPos.get(child)] = selected[choice];
+                        }
+                    }
+
+                    // Check if this pack is a child of a parent, and that the parent is not required
+                    else if(packs.get(choice).getParent() != null &&
+                            !packs.get(idPos.get(packs.get(choice).getParent())).isRequired())
+                    {
+                        //Select parent
+                        selected[idPos.get(packs.get(choice).getParent())] = SELECTED;
+
+                        // If at least one child is unselected ensure parent is unselected
+                        for (String child : treeData.get(packs.get(choice).getParent()))
+                        {
+                            if(selected[idPos.get(child)] == DESELECTED)
+                            {
+                                selected[idPos.get(packs.get(choice).getParent())] = DESELECTED;
+                            }
+                        }
+                    }
+
+                    printPackMenu(installData, packs, selected, mapChoiceToSelection);
+                }
+            }
+            else if (choice == -1)
+            {
+                break;
             }
             else
             {
-                // condition says don't install!
-                out(Type.INFORMATION, (packMaster ? "[" + packName + "]" : indent + packName) + SPACE
-                        + NOT_SELECTED);
-                return false;
+                out(Type.WARNING, installData.getMessages().get(INVALID));
             }
-            // If no condition specified
-        }
-        else if (p.isRequired())
-        {
-            out(Type.INFORMATION, (packMaster ? "[" + packName + "]" : indent + packName)
-                    + SPACE + REQUIRED);
 
-            selectedPacks.add(p);
-            if (!packMaster)
-            {
-                drawHelper(treeData, selectedPacks, installData, idToPack, packName, packMaster, indent + indent);
-            }
-            return true;
-            // Prompt the user
         }
-        else
-        {
 
-            if (askUser(packMaster ? "[" + packName + "] " : indent + packName))
+        for (int i = 0; i < selected.length; i++)
+        {
+            if (selected[i] == SELECTED)
             {
-                selectedPacks.add(p);
-                if (!packMaster)
-                {
-                    drawHelper(treeData, selectedPacks, installData, idToPack, packName, packMaster, indent + indent);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
+                selectedPacks.add(packs.get(i));
             }
         }
+        return selectedPacks;
     }
 
     /**
@@ -284,17 +303,6 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         }
     }
 
-    /**
-     * Helper method to read the input of user
-     * Method returns true if user types "y", "yes" or <Enter>·
-     *
-     * @return boolean  - true if condition above satisfied. Otherwise false
-     */
-    private boolean askUser(String message)
-    {
-        return Option.YES == prompt.confirm(Type.QUESTION, message, Options.YES_NO);
-    }
-
     private List<Pack> getAvailableShowablePacks(InstallData installData)
     {
         List<Pack> packs = new ArrayList<Pack>();
@@ -309,5 +317,48 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         }
 
         return packs;
+    }
+
+    /**
+     * Method will print the pack selection state onto the console.
+     *
+     * @param installData the data of izpack
+     * @param packs list of available packs
+     * @param selected  holds selection status for available packs
+     * @param choiceMap holds mapping of visible packs to their index in selected
+     */
+    public int printPackMenu(InstallData installData, List<Pack> packs, int[] selected, int[] choiceMap)
+    {
+        long totalSize = 0;
+        int packnum = 1;
+
+        for (Pack pack : packs)
+        {
+            if (pack.isHidden())
+            {
+                continue;
+            }
+            else if (pack.isRequired())
+            {
+                System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
+                        installData.getMessages().get(REQUIRED), installData.getMessages().get(pack.getName()), pack.toByteUnitsString(pack.getSize()));
+            }
+            else
+            {
+                System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
+                        "", installData.getMessages().get(pack.getName()), pack.toByteUnitsString(pack.getSize()));
+            }
+
+            if (selected[choiceMap[packnum-1]] == SELECTED)
+            {
+                totalSize += pack.getSize();
+            }
+            packnum++;
+        }
+
+        System.out.println(installData.getMessages().get(REQUIRED_SPACE) + " " + Pack.toByteUnitsString(totalSize));
+        System.out.println(installData.getMessages().get(CONFIRM));
+        System.out.println(installData.getMessages().get(PROMPT));
+        return packnum-1;
     }
 }

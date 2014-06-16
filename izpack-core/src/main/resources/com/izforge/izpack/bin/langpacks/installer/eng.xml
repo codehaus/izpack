@@ -33,6 +33,20 @@
     <str id="UserPathPanel.headline" txt="Select Path"/>
     <str id="InstallationTypePanel.headline" txt="Installation Type"/>
 
+    <!-- TreePacksPanel Strings -->
+    <str id="TreePacksPanel.confirm"
+         txt="Press 0 to confirm your selections."/>
+    <str id="TreePacksPanel.prompt"
+         txt="Please select which packs you want to install."/>
+    <str id="TreePacksPanel.no.packs"
+         txt="You have not selected any packs!\nAre you sure you want to continue?"/>
+    <str id="TreePacksPanel.space.required"
+         txt="Total space required:"/>
+    <str id="TreePacksPanel.invalid"
+         txt="Invalid pack selected"/>
+    <str id="TreePacksPanel.no.number"
+         txt="Please enter a number from the selection above."/>
+
     <!-- General installer strings -->
     <str id="installer.title" txt="IzPack - Installation of "/>
     <str id="installer.next" txt="Next"/>
@@ -104,6 +118,7 @@
          txt="This directory can not be written! Please choose another directory!"/>
     <str id="TargetPanel.incompatibleInstallation"
          txt="Incompatible installation detected. Uninstall it first, or choose another directory to install to."/>
+
 
     <!-- JDKPathPanel strings -->
     <str id="JDKPathPanel.extendedIntro"
