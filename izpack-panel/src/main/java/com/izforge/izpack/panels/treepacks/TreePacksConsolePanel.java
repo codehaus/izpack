@@ -58,8 +58,8 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
     private static final int SELECTED = 1;
     private static final int DESELECTED = 0;
 
-    private static final String REQUIRED = "required";
-    private static final String DONE = "Done!";
+    private static final String REQUIRED = "TreePacksPanel.required";
+    private static final String DONE = "TreePacksPanel.done";
 
     private static final String CONFIRM = "TreePacksPanel.confirm";
     private static final String NUMBER = "TreePacksPanel.no.number";
@@ -114,7 +114,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         }
 
         selectedPacks = selectPacks(treeData, installData);
-        out(Type.INFORMATION, DONE);
+        out(Type.INFORMATION, installData.getMessages().get(DONE));
 
         installData.setSelectedPacks(selectedPacks);
 

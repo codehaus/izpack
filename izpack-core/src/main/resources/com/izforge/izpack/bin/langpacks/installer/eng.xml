@@ -46,6 +46,10 @@
          txt="Invalid pack selected"/>
     <str id="TreePacksPanel.no.number"
          txt="Please enter a number from the selection above."/>
+    <str id="TreePacksPanel.required"
+         txt="Required"/>
+    <str id="TreePacksPanel.done"
+         txt="Done!"/>
 
     <!-- General installer strings -->
     <str id="installer.title" txt="IzPack - Installation of "/>
