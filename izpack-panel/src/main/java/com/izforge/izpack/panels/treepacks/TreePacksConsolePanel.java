@@ -30,11 +30,14 @@ import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Pack;
+import com.izforge.izpack.api.exception.ResourceNotFoundException;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.handler.Prompt.Type;
+import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.installer.console.AbstractConsolePanel;
 import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
+import com.izforge.izpack.installer.util.PackHelper;
 import com.izforge.izpack.util.Console;
 
 /**
@@ -48,6 +51,9 @@ import com.izforge.izpack.util.Console;
 public class TreePacksConsolePanel extends AbstractConsolePanel implements ConsolePanel
 {
     private final Prompt prompt;
+    private Messages messages;
+
+    private static final String LANG_FILE_NAME = "packsLang.xml";
 
     private static final int SELECTED = 1;
     private static final int DESELECTED = 0;
@@ -96,6 +102,16 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
     {
         List<Pack> selectedPacks;
         HashMap<String, List<String>> treeData = createTreeData(installData);
+
+        try
+        {
+            messages = installData.getMessages().newMessages(LANG_FILE_NAME);
+        }
+        catch (ResourceNotFoundException exception)
+        {
+            // no packs messages resource, so fall back to the default
+            messages = installData.getMessages();
+        }
 
         selectedPacks = selectPacks(treeData, installData);
         out(Type.INFORMATION, DONE);
@@ -341,12 +357,12 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
             else if (pack.isRequired())
             {
                 System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
-                        installData.getMessages().get(REQUIRED), installData.getMessages().get(pack.getName()), pack.toByteUnitsString(pack.getSize()));
+                        installData.getMessages().get(REQUIRED), PackHelper.getPackName(pack, messages), pack.toByteUnitsString(pack.getSize()));
             }
             else
             {
                 System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
-                        "", installData.getMessages().get(pack.getName()), pack.toByteUnitsString(pack.getSize()));
+                        "",  PackHelper.getPackName(pack, messages), pack.toByteUnitsString(pack.getSize()));
             }
 
             if (selected[choiceMap[packnum-1]] == SELECTED)
