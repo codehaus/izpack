@@ -564,6 +564,7 @@ public class InstallerFrame extends JFrame implements InstallerView
                 panelsContainer.remove(oldView);
                 oldView.panelDeactivate();
             }
+
             panelsContainer.add(newView);
             installdata.setCurPanelNumber(newPanel.getIndex());
 
