@@ -45,7 +45,6 @@ import com.izforge.izpack.installer.panel.Panels;
  */
 public class DefaultNavigator implements Navigator
 {
-
     /**
      * The parent frame.
      */
@@ -326,7 +325,7 @@ public class DefaultNavigator implements Navigator
     public boolean next(boolean validate)
     {
         boolean result = false;
-        if (panels.isNextEnabled() && panels.hasNext())
+        if (panels.isNextEnabled())
         {
             try
             {
@@ -351,7 +350,7 @@ public class DefaultNavigator implements Navigator
     public boolean previous()
     {
         boolean result = false;
-        if (panels.isPreviousEnabled() && panels.hasPrevious())
+        if (panels.isPreviousEnabled())
         {
             try
             {
@@ -462,8 +461,7 @@ public class DefaultNavigator implements Navigator
      */
     private void configureVisibility()
     {
-        int index = panels.getIndex();
-        if (panels.getNext(index, true) == -1)
+        if (panels.getNext(true) == -1)
         {
             // last panel. Disable navigation.
             setPreviousVisible(false);
@@ -476,7 +474,7 @@ public class DefaultNavigator implements Navigator
             if (configurePrevious)
             {
                 // only configure the previous button if it wasn't modified during panel switching
-                boolean enablePrev = panels.getPrevious(index, true) != -1;
+                boolean enablePrev = panels.getPrevious(true) != -1;
                 setPreviousVisible(enablePrev);
                 setPreviousEnabled(enablePrev);
             }
@@ -484,7 +482,7 @@ public class DefaultNavigator implements Navigator
             if (configureNext)
             {
                 // only configure the next button if it wasn't modified during panel switching
-                boolean enableNext = panels.getNext(index, true) != -1;
+                boolean enableNext = panels.getNext(true) != -1;
                 setNextVisible(enableNext);
                 setNextEnabled(enableNext);
             }
