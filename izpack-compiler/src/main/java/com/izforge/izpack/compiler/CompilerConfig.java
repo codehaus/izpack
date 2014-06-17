@@ -92,7 +92,6 @@ import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.compiler.data.CompilerData;
 import com.izforge.izpack.compiler.data.PropertyManager;
 import com.izforge.izpack.compiler.helper.AssertionHelper;
-import com.izforge.izpack.compiler.helper.CompilerHelper;
 import com.izforge.izpack.compiler.helper.TargetFileSet;
 import com.izforge.izpack.compiler.helper.XmlCompilerHelper;
 import com.izforge.izpack.compiler.listener.CompilerListener;
@@ -746,7 +745,7 @@ public class CompilerConfig extends Thread
             String description = xmlCompilerHelper.requireChildNamed(packElement, "description").getContent();
             boolean required = xmlCompilerHelper.requireYesNoAttribute(packElement, "required");
             String group = packElement.getAttribute("group");
-            String installGroups = packElement.getAttribute("installGroups");
+            String installGroups = packElement.getAttribute("installGroups");;
             String excludeGroup = packElement.getAttribute("excludeGroup");
             boolean uninstall = "yes".equalsIgnoreCase(packElement.getAttribute("uninstall", "yes"));
             long size = xmlCompilerHelper.getLong(packElement, "size", 0);
@@ -815,6 +814,10 @@ public class CompilerConfig extends Thread
             processFileSetChildren(baseDir, packElement, pack);
 
             processUpdateCheckChildren(packElement, pack);
+
+            processOnSelect(packElement, pack);
+
+            processOnDeselect(packElement, pack);
 
             // We get the dependencies
             for (IXMLElement dependsNode : packElement.getChildrenNamed("depends"))
@@ -963,6 +966,36 @@ public class CompilerConfig extends Thread
             {
                 assertionHelper.parseError(packElement, e.getMessage(), e);
             }
+        }
+    }
+
+    /**
+     * Process onSelect tags within pack tags
+     * @param packElement
+     * @param pack
+     */
+    private void processOnSelect(IXMLElement packElement, PackInfo pack)
+    {
+        for (IXMLElement selectNode : packElement.getChildrenNamed("onSelect"))
+        {
+            String name = xmlCompilerHelper.requireAttribute(selectNode, "name");
+            String condition = selectNode.getAttribute("condition");
+            pack.addOnSelect(name, condition);
+        }
+    }
+
+    /**
+     * Process onDeselect tags within pack tags
+     * @param packElement
+     * @param pack
+     */
+    private void processOnDeselect(IXMLElement packElement, PackInfo pack)
+    {
+        for (IXMLElement deselectNode : packElement.getChildrenNamed("onDeselect"))
+        {
+            String name = xmlCompilerHelper.requireAttribute(deselectNode, "name");
+            String condition = deselectNode.getAttribute("condition");
+            pack.addOnDeselect(name, condition);
         }
     }
 
