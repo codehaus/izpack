@@ -58,21 +58,21 @@ public class PacksModel extends AbstractTableModel
 
     private static final String INITAL_PACKSELECTION = "initial.pack.selection";
 
-    private List<Pack> packs;
-    private List<Pack> hiddenPacks;
+    protected List<Pack> packs;
+    protected List<Pack> hiddenPacks;
 
-    private List<Pack> packsToInstall;
+    protected List<Pack> packsToInstall;
 
     private Map<String, Pack> installedpacks;
     private boolean modifyinstallation;
 
 
-    private PacksPanelInterface panel;
+
 
     private Messages messages;
 
     // This is used to represent the status of the checkbox
-    private int[] checkValues;
+    protected int[] checkValues;
 
     // Map to hold the object name relationship
     Map<String, Pack> namesObj;
@@ -81,14 +81,14 @@ public class PacksModel extends AbstractTableModel
     Map<String, Integer> namesPos;
 
     // reference to the RulesEngine for validating conditions
-    private RulesEngine rules;
+    protected RulesEngine rules;
 
     // reference to the current variables, needed for condition validation
-    private Variables variables;
+    protected Variables variables;
 
-    private GUIInstallData idata;
+    private InstallData idata;
 
-    public PacksModel(PacksPanelInterface panel, GUIInstallData idata, RulesEngine rules)
+    public PacksModel(InstallData idata)
     {
         this.idata = idata;
         modifyinstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION));
@@ -143,7 +143,7 @@ public class PacksModel extends AbstractTableModel
                 }
             }
         }
-        this.rules = rules;
+        this.rules = idata.getRules();
 
         this.packs = new ArrayList<Pack>();
         this.hiddenPacks = new ArrayList<Pack>();
@@ -161,10 +161,10 @@ public class PacksModel extends AbstractTableModel
         }
 
         this.packsToInstall = idata.getSelectedPacks();
-        this.panel = panel;
+
         variables = idata.getVariables();
         variables.set(INITAL_PACKSELECTION, Boolean.toString(true));
-        messages = panel.getMessages();
+        messages = idata.getMessages();
         checkValues = new int[packs.size()];
         reverseDeps();
         initvalues();
@@ -384,18 +384,7 @@ public class PacksModel extends AbstractTableModel
     @Override
     public int getColumnCount()
     {
-        boolean doNotShowPackSize = Boolean.parseBoolean(idata.guiPrefs.modifier.get("doNotShowPackSizeColumn"));
-
-        int result;
-        if (!doNotShowPackSize)
-        {
-            result = 3;
-        }
-        else
-        {
-            result = 2;
-        }
-        return result;
+        return 3;
     }
 
     /*
@@ -496,19 +485,22 @@ public class PacksModel extends AbstractTableModel
 
                 if (added)
                 {
-                    if (panel.getDebugger() != null)
-                    {
-                        panel.getDebugger().packSelectionChanged("after adding pack " + pack.getName());
-                    }
+                    onSelectionUpdate(rowIndex);
+                }
+                else
+                {
+                    onDeselectionUpdate(rowIndex);
+                }
+
+                if (added)
+                {
+
                     // temporarily add pack to packstoinstall
                     this.packsToInstall.add(pack);
                 }
                 else
                 {
-                    if (panel.getDebugger() != null)
-                    {
-                        panel.getDebugger().packSelectionChanged("after removing pack " + pack.getName());
-                    }
+
                     // temporarily remove pack from packstoinstall
                     this.packsToInstall.remove(pack);
                 }
@@ -524,14 +516,49 @@ public class PacksModel extends AbstractTableModel
                     this.packsToInstall.add(pack);
                 }
                 refreshPacksToInstall();
-                updateBytes();
                 fireTableDataChanged();
-                panel.showSpaceRequired();
             }
         }
     }
 
-    private void refreshPacksToInstall()
+    private void selectionUpdate(Pack pack, Map<String, String> packsData)
+    {
+        for (Map.Entry<String, String> packData : packsData.entrySet())
+        {
+            int value, packPos;
+            String packName = packData.getKey();
+            String packCondition = pack.getCondition();
+
+            if (packName.startsWith("!"))
+            {
+                value = 0;
+                packPos = getPos(packName.substring(1));
+            }
+            else
+            {
+                value = 1;
+                packPos = getPos(packName);
+            }
+
+            checkValues[packPos] = value;
+        }
+    }
+
+    protected void onSelectionUpdate(int index)
+    {
+        Pack pack = packs.get(index);
+        Map<String, String> packsData = pack.getOnSelect();
+        selectionUpdate(pack, packsData);
+    }
+
+    protected void onDeselectionUpdate(int index)
+    {
+        Pack pack = packs.get(index);
+        Map<String, String> packsData = pack.getOnDeselect();
+        selectionUpdate(pack, packsData);
+    }
+
+    protected void refreshPacksToInstall()
     {
 
         packsToInstall.clear();
@@ -571,7 +598,7 @@ public class PacksModel extends AbstractTableModel
      * running a search that pinpoints the packs that must be disabled by a non-fullfiled
      * dependency.
      */
-    private void updateDeps()
+    protected void updateDeps()
     {
         int[] statusArray = new int[packs.size()];
         for (int i = 0; i < statusArray.length; i++)
@@ -610,7 +637,7 @@ public class PacksModel extends AbstractTableModel
      * Sees which packs (if any) should be unchecked and updates checkValues
      */
 
-    private void updateExcludes(int rowindex)
+    protected void updateExcludes(int rowindex)
     {
         int value = checkValues[rowindex];
         Pack pack = packs.get(rowindex);
@@ -635,28 +662,6 @@ public class PacksModel extends AbstractTableModel
         }
     }
 
-    private void updateBytes()
-    {
-        long bytes = 0;
-        for (int q = 0; q < packs.size(); q++)
-        {
-            if (Math.abs(checkValues[q]) == 1)
-            {
-                Pack pack = packs.get(q);
-                bytes += pack.getSize();
-            }
-        }
-
-        // add selected hidden bytes
-        for (Pack hidden : this.hiddenPacks)
-        {
-            if (this.rules.canInstallPack(hidden.getName(), variables))
-            {
-                bytes += hidden.getSize();
-            }
-        }
-        panel.setBytes(bytes);
-    }
 
     /**
      * We use a modified dfs graph search algorithm as described in: Thomas H. Cormen, Charles

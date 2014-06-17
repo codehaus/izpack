@@ -47,6 +47,7 @@ import com.izforge.izpack.installer.util.PackHelper;
 import com.izforge.izpack.installer.web.WebAccessor;
 import com.izforge.izpack.panels.imgpacks.ImgPacksPanelAutomationHelper;
 import com.izforge.izpack.panels.packs.PacksModel;
+import com.izforge.izpack.panels.packs.PacksModelGUI;
 import com.izforge.izpack.panels.packs.PacksPanelInterface;
 import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.file.FileUtils;
@@ -806,7 +807,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             // TODO the PacksModel could be patched such that isCellEditable
             // allows returns false. In that case the PacksModel must not be
             // adapted here.
-            packsModel = new PacksModel(this, installData, rules)
+            packsModel = new PacksModelGUI(this, installData, rules)
             {
                 /**
                  * Required (serializable)

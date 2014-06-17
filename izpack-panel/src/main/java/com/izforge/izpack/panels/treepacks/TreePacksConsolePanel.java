@@ -38,6 +38,7 @@ import com.izforge.izpack.installer.console.AbstractConsolePanel;
 import com.izforge.izpack.installer.console.ConsolePanel;
 import com.izforge.izpack.installer.panel.PanelView;
 import com.izforge.izpack.installer.util.PackHelper;
+import com.izforge.izpack.panels.packs.PacksModel;
 import com.izforge.izpack.util.Console;
 
 /**
@@ -53,7 +54,11 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
     private final Prompt prompt;
     private Messages messages;
 
+
     private static final String LANG_FILE_NAME = "packsLang.xml";
+    private HashMap<String, Pack> idToPack;
+    private HashMap<String, List<String>> treeData;
+    private PacksModel packsModel;
 
     private static final int SELECTED = 1;
     private static final int DESELECTED = 0;
@@ -100,6 +105,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      */
     public boolean run(InstallData installData, Console console)
     {
+        packsModel = new PacksModel(installData);
         List<Pack> selectedPacks;
         HashMap<String, List<String>> treeData = createTreeData(installData);
 

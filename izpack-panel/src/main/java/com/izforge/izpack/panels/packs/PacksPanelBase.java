@@ -652,7 +652,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
 
         try
         {
-            packsModel = new PacksModel(this, installData, rules)
+            packsModel = new PacksModelGUI(this, installData, rules)
             {
                 /**
                  *
