@@ -44,7 +44,6 @@ import com.izforge.izpack.api.data.PackColor;
 import com.izforge.izpack.api.data.Variables;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.api.rules.RulesEngine;
-import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.util.PackHelper;
 
 /**
@@ -53,124 +52,120 @@ import com.izforge.izpack.installer.util.PackHelper;
 public class PacksModel extends AbstractTableModel
 {
     private static final long serialVersionUID = 3258128076746733110L;
-
     private static final transient Logger logger = Logger.getLogger(PacksModel.class.getName());
-
-    private static final String INITAL_PACKSELECTION = "initial.pack.selection";
 
     protected List<Pack> packs;
     protected List<Pack> hiddenPacks;
-
     protected List<Pack> packsToInstall;
 
     private Map<String, Pack> installedpacks;
-    private boolean modifyinstallation;
-
-
-
-
-    private Messages messages;
 
     // This is used to represent the status of the checkbox
     protected int[] checkValues;
 
-    // Map to hold the object name relationship
-    Map<String, Pack> namesObj;
-
-    // Map to hold the object name relationship
-    Map<String, Integer> namesPos;
-
-    // reference to the RulesEngine for validating conditions
-    protected RulesEngine rules;
-
-    // reference to the current variables, needed for condition validation
-    protected Variables variables;
+    Map<String, Pack> nameToPack; // Map to hold the object name relationship
+    Map<String, Integer> nameToPos; // Map to hold the object name relationship
 
     private InstallData idata;
+    private Messages messages;
+    protected RulesEngine rules; // reference to the RulesEngine for validating conditions
+    protected Variables variables; // reference to the current variables, needed for condition validation
+
+    private boolean modifyInstallation;
 
     public PacksModel(InstallData idata)
     {
         this.idata = idata;
-        modifyinstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION));
-        this.installedpacks = new HashMap<String, Pack>();
-
-        if (modifyinstallation)
-        {
-            // installation shall be modified
-            // load installation information
-            ObjectInputStream oin = null;
-            try
-            {
-                FileInputStream fin = new FileInputStream(new File(
-                        idata.getInstallPath() + File.separator + InstallData.INSTALLATION_INFORMATION));
-                oin = new ObjectInputStream(fin);
-                List<Pack> packsinstalled = (List<Pack>) oin.readObject();
-                for (Pack installedpack : packsinstalled)
-                {
-                    this.installedpacks.put(installedpack.getName(), installedpack);
-                }
-                this.removeAlreadyInstalledPacks(idata.getSelectedPacks());
-                logger.fine("Found " + packsinstalled.size() + " installed packs");
-
-                Properties variables = (Properties) oin.readObject();
-
-                for (Object key : variables.keySet())
-                {
-                    idata.setVariable((String) key, (String) variables.get(key));
-                }
-            }
-            catch (FileNotFoundException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (IOException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (ClassNotFoundException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            finally
-            {
-                if (oin != null)
-                {
-                    try { oin.close(); }
-                    catch (IOException e) {}
-                }
-            }
-        }
         this.rules = idata.getRules();
-
-        this.packs = new ArrayList<Pack>();
-        this.hiddenPacks = new ArrayList<Pack>();
-        for (Pack availablePack : idata.getAvailablePacks())
-        {
-            // only add a pack if not hidden
-            if (!availablePack.isHidden())
-            {
-                this.packs.add(availablePack);
-            }
-            else
-            {
-                this.hiddenPacks.add(availablePack);
-            }
-        }
-
+        this.variables = idata.getVariables();
         this.packsToInstall = idata.getSelectedPacks();
+        this.messages = idata.getMessages();
 
-        variables = idata.getVariables();
-        variables.set(INITAL_PACKSELECTION, Boolean.toString(true));
-        messages = idata.getMessages();
-        checkValues = new int[packs.size()];
-        reverseDeps();
-        initvalues();
+        this.modifyInstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION));
+        this.installedpacks = loadInstallationInformation(modifyInstallation);
+
+        this.packs = getVisiblePacks();
+        this.hiddenPacks = getHiddenPacks();
+        this.nameToPos = getNametoPosMapping(packs);
+        this.nameToPack = getNametoPackMapping(packs);
+
+        setPackDependencies(packs, nameToPack);
+        this.checkValues = initCheckValues(packs, packsToInstall);
+
+        refreshPacksToInstall();
         this.updateConditions(true);
         refreshPacksToInstall();
-        variables.set(INITAL_PACKSELECTION, Boolean.toString(false));
+    }
+
+
+    private List<Pack> getHiddenPacks()
+    {
+        List<Pack> hiddenPacks = new ArrayList<Pack>();
+        for (Pack availablePack : idata.getAvailablePacks())
+        {
+            if (availablePack.isHidden())
+            {
+                hiddenPacks.add(availablePack);
+            }
+        }
+        return hiddenPacks;
+    }
+
+    private List<Pack> getVisiblePacks()
+    {
+        List<Pack> visiblePacks = new ArrayList<Pack>();
+        for (Pack availablePack : idata.getAvailablePacks())
+        {
+            if (!availablePack.isHidden())
+            {
+                visiblePacks.add(availablePack);
+            }
+        }
+        return visiblePacks;
+    }
+
+    /**
+     * Generate a map from a pack's name to its pack object.
+     *
+     * @param packs list os pack objects
+     * @return map from a pack's name to its pack object.
+     */
+    private Map<String, Pack> getNametoPackMapping(List<Pack> packs)
+    {
+        Map <String, Pack> nameToPack = new HashMap<String, Pack>();
+        for (Pack pack : packs)
+        {
+            nameToPack.put(pack.getName(), pack);
+        }
+        return nameToPack;
+    }
+
+    private Map<String, Integer> getNametoPosMapping(List<Pack> packs)
+    {
+        Map<String, Integer> nameToPos = new HashMap<String, Integer>();
+        for (int i = 0; i < packs.size(); i++)
+        {
+            Pack pack = packs.get(i);
+            nameToPos.put(pack.getName(), i);
+        }
+        return nameToPos;
+    }
+    /**
+     * Creates the reverse dependency graph
+     */
+    private List<Pack> setPackDependencies(List<Pack> packs, Map<String, Pack> nameToPack)
+    {
+        for (Pack pack : packs)
+        {
+            List<String> deps = pack.getDependencies();
+            for (int j = 0; deps != null && j < deps.size(); j++)
+            {
+                String name = deps.get(j);
+                Pack parent = nameToPack.get(name);
+                parent.addDependant(pack.getName());
+            }
+        }
+        return packs;
     }
 
     public Pack getPackAtRow(int row)
@@ -222,25 +217,19 @@ public class PacksModel extends AbstractTableModel
                         logger.fine(pack.getName() + " can be installed optionally.");
                         if (initial)
                         {
-                            if (checkValues[pos] != 0)
-                            {
-                                checkValues[pos] = 0;
-                                changes = true;
-                                // let the process start from the beginning
-                                break;
-                            }
+                            checkValues[pos] = 0;
+                            changes = true;
+                            // let the process start from the beginning
+                            break;
                         }
                     }
                     else
                     {
                         logger.fine("Pack" + pack.getName() + " cannot be installed");
-                        if (checkValues[pos] != -2)
-                        {
-                            checkValues[pos] = -2;
-                            changes = true;
-                            // let the process start from the beginning
-                            break;
-                        }
+                        checkValues[pos] = -2;
+                        changes = true;
+                        // let the process start from the beginning
+                        break;
                     }
                 }
             }
@@ -248,41 +237,10 @@ public class PacksModel extends AbstractTableModel
         }
     }
 
-    /**
-     * Creates the reverse dependency graph
-     */
-    private void reverseDeps()
+    private int[] initCheckValues(List<Pack> packs, List<Pack> packsToInstall)
     {
-        // name to pack map
-        namesObj = new HashMap<String, Pack>();
-        for (Pack pack : packs)
-        {
-            namesObj.put(pack.getName(), pack);
-        }
-        // process each pack
-        for (Pack pack : packs)
-        {
-            List<String> deps = pack.getDependencies();
-            for (int j = 0; deps != null && j < deps.size(); j++)
-            {
-                String name = deps.get(j);
-                Pack parent = namesObj.get(name);
-                parent.addDependant(pack.getName());
-            }
-        }
+        int[] checkValues = new int[packs.size()];
 
-    }
-
-    private void initvalues()
-    {
-        // name to pack position map
-        namesPos = new HashMap<String, Integer>();
-        for (int i = 0; i < packs.size(); i++)
-        {
-            Pack pack = packs.get(i);
-            namesPos.put(pack.getName(), i);
-        }
-        // Init to the first values
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
@@ -292,8 +250,6 @@ public class PacksModel extends AbstractTableModel
             }
         }
 
-        // Check out and disable the ones that are excluded by non fullfiled
-        // deps
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
@@ -307,9 +263,9 @@ public class PacksModel extends AbstractTableModel
                     checkValues[pos] = -2;
                 }
             }
+
             // for mutual exclusion, uncheck uncompatible packs too
             // (if available in the current installGroup)
-
             if (checkValues[i] > 0 && pack.getExcludeGroup() != null)
             {
                 for (int q = 0; q < packs.size(); q++)
@@ -328,21 +284,19 @@ public class PacksModel extends AbstractTableModel
                 }
             }
         }
-        // The required ones must propagate their required status to all the
-        // ones
-        // that they depend on
+
         for (Pack pack : packs)
         {
             if (pack.isRequired())
             {
-                propRequirement(pack.getName());
+                checkValues = propRequirement(pack.getName(), checkValues);
             }
         }
 
-        refreshPacksToInstall();
+        return checkValues;
     }
 
-    private void propRequirement(String name)
+    private int [] propRequirement(String name, int[] checkValues)
     {
 
         final int pos = getPos(name);
@@ -351,8 +305,9 @@ public class PacksModel extends AbstractTableModel
         for (int i = 0; deps != null && i < deps.size(); i++)
         {
             String s = deps.get(i);
-            propRequirement(s);
+            return propRequirement(s, checkValues);
         }
+        return checkValues;
 
     }
 
@@ -364,7 +319,7 @@ public class PacksModel extends AbstractTableModel
      */
     private int getPos(String name)
     {
-        return namesPos.get(name);
+        return nameToPos.get(name);
     }
 
     /*
@@ -626,7 +581,7 @@ public class PacksModel extends AbstractTableModel
                 String name = pack.getName();
                 if (!(!rules.canInstallPack(name, variables) && rules.canInstallPackOptional(name, variables)))
                 {
-                    propRequirement(name);
+                    checkValues = propRequirement(name, checkValues);
                 }
             }
         }
@@ -703,7 +658,7 @@ public class PacksModel extends AbstractTableModel
         {
             for (String name : deps)
             {
-                Pack v = namesObj.get(name);
+                Pack v = nameToPack.get(name);
                 if (wipe)
                 {
                     status[getPos(v.getName())] = 1;
@@ -733,10 +688,67 @@ public class PacksModel extends AbstractTableModel
     }
 
     /**
-     * @return the modifyinstallation
+     * @return the modifyInstallation
      */
-    public boolean isModifyinstallation()
+    public boolean isModifyInstallation()
     {
-        return this.modifyinstallation;
+        return this.modifyInstallation;
+    }
+
+    private Map<String, Pack> loadInstallationInformation(boolean modifyInstallation)
+    {
+        Map<String, Pack> installedpacks = new HashMap<String, Pack>();
+        if (!modifyInstallation)
+        {
+            return installedpacks;
+        }
+
+        // installation shall be modified
+        // load installation information
+        ObjectInputStream oin = null;
+        try
+        {
+            FileInputStream fin = new FileInputStream(new File(
+                    idata.getInstallPath() + File.separator + InstallData.INSTALLATION_INFORMATION));
+            oin = new ObjectInputStream(fin);
+            List<Pack> packsinstalled = (List<Pack>) oin.readObject();
+            for (Pack installedpack : packsinstalled)
+            {
+                installedpacks.put(installedpack.getName(), installedpack);
+            }
+            this.removeAlreadyInstalledPacks(idata.getSelectedPacks());
+            logger.fine("Found " + packsinstalled.size() + " installed packs");
+
+            Properties variables = (Properties) oin.readObject();
+
+            for (Object key : variables.keySet())
+            {
+                idata.setVariable((String) key, (String) variables.get(key));
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (ClassNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (oin != null)
+            {
+                try { oin.close(); }
+                catch (IOException e) {}
+            }
+        }
+        return installedpacks;
     }
 }
