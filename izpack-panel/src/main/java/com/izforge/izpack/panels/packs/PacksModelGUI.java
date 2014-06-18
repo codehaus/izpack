@@ -44,80 +44,25 @@ public class PacksModelGUI extends PacksModel
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex)
     {
-        if (columnIndex == 0)
+        if (columnIndex != 0 || !(aValue instanceof Integer))
         {
-            if (aValue instanceof Integer)
-            {
-                Pack pack = packs.get(rowIndex);
-                boolean added;
-                if ((Integer) aValue == 1)
-                {
-                    added = true;
-                    String name = pack.getName();
-                    if (rules.canInstallPack(name, variables) || rules.canInstallPackOptional(name, variables))
-                    {
-                        if (pack.isRequired())
-                        {
-                            checkValues[rowIndex] = -1;
-                        }
-                        else
-                        {
-                            checkValues[rowIndex] = 1;
-                        }
-                    }
-                }
-                else
-                {
-                    added = false;
-                    checkValues[rowIndex] = 0;
-                }
-                updateExcludes(rowIndex);
-                updateDeps();
-
-                if (added)
-                {
-                    onSelectionUpdate(rowIndex);
-                }
-                else
-                {
-                    onDeselectionUpdate(rowIndex);
-                }
-
-                if (added)
-                {
-                    if (panel.getDebugger() != null)
-                    {
-                        panel.getDebugger().packSelectionChanged("after adding pack " + pack.getName());
-                    }
-                    // temporarily add pack to packstoinstall
-                    this.packsToInstall.add(pack);
-                }
-                else
-                {
-                    if (panel.getDebugger() != null)
-                    {
-                        panel.getDebugger().packSelectionChanged("after removing pack " + pack.getName());
-                    }
-                    // temporarily remove pack from packstoinstall
-                    this.packsToInstall.remove(pack);
-                }
-                updateConditions();
-                if (added)
-                {
-                    // redo
-                    this.packsToInstall.remove(pack);
-                }
-                else
-                {
-                    // redo
-                    this.packsToInstall.add(pack);
-                }
-                refreshPacksToInstall();
-                updateBytes();
-                fireTableDataChanged();
-                panel.showSpaceRequired();
-            }
+            return;
         }
+        else
+        {
+            super.setValueAt(aValue, rowIndex, columnIndex);
+            refreshPacksToInstall();
+            updateBytes();
+            fireTableDataChanged();
+            panel.showSpaceRequired();
+
+        }
+        System.out.println("====================== CHECK VALUES ============================");
+        for (int i=0; i<packs.size(); i++)
+        {
+            System.out.println(packs.get(i).getName() + ": " + checkValues[i]);
+        }
+        System.out.println("====================== CHECK VALUES ============================");
     }
 
     private void updateBytes()

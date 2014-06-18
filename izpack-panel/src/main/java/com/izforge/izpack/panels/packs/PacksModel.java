@@ -58,20 +58,24 @@ public class PacksModel extends AbstractTableModel
     protected List<Pack> hiddenPacks;
     protected List<Pack> packsToInstall;
 
-    private Map<String, Pack> installedpacks;
+    private Map<String, Pack> installedPacks;
 
-    // This is used to represent the status of the checkbox
-    protected int[] checkValues;
+    protected int[] checkValues; // This is used to represent the status of the checkbox
 
-    Map<String, Pack> nameToPack; // Map to hold the object name relationship
-    Map<String, Integer> nameToPos; // Map to hold the object name relationship
+    private Map<String, Pack> nameToPack; // Map to hold the object name relationship
+    private Map<String, Integer> nameToPos; // Map to hold the object name relationship
 
     private InstallData idata;
     private Messages messages;
-    protected RulesEngine rules; // reference to the RulesEngine for validating conditions
-    protected Variables variables; // reference to the current variables, needed for condition validation
+    protected RulesEngine rules;
+    protected Variables variables;
 
     private boolean modifyInstallation;
+
+    public final int SELECTED = 1;
+    public final int DESELECTED = 0;
+    public final int REQUIRED_SELECTED = -1;
+    public final int DEPENDENT_DESELECTED = -2;
 
     public PacksModel(InstallData idata)
     {
@@ -82,18 +86,18 @@ public class PacksModel extends AbstractTableModel
         this.messages = idata.getMessages();
 
         this.modifyInstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION));
-        this.installedpacks = loadInstallationInformation(modifyInstallation);
+        this.installedPacks = loadInstallationInformation(modifyInstallation);
 
         this.packs = getVisiblePacks();
         this.hiddenPacks = getHiddenPacks();
         this.nameToPos = getNametoPosMapping(packs);
         this.nameToPack = getNametoPackMapping(packs);
 
-        setPackDependencies(packs, nameToPack);
+        this.packs = setPackDependencies(packs, nameToPack);
         this.checkValues = initCheckValues(packs, packsToInstall);
 
         refreshPacksToInstall();
-        this.updateConditions(true);
+        updateConditions(true);
         refreshPacksToInstall();
     }
 
@@ -150,9 +154,10 @@ public class PacksModel extends AbstractTableModel
         }
         return nameToPos;
     }
-    /**
-     * Creates the reverse dependency graph
-     */
+
+
+
+    //Creates the reverse dependency graph
     private List<Pack> setPackDependencies(List<Pack> packs, Map<String, Pack> nameToPack)
     {
         for (Pack pack : packs)
@@ -179,7 +184,7 @@ public class PacksModel extends AbstractTableModel
 
         for (Pack selectedpack : selectedpacks)
         {
-            if (installedpacks.containsKey(selectedpack.getName()))
+            if (installedPacks.containsKey(selectedpack.getName()))
             {
                 // pack is already installed, remove it
                 removepacks.add(selectedpack);
@@ -226,7 +231,7 @@ public class PacksModel extends AbstractTableModel
                     else
                     {
                         logger.fine("Pack" + pack.getName() + " cannot be installed");
-                        checkValues[pos] = -2;
+                        checkValues[pos] = DEPENDENT_DESELECTED;
                         changes = true;
                         // let the process start from the beginning
                         break;
@@ -246,21 +251,21 @@ public class PacksModel extends AbstractTableModel
             Pack pack = packs.get(i);
             if (packsToInstall.contains(pack))
             {
-                checkValues[i] = 1;
+                checkValues[i] = SELECTED;
             }
         }
 
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
-            if (checkValues[i] == 0)
+            if (checkValues[i] == DESELECTED)
             {
                 List<String> deps = pack.getDependants();
                 for (int j = 0; deps != null && j < deps.size(); j++)
                 {
                     String name = deps.get(j);
                     int pos = getPos(name);
-                    checkValues[pos] = -2;
+                    checkValues[pos] = DEPENDENT_DESELECTED;
                 }
             }
 
@@ -275,9 +280,9 @@ public class PacksModel extends AbstractTableModel
                         Pack otherpack = packs.get(q);
                         if (pack.getExcludeGroup().equals(otherpack.getExcludeGroup()))
                         {
-                            if (checkValues[q] == 1)
+                            if (checkValues[q] == SELECTED)
                             {
-                                checkValues[q] = 0;
+                                checkValues[q] = DESELECTED;
                             }
                         }
                     }
@@ -300,7 +305,7 @@ public class PacksModel extends AbstractTableModel
     {
 
         final int pos = getPos(name);
-        checkValues[pos] = -1;
+        checkValues[pos] = REQUIRED_SELECTED;
         List<String> deps = packs.get(pos).getDependencies();
         for (int i = 0; deps != null && i < deps.size(); i++)
         {
@@ -379,7 +384,6 @@ public class PacksModel extends AbstractTableModel
     /*
      * @see TableModel#getValueAt(int, int)
      */
-
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
     {
@@ -387,7 +391,6 @@ public class PacksModel extends AbstractTableModel
         switch (columnIndex)
         {
             case 0:
-
                 return checkValues[rowIndex];
 
             case 1:
@@ -408,71 +411,70 @@ public class PacksModel extends AbstractTableModel
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex)
     {
-        if (columnIndex == 0)
+        if (columnIndex != 0 || !(aValue instanceof Integer))
         {
-            if (aValue instanceof Integer)
+            return;
+        }
+        else
+        {
+            Pack pack = packs.get(rowIndex);
+            boolean added;
+            if ((Integer) aValue == 1)
             {
-                Pack pack = packs.get(rowIndex);
-                boolean added;
-                if ((Integer) aValue == 1)
+                added = true;
+                String name = pack.getName();
+                if (rules.canInstallPack(name, variables) || rules.canInstallPackOptional(name, variables))
                 {
-                    added = true;
-                    String name = pack.getName();
-                    if (rules.canInstallPack(name, variables) || rules.canInstallPackOptional(name, variables))
+                    if (pack.isRequired())
                     {
-                        if (pack.isRequired())
-                        {
-                            checkValues[rowIndex] = -1;
-                        }
-                        else
-                        {
-                            checkValues[rowIndex] = 1;
-                        }
+                        checkValues[rowIndex] = REQUIRED_SELECTED;
+                    }
+                    else
+                    {
+                        checkValues[rowIndex] = SELECTED;
                     }
                 }
-                else
-                {
-                    added = false;
-                    checkValues[rowIndex] = 0;
-                }
-                updateExcludes(rowIndex);
-                updateDeps();
-
-                if (added)
-                {
-                    onSelectionUpdate(rowIndex);
-                }
-                else
-                {
-                    onDeselectionUpdate(rowIndex);
-                }
-
-                if (added)
-                {
-
-                    // temporarily add pack to packstoinstall
-                    this.packsToInstall.add(pack);
-                }
-                else
-                {
-
-                    // temporarily remove pack from packstoinstall
-                    this.packsToInstall.remove(pack);
-                }
-                updateConditions();
-                if (added)
-                {
-                    // redo
-                    this.packsToInstall.remove(pack);
-                }
-                else
-                {
-                    // redo
-                    this.packsToInstall.add(pack);
-                }
-                refreshPacksToInstall();
-                fireTableDataChanged();
             }
+            else
+            {
+                added = false;
+                checkValues[rowIndex] = DESELECTED;
+            }
+            updateExcludes(rowIndex);
+            updateDeps();
+
+            if (added)
+            {
+                onSelectionUpdate(rowIndex);
+            }
+            else
+            {
+                onDeselectionUpdate(rowIndex);
+            }
+
+            if (added)
+            {
+                // temporarily add pack to packstoinstall
+                this.packsToInstall.add(pack);
+            }
+            else
+            {
+                // temporarily remove pack from packstoinstall
+                this.packsToInstall.remove(pack);
+            }
+            updateConditions();
+            if (added)
+            {
+                // redo
+                this.packsToInstall.remove(pack);
+            }
+            else
+            {
+                // redo
+                this.packsToInstall.add(pack);
+            }
+            refreshPacksToInstall();
+            fireTableDataChanged();
         }
     }
 
@@ -482,7 +484,6 @@ public class PacksModel extends AbstractTableModel
         {
             int value, packPos;
             String packName = packData.getKey();
-            String packCondition = pack.getCondition();
 
             if (packName.startsWith("!"))
             {
@@ -520,7 +521,7 @@ public class PacksModel extends AbstractTableModel
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
-            if ((Math.abs(checkValues[i]) == 1) && (!installedpacks.containsKey(pack.getName())))
+            if ((Math.abs(checkValues[i]) == 1) && (!installedPacks.containsKey(pack.getName())))
             {
                 packsToInstall.add(pack);
             }
@@ -531,7 +532,7 @@ public class PacksModel extends AbstractTableModel
         {
             Pack pack = packs.get(i);
 
-            if (installedpacks.containsKey(pack.getName()))
+            if (installedPacks.containsKey(pack.getName()))
             {
                 checkValues[i] = -3;
             }
@@ -680,11 +681,11 @@ public class PacksModel extends AbstractTableModel
 
     /**
      * Get previously installed packs on modifying a pre-installed application
-     * @return the installedpacks
+     * @return the installedPacks
      */
-    public Map<String, Pack> getInstalledpacks()
+    public Map<String, Pack> getInstalledPacks()
     {
-        return this.installedpacks;
+        return this.installedPacks;
     }
 
     /**

@@ -728,7 +728,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
         }
         if (packsModel.isModifyInstallation())
         {
-            Map<String, Pack> installedpacks = packsModel.getInstalledpacks();
+            Map<String, Pack> installedpacks = packsModel.getInstalledPacks();
             retval.append("<br><b>");
             retval.append(messages.get("PacksPanel.installedpacks.summarycaption"));
             retval.append("</b>");
