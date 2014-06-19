@@ -136,7 +136,6 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     private HashMap<Pack, Integer> packToRowNumber;
 
     private HashMap<String, CheckBoxNode> idToCheckBoxNode = new HashMap<String, CheckBoxNode>();
-    //private boolean created = false;   // UNUSED
 
     private CheckTreeController checkTreeController;
     private RulesEngine rules;
@@ -155,9 +154,13 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
                           Locales locales, RulesEngine rules)
     {
         super(panel, parent, installData, resources);
-        // Load langpack.
+
         try
         {
+            // TODO the PacksModel could be patched such that isCellEditable
+            // allows returns false. In that case the PacksModel must not be
+            // adapted here.
+            packsModel = new PacksModelGUI(this, installData, rules);
             messages = installData.getMessages();
             String webdir = installData.getInfo().getWebDirURL();
             boolean fallback = true;
@@ -517,9 +520,15 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     {
         TreeModel model = this.packsTree.getModel();
         CheckBoxNode root = (CheckBoxNode) model.getRoot();
-        updateModel(root);
+        syncCheckboxesWithModel(root);
     }
 
+    /**
+     * Return the row where the pack is represented
+     *
+     * @param pack
+     * @return the row where the pack is represented
+     */
     private int getRowIndex(Pack pack)
     {
         Integer rowNumber = packToRowNumber.get(pack);
@@ -532,96 +541,62 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
 
     /**
      * Helper function for fromModel() - runs the recursion
+     * Update our checkboxes based on the packs model.
      *
-     * @param rnode
+     * @param rootNode
      */
-    private void updateModel(CheckBoxNode rnode)
+    private void syncCheckboxesWithModel(CheckBoxNode rootNode)
     {
-        int rowIndex = getRowIndex(rnode.getPack());
-        if (rowIndex > 0)
-        {
-            Integer state = (Integer) packsModel.getValueAt(rowIndex, 0);
-            if ((state == -2) && rnode.getChildCount() > 0)
-            {
-                boolean dirty = false;
-                Enumeration<CheckBoxNode> toBeDeselected = rnode.depthFirstEnumeration();
-                while (toBeDeselected.hasMoreElements())
-                {
-                    CheckBoxNode checkBoxNode = toBeDeselected.nextElement();
-                    boolean chDirty = checkBoxNode.isSelected() || checkBoxNode.isPartial() || checkBoxNode.isEnabled();
-                    dirty = dirty || chDirty;
-                    if (chDirty)
-                    {
-                        checkBoxNode.setPartial(false);
-                        checkBoxNode.setSelected(false);
-                        checkBoxNode.setEnabled(false);
-                        setModelValue(checkBoxNode);
-                    }
-                }
-                if (dirty)
-                {
-                    fromModel();
-                }
-                return;
-            }
-        }
-
-        Enumeration<CheckBoxNode> e = rnode.children();
+        Enumeration<CheckBoxNode> e = rootNode.children();
         while (e.hasMoreElements())
         {
-            CheckBoxNode cbnode = e.nextElement();
-            String nodeText = cbnode.getId();
+            CheckBoxNode node = e.nextElement();
+            String nodeText = node.getId();
             Object nodePack = nameToPack.get(nodeText);
-            if (!cbnode.isPartial())
+
+            int childRowIndex = getRowIndex((Pack) nodePack);
+            if (childRowIndex >= 0)
             {
-                int childRowIndex = getRowIndex((Pack) nodePack);
-                if (childRowIndex >= 0)
+                Integer state = (Integer) packsModel.getValueAt(childRowIndex, 0);
+                node.setEnabled(state >= 0);
+                if (state == packsModel.PARTIAL_SELECTED)
                 {
-                    Integer state = (Integer) packsModel.getValueAt(childRowIndex, 0);
-                    cbnode.setEnabled(state >= 0);
-                    cbnode.setSelected(Math.abs(state.intValue()) == 1);
+                    node.setPartial(true);
+                }
+                else
+                {
+                    node.setPartial(false);
+                }
+                if (state == packsModel.REQUIRED_SELECTED
+                        || state == packsModel.SELECTED)
+                {
+                    node.setSelected(true);
+                }
+                else
+                {
+                    node.setSelected(false);
                 }
             }
-            updateModel(cbnode);
+
+            syncCheckboxesWithModel(node);
         }
     }
 
     /**
      * Updates a value for pack in PacksModel with installDataGUI from a checkbox node
      *
-     * @param cbnode This is the checkbox node which contains model values
+     * @param checkbox This is the checkbox node which contains model values
      */
-    public void setModelValue(CheckBoxNode cbnode)
+    public void setModelValue(CheckBoxNode checkbox)
     {
-        String id = cbnode.getId();
-        Object nodePack = nameToPack.get(id);
-        int value = 0;
-        if (cbnode.isEnabled() && cbnode.isSelected())
-        {
-            value = 1;
-        }
-        if (!cbnode.isEnabled() && cbnode.isSelected())
-        {
-            value = -1;
-        }
-        if (!cbnode.isEnabled() && !cbnode.isSelected())
-        {
-            value = -2;
-        }
-        int rowIndex = getRowIndex((Pack) nodePack);
-        if (rowIndex > 0)
-        {
-            Integer newValue = value;
-            Integer modelValue = (Integer) packsModel.getValueAt(rowIndex, 0);
-            if (!newValue.equals(modelValue))
-            {
-                packsModel.setValueAt(newValue, rowIndex, 0);
-            }
-        }
+        String id = checkbox.getId();
+        Pack nodePack = nameToPack.get(id);
+        int rowIndex = getRowIndex(nodePack);
+        packsModel.toggleValueAt(rowIndex);
     }
 
     /**
-     * Initialize tree model sructures
+     * Initialize tree model structures
      */
     private void createTreeData()
     {
@@ -804,14 +779,11 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         try
         {
 
-            // TODO the PacksModel could be patched such that isCellEditable
-            // allows returns false. In that case the PacksModel must not be
-            // adapted here.
-            packsModel = new PacksModelGUI(this, installData, rules)
+            /*
             {
                 /**
                  * Required (serializable)
-                 */
+                 *
                 private static final long serialVersionUID = 697462278279845304L;
 
                 @Override
@@ -819,7 +791,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
                 {
                     return false;
                 }
-            };
+            };*/
 
             //initialize helper map to increa performance
             packToRowNumber = new HashMap<Pack, Integer>();
@@ -879,7 +851,6 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     *
     * @see com.izforge.izpack.installer.IzPanel#getSummaryBody()
     */
-
     @Override
     public String getSummaryBody()
     {
@@ -940,216 +911,71 @@ class CheckTreeController extends MouseAdapter
         this.treePacksPanel = p;
     }
 
+    /**
+     * Handle checkbox selection.
+     *
+     * @param current
+     */
     private void selectNode(CheckBoxNode current)
     {
         current.setPartial(false);
         treePacksPanel.setModelValue(current);
-        Enumeration<CheckBoxNode> e = current.depthFirstEnumeration();
-        while (e.hasMoreElements())
-        {
-            CheckBoxNode child = e.nextElement();
-            child.setSelected(current.isSelected() || child.getPack().isRequired());
-            if (!child.isSelected())
-            {
-                child.setPartial(false);
-            }
-            treePacksPanel.setModelValue(child);
-        }
         treePacksPanel.fromModel();
     }
 
-    private boolean hasExcludes(CheckBoxNode node)
-    {
-        Enumeration<CheckBoxNode> e = node.depthFirstEnumeration();
-        while (e.hasMoreElements())
-        {
-            CheckBoxNode checkBoxNode = e.nextElement();
-            if (checkBoxNode.getPack().getExcludeGroup() != null)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     public void mouseReleased(MouseEvent me)
     {
-        TreePath path = tree.getPathForLocation(me.getX(), me.getY());
-        if (path == null)
-        {
-            return;
-        }
-        CheckBoxNode current = (CheckBoxNode) path.getLastPathComponent();
-        treePacksPanel.setDescription(current.getId());
-        treePacksPanel.setDependencies(current.getId());
-        if (me.getX() > tree.getPathBounds(path).x + checkWidth)
+        CheckBoxNode selectedNode = handleClick(me);
+        if (selectedNode == null)
         {
             return;
         }
 
-        // If this pack is required, leave it alone
-        if (current.getPack().isRequired())
-        {
-            return;
-        }
+        selectNode(selectedNode);
 
-        boolean currIsSelected = current.isSelected() & !current.isPartial();
-        boolean currIsPartial = current.isPartial();
-        boolean currHasExcludes = hasExcludes(current);
-        CheckBoxNode root = (CheckBoxNode) current.getRoot();
-
-        if (currIsPartial && currHasExcludes)
-        {
-            current.setSelected(false);
-            selectNode(current); // deselect actually
-            //updateAllParents(root);
-        }
-        else
-        {
-            if (!currIsSelected)
-            {
-                selectAllChildNodes(current);
-            }
-            current.setSelected(!currIsSelected);
-            selectNode(current);
-            //updateAllParents(root);
-        }
-
-        initTotalSize(root, true);
+        CheckBoxNode rootNode = (CheckBoxNode) selectedNode.getRoot();
+        initTotalSize(rootNode, true);
 
         // must override the bytes being computed at packsModel
-        treePacksPanel.setBytes(root.getTotalSize());
+        treePacksPanel.setBytes(rootNode.getTotalSize());
         treePacksPanel.showSpaceRequired();
         tree.treeDidChange();
     }
 
-    public void selectAllChildNodes(CheckBoxNode cbn)
-    {
-        Enumeration<CheckBoxNode> e = cbn.children();
-        while (e.hasMoreElements())
-        {
-            CheckBoxNode subCbn = e.nextElement();
-            selectAllDependencies(subCbn);
-            if (subCbn.getChildCount() > 0)
-            {
-                selectAllChildNodes(subCbn);
-            }
 
-            subCbn.setSelected(true);
-            // we need this, because the setModel ignored disabled values
-            subCbn.setEnabled(true);
-            treePacksPanel.setModelValue(subCbn);
-            subCbn.setEnabled(!subCbn.getPack().isRequired());
-        }
-    }
-
-    public void selectAllDependencies(CheckBoxNode cbn)
-    {
-        Pack pack = cbn.getPack();
-        java.util.List<String> deps = pack.getDependencies();
-        if (deps == null)
-        {
-            return;
-        }
-        for (String depId : deps)
-        {
-            CheckBoxNode depCbn = treePacksPanel.getCbnById(depId);
-            selectAllDependencies(depCbn);
-            if (depCbn.getChildCount() > 0)
-            {
-                if (!depCbn.isSelected() || depCbn.isPartial())
-                {
-                    selectAllChildNodes(depCbn);
-                }
-            }
-            depCbn.setSelected(true);
-            // we need this, because the setModel ignored disabled values
-            depCbn.setEnabled(true);
-            treePacksPanel.setModelValue(depCbn);
-            depCbn.setEnabled(!depCbn.getPack().isRequired());
-        }
-    }
 
     /**
-     * Updates partial/deselected/selected state of all parent nodes.
-     * This is needed and is a patch to allow unrelated nodes (in terms of the tree)
-     * to fire updates for each other.
-     *
-     * @param root
+     * Handle a click event on the JTree.
+     * Update the descriptions and dependencies/excludes if a checkbox or checkbox's text was clicked.
+     * If a checkbox not clicked return null, otherwise return the checkbox that was clicked.
+     * @param mouseEvent
+     * @return {@code CheckBoxNode} if clicked otherwise {@code null}
      */
-    public void updateAllParents(CheckBoxNode root)
+    private CheckBoxNode handleClick(MouseEvent mouseEvent)
     {
-        Enumeration<CheckBoxNode> rootEnum = root.depthFirstEnumeration();
-        while (rootEnum.hasMoreElements())
+        // True when expanding/contracting a group (clicking +/- button)
+        // True when clicking on whitespace within the TreePacksPanel area
+        TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
+        if (path == null)
         {
-            CheckBoxNode child = rootEnum.nextElement();
-            if (child.getParent() != null && !child.getParent().equals(root))
-            {
-                updateParents(child);
-            }
+            return null;
         }
-    }
 
-    /**
-     * Updates the parents of this particular node
-     *
-     * @param node
-     */
-    private void updateParents(CheckBoxNode node)
-    {
-        CheckBoxNode parent = (CheckBoxNode) node.getParent();
-        if (parent != null && !parent.equals(parent.getRoot()))
+        // If a checkbox or the checkbox's text was clicked update any descriptions
+        // Also update any dependencies and/or excludes
+        CheckBoxNode selectedNode = (CheckBoxNode) path.getLastPathComponent();
+        treePacksPanel.setDescription(selectedNode.getId());
+        treePacksPanel.setDependencies(selectedNode.getId());
+
+        // True is the a checkbox was not clicked
+        if ((mouseEvent.getX() > tree.getPathBounds(path).x + checkWidth) || selectedNode.getPack().isRequired())
         {
-            Enumeration<CheckBoxNode> ne = parent.children();
-            boolean allSelected = true;
-            boolean allDeselected = true;
-            while (ne.hasMoreElements())
-            {
-                CheckBoxNode child = ne.nextElement();
-                if (child.isSelected())
-                {
-                    allDeselected = false;
-                }
-                else
-                {
-                    allSelected = false;
-                }
-                if (child.isPartial())
-                {
-                    allSelected = allDeselected = false;
-                }
-                if (!allSelected && !allDeselected)
-                {
-                    break;
-                }
-            }
-            if (parent.getChildCount() > 0)
-            {
-                if (!allSelected && !allDeselected)
-                {
-                    setPartialParent(parent);
-                }
-                else
-                {
-                    parent.setPartial(false);
-                }
-                if (allSelected)
-                {
-                    parent.setSelected(true);
-                }
-                if (allDeselected)
-                {
-                    parent.setSelected(false);
-                }
-                treePacksPanel.setModelValue(parent);
-                if (allSelected || allDeselected)
-                {
-                    updateParents(parent);
-                }
-            }
-            //updateTotalSize(node);
+            return null;
         }
+
+        return selectedNode;
     }
 
     public static void setPartialParent(CheckBoxNode node)
@@ -1168,6 +994,7 @@ class CheckTreeController extends MouseAdapter
         {
             return node.getPack().getSize();
         }
+
         Enumeration<CheckBoxNode> e = node.children();
         Pack nodePack = node.getPack();
         long bytes = 0;

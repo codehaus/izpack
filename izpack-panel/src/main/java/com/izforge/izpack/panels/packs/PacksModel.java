@@ -420,6 +420,18 @@ public class PacksModel extends AbstractTableModel
         }
     }
 
+    public void toggleValueAt(int rowIndex)
+    {
+        if  (checkValues[rowIndex] == SELECTED)
+        {
+            setValueAt(DESELECTED, rowIndex, 0);
+        }
+        else
+        {
+            setValueAt(SELECTED, rowIndex, 0);
+        }
+
+    }
     /*
      * @see TableModel#setValueAt(Object, int, int)
      */
