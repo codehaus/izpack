@@ -137,6 +137,11 @@ public class Pack implements Serializable
     private String parent;
 
     /**
+     * Children pack names.
+     */
+    private List<String> children = new ArrayList<String>();
+
+    /**
      * The pack's image resource identifier. May be {@code null}
      */
     private String imageId;
@@ -284,6 +289,11 @@ public class Pack implements Serializable
     public List<String> getDependencies()
     {
         return dependencies;
+    }
+
+    public boolean hasDependencies()
+    {
+        return dependencies != null;
     }
 
     /**
@@ -517,6 +527,42 @@ public class Pack implements Serializable
     public String getParent()
     {
         return parent;
+    }
+
+    /**
+     *
+     * @return {@code true} if the pack has a parent otherwise {@code false}
+     */
+    public boolean hasParent()
+    {
+        return parent != null;
+    }
+
+    /**
+     * Add a child to this pack.
+     */
+    public void addChild(String child)
+    {
+        this.children.add(child);
+    }
+
+    /**
+     * Returns the children pack names.
+     *
+     * @return the names of the children for this pack.
+     */
+    public List<String> getChildren()
+    {
+        return children;
+    }
+
+    /**
+     *
+     * @return {@code true} if the pack has a parent otherwise {@code false}
+     */
+    public boolean hasChildren()
+    {
+        return !children.isEmpty();
     }
 
     /**

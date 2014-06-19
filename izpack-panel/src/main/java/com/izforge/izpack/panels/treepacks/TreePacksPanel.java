@@ -840,7 +840,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
 
             // Init the pack sizes (individual and cumulative)
             CheckBoxNode root = (CheckBoxNode) packsTree.getModel().getRoot();
-            checkTreeController.updateAllParents(root);
+            //checkTreeController.updateAllParents(root);
             CheckTreeController.initTotalSize(root, false);
 
             // Ugly repaint because of a bug in tree.treeDidChange
@@ -1003,7 +1003,7 @@ class CheckTreeController extends MouseAdapter
         {
             current.setSelected(false);
             selectNode(current); // deselect actually
-            updateAllParents(root);
+            //updateAllParents(root);
         }
         else
         {
@@ -1013,7 +1013,7 @@ class CheckTreeController extends MouseAdapter
             }
             current.setSelected(!currIsSelected);
             selectNode(current);
-            updateAllParents(root);
+            //updateAllParents(root);
         }
 
         initTotalSize(root, true);

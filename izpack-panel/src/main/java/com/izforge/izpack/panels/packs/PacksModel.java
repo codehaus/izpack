@@ -72,6 +72,7 @@ public class PacksModel extends AbstractTableModel
 
     private boolean modifyInstallation;
 
+    public final int PARTIAL_SELECTED = 2;
     public final int SELECTED = 1;
     public final int DESELECTED = 0;
     public final int REQUIRED_SELECTED = -1;
@@ -93,7 +94,7 @@ public class PacksModel extends AbstractTableModel
         this.nameToPos = getNametoPosMapping(packs);
         this.nameToPack = getNametoPackMapping(packs);
 
-        this.packs = setPackDependencies(packs, nameToPack);
+        this.packs = setPackProperties(packs, nameToPack);
         this.checkValues = initCheckValues(packs, packsToInstall);
 
         refreshPacksToInstall();
@@ -156,22 +157,38 @@ public class PacksModel extends AbstractTableModel
     }
 
 
-
-    //Creates the reverse dependency graph
-    private List<Pack> setPackDependencies(List<Pack> packs, Map<String, Pack> nameToPack)
+    /**
+     * Ensure that parent packs know which packs are their children.
+     * Ensure that packs who have dependants know which packs depend on them
+     *
+     * @param packs packs visible to the user
+     * @param nameToPack mapping from pack names to pack objects
+     * @return packs
+     */
+    private List<Pack> setPackProperties(List<Pack> packs, Map<String, Pack> nameToPack)
     {
+        Pack parent;
         for (Pack pack : packs)
         {
-            List<String> deps = pack.getDependencies();
-            for (int j = 0; deps != null && j < deps.size(); j++)
+            if (pack.hasParent())
             {
-                String name = deps.get(j);
-                Pack parent = nameToPack.get(name);
-                parent.addDependant(pack.getName());
+                String parentName = pack.getParent();
+                parent = nameToPack.get(parentName);
+                parent.addChild(pack.getName());
+            }
+
+            if (pack.hasDependencies())
+            {
+                for (String name : pack.getDependencies())
+                {
+                    parent = nameToPack.get(name);
+                    parent.addDependant(pack.getName());
+                }
             }
         }
         return packs;
     }
+
 
     public Pack getPackAtRow(int row)
     {
@@ -222,7 +239,7 @@ public class PacksModel extends AbstractTableModel
                         logger.fine(pack.getName() + " can be installed optionally.");
                         if (initial)
                         {
-                            checkValues[pos] = 0;
+                            checkValues[pos] = DESELECTED;
                             changes = true;
                             // let the process start from the beginning
                             break;
@@ -367,7 +384,6 @@ public class PacksModel extends AbstractTableModel
     /*
      * @see TableModel#isCellEditable(int, int)
      */
-
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex)
     {
@@ -407,7 +423,6 @@ public class PacksModel extends AbstractTableModel
     /*
      * @see TableModel#setValueAt(Object, int, int)
      */
-
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex)
     {
@@ -418,6 +433,7 @@ public class PacksModel extends AbstractTableModel
         else
         {
             Pack pack = packs.get(rowIndex);
+
             boolean added;
             if ((Integer) aValue == 1)
             {
@@ -450,6 +466,7 @@ public class PacksModel extends AbstractTableModel
             else
             {
                 onDeselectionUpdate(rowIndex);
+
             }
 
             if (added)
@@ -470,13 +487,79 @@ public class PacksModel extends AbstractTableModel
             }
             else
             {
+
                 // redo
                 this.packsToInstall.add(pack);
             }
             refreshPacksToInstall();
+            if (pack.hasParent())
+            {
+                updateParent(pack);
+            }
+            else if (pack.hasChildren())
+            {
+                updateChildren(pack);
+            }
             fireTableDataChanged();
         }
     }
+
+    /**
+     * Set the value of the parent pack of the given pack to SELECTED, PARTIAL_SELECT, or DESELECTED.
+     * Value of the pack is dependent of its children values.
+     *
+     * @param childPack
+     */
+    private void updateParent(Pack childPack)
+    {
+        String parentName = childPack.getParent();
+        Pack parentPack = nameToPack.get(parentName);
+        int parentPosition = nameToPos.get(parentName);
+
+        int childrenSelected = 0;
+        for (String childName : parentPack.getChildren())
+        {
+            int childPosition = nameToPos.get(childName);
+            if (checkValues[childPosition] == SELECTED
+                    || checkValues[childPosition] == REQUIRED_SELECTED)
+            {
+                childrenSelected += 1;
+            }
+        }
+
+        if (parentPack.getChildren().size() == childrenSelected)
+        {
+            checkValues[parentPosition] = SELECTED;
+        }
+        else if (childrenSelected > 0)
+        {
+            checkValues[parentPosition] = PARTIAL_SELECTED;
+        }
+        else
+        {
+            checkValues[parentPosition] = DESELECTED;
+        }
+    }
+
+
+    /**
+     * Set the value of children packs to the same value as the parent pack.
+     *
+     * @param parentPack
+     */
+    private void updateChildren(Pack parentPack)
+    {
+        String parentName = parentPack.getName();
+        int parentPosition = nameToPos.get(parentName);
+        int parentValue = checkValues[parentPosition];
+
+        for (String childName : parentPack.getChildren())
+        {
+            int childPosition = nameToPos.get(childName);
+            checkValues[childPosition] = parentValue;
+        }
+    }
+
 
     private void selectionUpdate(Pack pack, Map<String, String> packsData)
     {
@@ -608,9 +691,9 @@ public class PacksModel extends AbstractTableModel
                     String name2 = pack.getExcludeGroup();
                     if (name2.equals(name1))
                     {
-                        if (checkValues[q] == 1)
+                        if (checkValues[q] == SELECTED)
                         {
-                            checkValues[q] = 0;
+                            checkValues[q] = DESELECTED;
                         }
                     }
                 }
