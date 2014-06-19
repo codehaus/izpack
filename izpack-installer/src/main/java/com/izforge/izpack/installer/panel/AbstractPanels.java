@@ -84,10 +84,6 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      */
     private static final Logger logger = Logger.getLogger(AbstractPanels.class.getName());
 
-    T lastPanel;
-    boolean lastPanelCanShow;
-    boolean lastPanelVisibleOnly;
-
     /**
      * Constructs an {@code AbstractPanels}.
      *
@@ -570,16 +566,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      */
     private boolean canShow(T panel, boolean visibleOnly)
     {
-        if (lastPanel != panel || lastPanelVisibleOnly != visibleOnly)
-        {
-            // Cache the values if the panel hasn't changed
-            // to not many times re-evaluate conditions and dynamic variables
-            lastPanel = panel;
-            lastPanelVisibleOnly = visibleOnly;
-            lastPanelCanShow = ((!visibleOnly || panel.isVisible()) && panel.canShow());
-        }
-
-        return lastPanelCanShow;
+        return ((!visibleOnly || panel.isVisible()) && panel.canShow());
     }
 
 }
