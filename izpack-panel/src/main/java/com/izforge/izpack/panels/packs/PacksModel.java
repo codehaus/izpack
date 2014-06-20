@@ -55,6 +55,7 @@ public class PacksModel extends AbstractTableModel
     private static final transient Logger logger = Logger.getLogger(PacksModel.class.getName());
 
     protected List<Pack> packs;
+    protected List<Pack> allPacks;
     protected List<Pack> hiddenPacks;
     protected List<Pack> packsToInstall;
 
@@ -63,7 +64,7 @@ public class PacksModel extends AbstractTableModel
     protected int[] checkValues; // This is used to represent the status of the checkbox
 
     private Map<String, Pack> nameToPack; // Map to hold the object name relationship
-    private Map<String, Integer> nameToPos; // Map to hold the object name relationship
+    private Map<String, Integer> namesToRowNumbers; // Map to hold the object name relationship
 
     private InstallData idata;
     private Messages messages;
@@ -91,8 +92,9 @@ public class PacksModel extends AbstractTableModel
 
         this.packs = getVisiblePacks();
         this.hiddenPacks = getHiddenPacks();
-        this.nameToPos = getNametoPosMapping(packs);
-        this.nameToPack = getNametoPackMapping(packs);
+        this.allPacks = idata.getAvailablePacks();
+        this.namesToRowNumbers = getNametoPosMapping(packs);
+        this.nameToPack = getNametoPackMapping(allPacks);
 
         this.packs = setPackProperties(packs, nameToPack);
         this.checkValues = initCheckValues(packs, packsToInstall);
@@ -116,7 +118,7 @@ public class PacksModel extends AbstractTableModel
         return hiddenPacks;
     }
 
-    private List<Pack> getVisiblePacks()
+    public List<Pack> getVisiblePacks()
     {
         List<Pack> visiblePacks = new ArrayList<Pack>();
         for (Pack availablePack : idata.getAvailablePacks())
@@ -341,7 +343,7 @@ public class PacksModel extends AbstractTableModel
      */
     private int getPos(String name)
     {
-        return nameToPos.get(name);
+        return namesToRowNumbers.get(name);
     }
 
     /*
@@ -526,12 +528,12 @@ public class PacksModel extends AbstractTableModel
     {
         String parentName = childPack.getParent();
         Pack parentPack = nameToPack.get(parentName);
-        int parentPosition = nameToPos.get(parentName);
+        int parentPosition = namesToRowNumbers.get(parentName);
 
         int childrenSelected = 0;
         for (String childName : parentPack.getChildren())
         {
-            int childPosition = nameToPos.get(childName);
+            int childPosition = namesToRowNumbers.get(childName);
             if (checkValues[childPosition] == SELECTED
                     || checkValues[childPosition] == REQUIRED_SELECTED)
             {
@@ -562,12 +564,12 @@ public class PacksModel extends AbstractTableModel
     private void updateChildren(Pack parentPack)
     {
         String parentName = parentPack.getName();
-        int parentPosition = nameToPos.get(parentName);
+        int parentPosition = namesToRowNumbers.get(parentName);
         int parentValue = checkValues[parentPosition];
 
         for (String childName : parentPack.getChildren())
         {
-            int childPosition = nameToPos.get(childName);
+            int childPosition = namesToRowNumbers.get(childName);
             checkValues[childPosition] = parentValue;
         }
     }
@@ -609,7 +611,7 @@ public class PacksModel extends AbstractTableModel
         selectionUpdate(pack, packsData);
     }
 
-    protected void refreshPacksToInstall()
+    public List<Pack> refreshPacksToInstall()
     {
 
         packsToInstall.clear();
@@ -640,6 +642,8 @@ public class PacksModel extends AbstractTableModel
                 packsToInstall.add(hiddenpack);
             }
         }
+
+        return packsToInstall;
     }
 
 
@@ -846,5 +850,42 @@ public class PacksModel extends AbstractTableModel
             }
         }
         return installedpacks;
+    }
+    public Map<String, Pack> getNameToPack()
+    {
+        return nameToPack;
+    }
+
+    public Map<Pack, Integer> getPacksToRowNumbers()
+    {
+        Map<Pack, Integer> packsToRowNumbers = new HashMap<Pack, Integer>();
+        for (Map.Entry<String, Integer> entry : namesToRowNumbers.entrySet())
+        {
+            packsToRowNumbers.put(nameToPack.get(entry.getKey()), entry.getValue());
+        }
+        return packsToRowNumbers;
+    }
+
+    public Map<String, Integer> getNamesToRowNumbers()
+    {
+        return namesToRowNumbers;
+    }
+
+    public int getTotalByteSize(List<Pack> packs)
+    {
+        Map<Pack, Integer> packToRow = getPacksToRowNumbers();
+        int row;
+        int bytes = 0;
+        for (Pack pack : packs)
+        {
+            row = packToRow.get(pack);
+            if(checkValues[row] == SELECTED
+                    || checkValues[row] == REQUIRED_SELECTED
+                    || checkValues[row] == PARTIAL_SELECTED)
+            {
+                bytes += pack.getSize();
+            }
+        }
+        return bytes;
     }
 }

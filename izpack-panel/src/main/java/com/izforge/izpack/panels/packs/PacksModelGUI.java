@@ -104,4 +104,22 @@ public class PacksModelGUI extends PacksModel
         }
         return result;
     }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex)
+    {
+        return false;
+    }
+
+    public boolean dependenciesExist()
+    {
+        for (Pack pack : getVisiblePacks())
+        {
+            if (pack.hasDependencies())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
