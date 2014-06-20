@@ -44,6 +44,8 @@
          txt="Total space required:"/>
     <str id="TreePacksPanel.invalid"
          txt="Invalid pack selected"/>
+    <str id="TreePacksPanel.dependent"
+         txt="Dependent"/>
     <str id="TreePacksPanel.no.number"
          txt="Please enter a number from the selection above."/>
     <str id="TreePacksPanel.required"

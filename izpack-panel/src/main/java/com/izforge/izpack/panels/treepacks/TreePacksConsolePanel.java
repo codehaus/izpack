@@ -21,11 +21,7 @@
 
 package com.izforge.izpack.panels.treepacks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
@@ -51,19 +47,15 @@ import com.izforge.izpack.util.Console;
  */
 public class TreePacksConsolePanel extends AbstractConsolePanel implements ConsolePanel
 {
-    private final Prompt prompt;
     private Messages messages;
+    private final Prompt prompt;
 
-
-    private static final String LANG_FILE_NAME = "packsLang.xml";
-    private HashMap<String, Pack> idToPack;
-    private HashMap<String, List<String>> treeData;
     private PacksModel packsModel;
+    private static final String LANG_FILE_NAME = "packsLang.xml";
 
-    private static final int SELECTED = 1;
-    private static final int DESELECTED = 0;
 
     private static final String REQUIRED = "TreePacksPanel.required";
+    private static final String DEPENDENT = "TreePacksPanel.dependent";
     private static final String DONE = "TreePacksPanel.done";
 
     private static final String CONFIRM = "TreePacksPanel.confirm";
@@ -105,9 +97,8 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      */
     public boolean run(InstallData installData, Console console)
     {
-        packsModel = new PacksModel(installData);
         List<Pack> selectedPacks;
-        HashMap<String, List<String>> treeData = createTreeData(installData);
+        packsModel = new PacksModel(installData);
 
         try
         {
@@ -119,10 +110,9 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
             messages = installData.getMessages();
         }
 
-        selectedPacks = selectPacks(treeData, installData);
+        displayPackMenu(installData);
         out(Type.INFORMATION, installData.getMessages().get(DONE));
-
-        installData.setSelectedPacks(selectedPacks);
+        selectedPacks = packsModel.updatePacksToInstall();
 
         if (selectedPacks.size() == 0)
         {
@@ -131,37 +121,6 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         }
 
         return promptEndPanel(installData, console);
-    }
-
-    /**
-     * Get information on the children each parent pack has.
-     *
-     * @param installData
-     * @return Map that contains information on the parent pack and its children
-     */
-    private HashMap<String, List<String>> createTreeData(InstallData installData)
-    {
-        HashMap<String, List<String>> treeData = new HashMap<String, List<String>>();
-
-        for (Pack pack : getAvailableShowablePacks(installData))
-        {
-            if (pack.getParent() != null)
-            {
-                List<String> kids;
-                if (treeData.containsKey(pack.getParent()))
-                {
-                    kids = treeData.get(pack.getParent());
-                }
-                else
-                {
-                    kids = new ArrayList<String>();
-                }
-                kids.add(pack.getName());
-                treeData.put(pack.getParent(), kids);
-            }
-        }
-
-        return treeData;
     }
 
     private void out(Type type, String message)
@@ -178,59 +137,18 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      * 1. the pack is not required
      * 2. the pack has no condition string
      *
-     * @param treeData          - Map that contains information on the parent pack and its children
      * @param installData       - Database of izpack
      */
-    private List<Pack> selectPacks(final Map<String, List<String>> treeData, final InstallData installData)
+    private void displayPackMenu(final InstallData installData)
     {
         java.io.Console console = System.console();
 
-        List<Pack> packs = new ArrayList<Pack>();
-        List<Pack> selectedPacks = new LinkedList<Pack>();
-
-        for(Pack pack : getAvailableShowablePacks(installData))
-        {
-            packs.add(pack);
-        }
-
-        int mapChoiceToSelection[] = new int[packs.size()];
-        int selected[] = new int[packs.size()];
-        int choiceCount = 0;
-        Map<String, Integer> idPos = new HashMap<String, Integer>();
-
-        /**
-         * Generate mapping from choice to selection.
-         * Figure out which packs are already selected.
-         */
-        for (int i = 0; i < packs.size(); i++)
-        {
-            Pack pack = packs.get(i);
-            Boolean conditionSatisfied = checkCondition(installData, pack);
-            idPos.put(pack.getName(), i);
-
-            if (pack.hasCondition() && conditionSatisfied)
-            {
-                selected[i] = SELECTED;
-            }
-            else if (pack.isPreselected())
-            {
-                selected[i] = SELECTED;
-            }
-
-            if (!pack.isHidden())
-            {
-                mapChoiceToSelection[choiceCount] = i;
-                choiceCount++;
-            }
-        }
-
-        int packNum = printPackMenu(installData, packs, selected, mapChoiceToSelection);
-
-        //Allow user to select/deselect packs
+        printPackMenu();
+        List<Pack> visiblePacks = packsModel.getVisiblePacks();
+        int maxRow = visiblePacks.size();
         while (true)
         {
             int choice = -1;
-
             try
             {
                 choice = (Integer.parseInt(console.readLine())) -1;
@@ -241,46 +159,16 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
                 continue;
             }
 
-            if (choice < packNum && choice >= 0)
+            if (choice <= maxRow && choice >= 0)
             {
-                choice = mapChoiceToSelection[choice];
-                if (packs.get(choice).isRequired())
+                if (!packsModel.isCheckBoxSelectable(choice))
                 {
                     out(Type.WARNING, installData.getMessages().get(INVALID));
                 }
                 else
                 {
-                    //Toggle between selected and unselected
-                    selected[choice] = (selected[choice] + 1) % 2;
-
-                    //Check if what the user selected is a parent
-                    if (treeData.containsKey(packs.get(choice).getName()))
-                    {
-                        // If parent selected select/deselect all its children
-                        for (String child : treeData.get(packs.get(choice).getName()))
-                        {
-                            selected[idPos.get(child)] = selected[choice];
-                        }
-                    }
-
-                    // Check if this pack is a child of a parent, and that the parent is not required
-                    else if(packs.get(choice).getParent() != null &&
-                            !packs.get(idPos.get(packs.get(choice).getParent())).isRequired())
-                    {
-                        //Select parent
-                        selected[idPos.get(packs.get(choice).getParent())] = SELECTED;
-
-                        // If at least one child is unselected ensure parent is unselected
-                        for (String child : treeData.get(packs.get(choice).getParent()))
-                        {
-                            if(selected[idPos.get(child)] == DESELECTED)
-                            {
-                                selected[idPos.get(packs.get(choice).getParent())] = DESELECTED;
-                            }
-                        }
-                    }
-
-                    printPackMenu(installData, packs, selected, mapChoiceToSelection);
+                    packsModel.toggleValueAt(choice);
+                    printPackMenu();
                 }
             }
             else if (choice == -1)
@@ -291,96 +179,50 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
             {
                 out(Type.WARNING, installData.getMessages().get(INVALID));
             }
-
-        }
-
-        for (int i = 0; i < selected.length; i++)
-        {
-            if (selected[i] == SELECTED)
-            {
-                selectedPacks.add(packs.get(i));
-            }
-        }
-        return selectedPacks;
-    }
-
-    /**
-     * helper method to know if the condition assigned to the pack is satisfied
-     *
-     * @param installData - the data of izpack
-     * @param pack        - the pack whose condition needs to be checked·
-     * @return true             - if the condition is satisfied
-     *         false            - if condition not satisfied
-     *         null             - if no condition assigned
-     */
-    private Boolean checkCondition(InstallData installData, Pack pack)
-    {
-        if (pack.hasCondition())
-        {
-            return installData.getRules().isConditionTrue(pack.getCondition());
-        }
-        else
-        {
-            return null;
         }
     }
 
-    private List<Pack> getAvailableShowablePacks(InstallData installData)
+    public void printPackMenu()
     {
-        List<Pack> packs = new ArrayList<Pack>();
-        List<Pack> availablePacks = installData.getAvailablePacks();
+        int row = 0;
+        int totalSize = packsModel.getTotalByteSize();
 
-        for (Pack pack : availablePacks)
+        for (Pack pack : packsModel.getVisiblePacks())
         {
-            if (!pack.isHidden())
+            if (pack.isRequired())
             {
-                packs.add(pack);
+                System.out.println(generateRowEntry(row, pack, REQUIRED));
             }
-        }
-
-        return packs;
-    }
-
-    /**
-     * Method will print the pack selection state onto the console.
-     *
-     * @param installData the data of izpack
-     * @param packs list of available packs
-     * @param selected  holds selection status for available packs
-     * @param choiceMap holds mapping of visible packs to their index in selected
-     */
-    public int printPackMenu(InstallData installData, List<Pack> packs, int[] selected, int[] choiceMap)
-    {
-        long totalSize = 0;
-        int packnum = 1;
-
-        for (Pack pack : packs)
-        {
-            if (pack.isHidden())
+            else if(pack.hasDependencies())
             {
-                continue;
-            }
-            else if (pack.isRequired())
-            {
-                System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
-                        installData.getMessages().get(REQUIRED), PackHelper.getPackName(pack, messages), pack.toByteUnitsString(pack.getSize()));
+                System.out.println(generateRowEntry(row, pack, DEPENDENT));
             }
             else
             {
-                System.out.printf("%-4d [%s] %-15s [%s] (%-4s)\n", packnum, (selected[choiceMap[packnum - 1]] == SELECTED ? "x" : " "),
-                        "",  PackHelper.getPackName(pack, messages), pack.toByteUnitsString(pack.getSize()));
+                System.out.println(generateRowEntry(row, pack, ""));
             }
-
-            if (selected[choiceMap[packnum-1]] == SELECTED)
-            {
-                totalSize += pack.getSize();
-            }
-            packnum++;
+            row++;
         }
 
-        System.out.println(installData.getMessages().get(REQUIRED_SPACE) + " " + Pack.toByteUnitsString(totalSize));
-        System.out.println(installData.getMessages().get(CONFIRM));
-        System.out.println(installData.getMessages().get(PROMPT));
-        return packnum-1;
+        System.out.println(messages.get(REQUIRED_SPACE) + " " + Pack.toByteUnitsString(totalSize));
+        System.out.println(messages.get(CONFIRM));
+        System.out.println(messages.get(PROMPT));
+    }
+
+    /**
+     *
+     * @param row row to be displayed (starting from 0)
+     * @param pack the associated pack to display
+     * @param extra any extra information to be displayed for the pack
+     * @return String to display a row of the packs selection menu
+     */
+    private String generateRowEntry(int row, Pack pack, String extra)
+    {
+        return String.format("%-4d [%s] %-15s [%s] (%-4s)",
+                row+1,
+                (packsModel.isChecked(row) ? "x" : " "),
+                messages.get(extra),
+                PackHelper.getPackName(pack, messages),
+                pack.toByteUnitsString(pack.getSize()));
     }
 }

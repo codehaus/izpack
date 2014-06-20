@@ -61,12 +61,12 @@ public class PacksModel extends AbstractTableModel
 
     private Map<String, Pack> installedPacks;
 
-    protected int[] checkValues; // This is used to represent the status of the checkbox
+    protected int[] checkValues;
 
-    private Map<String, Pack> nameToPack; // Map to hold the object name relationship
-    private Map<String, Integer> namesToRowNumbers; // Map to hold the object name relationship
+    private Map<String, Pack> nameToPack;
+    private Map<String, Integer> nameToRow;
 
-    private InstallData idata;
+    private InstallData installData;
     private Messages messages;
     protected RulesEngine rules;
     protected Variables variables;
@@ -81,7 +81,7 @@ public class PacksModel extends AbstractTableModel
 
     public PacksModel(InstallData idata)
     {
-        this.idata = idata;
+        this.installData = idata;
         this.rules = idata.getRules();
         this.variables = idata.getVariables();
         this.packsToInstall = idata.getSelectedPacks();
@@ -93,22 +93,22 @@ public class PacksModel extends AbstractTableModel
         this.packs = getVisiblePacks();
         this.hiddenPacks = getHiddenPacks();
         this.allPacks = idata.getAvailablePacks();
-        this.namesToRowNumbers = getNametoPosMapping(packs);
+        this.nameToRow = getNametoPosMapping(packs);
         this.nameToPack = getNametoPackMapping(allPacks);
 
         this.packs = setPackProperties(packs, nameToPack);
         this.checkValues = initCheckValues(packs, packsToInstall);
 
-        refreshPacksToInstall();
+        updatePacksToInstall();
         updateConditions(true);
-        refreshPacksToInstall();
+        updatePacksToInstall();
     }
 
 
     private List<Pack> getHiddenPacks()
     {
         List<Pack> hiddenPacks = new ArrayList<Pack>();
-        for (Pack availablePack : idata.getAvailablePacks())
+        for (Pack availablePack : installData.getAvailablePacks())
         {
             if (availablePack.isHidden())
             {
@@ -121,7 +121,7 @@ public class PacksModel extends AbstractTableModel
     public List<Pack> getVisiblePacks()
     {
         List<Pack> visiblePacks = new ArrayList<Pack>();
-        for (Pack availablePack : idata.getAvailablePacks())
+        for (Pack availablePack : installData.getAvailablePacks())
         {
             if (!availablePack.isHidden())
             {
@@ -257,7 +257,7 @@ public class PacksModel extends AbstractTableModel
                     }
                 }
             }
-            refreshPacksToInstall();
+            updatePacksToInstall();
         }
     }
 
@@ -343,7 +343,7 @@ public class PacksModel extends AbstractTableModel
      */
     private int getPos(String name)
     {
-        return namesToRowNumbers.get(name);
+        return nameToRow.get(name);
     }
 
     /*
@@ -421,6 +421,7 @@ public class PacksModel extends AbstractTableModel
                 return null;
         }
     }
+
 
     public void toggleValueAt(int rowIndex)
     {
@@ -505,7 +506,7 @@ public class PacksModel extends AbstractTableModel
                 // redo
                 this.packsToInstall.add(pack);
             }
-            refreshPacksToInstall();
+            updatePacksToInstall();
             if (pack.hasParent())
             {
                 updateParent(pack);
@@ -528,14 +529,13 @@ public class PacksModel extends AbstractTableModel
     {
         String parentName = childPack.getParent();
         Pack parentPack = nameToPack.get(parentName);
-        int parentPosition = namesToRowNumbers.get(parentName);
+        int parentPosition = nameToRow.get(parentName);
 
         int childrenSelected = 0;
         for (String childName : parentPack.getChildren())
         {
-            int childPosition = namesToRowNumbers.get(childName);
-            if (checkValues[childPosition] == SELECTED
-                    || checkValues[childPosition] == REQUIRED_SELECTED)
+            int childPosition = nameToRow.get(childName);
+            if (isChecked(childPosition))
             {
                 childrenSelected += 1;
             }
@@ -564,12 +564,12 @@ public class PacksModel extends AbstractTableModel
     private void updateChildren(Pack parentPack)
     {
         String parentName = parentPack.getName();
-        int parentPosition = namesToRowNumbers.get(parentName);
+        int parentPosition = nameToRow.get(parentName);
         int parentValue = checkValues[parentPosition];
 
         for (String childName : parentPack.getChildren())
         {
-            int childPosition = namesToRowNumbers.get(childName);
+            int childPosition = nameToRow.get(childName);
             checkValues[childPosition] = parentValue;
         }
     }
@@ -611,37 +611,29 @@ public class PacksModel extends AbstractTableModel
         selectionUpdate(pack, packsData);
     }
 
-    public List<Pack> refreshPacksToInstall()
+    public List<Pack> updatePacksToInstall()
     {
-
         packsToInstall.clear();
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
-            if ((Math.abs(checkValues[i]) == 1) && (!installedPacks.containsKey(pack.getName())))
+            if (isChecked(i) && (!installedPacks.containsKey(pack.getName())))
             {
                 packsToInstall.add(pack);
             }
-
-        }
-
-        for (int i = 0; i < packs.size(); i++)
-        {
-            Pack pack = packs.get(i);
-
-            if (installedPacks.containsKey(pack.getName()))
+            else if (installedPacks.containsKey(pack.getName()))
             {
                 checkValues[i] = -3;
             }
         }
-        // add hidden packs
-        for (Pack hiddenpack : this.hiddenPacks)
+        for (Pack hiddenPack : this.hiddenPacks)
         {
-            if (this.rules.canInstallPack(hiddenpack.getName(), variables))
+            if (this.rules.canInstallPack(hiddenPack.getName(), variables))
             {
-                packsToInstall.add(hiddenpack);
+                packsToInstall.add(hiddenPack);
             }
         }
+        installData.setSelectedPacks(packsToInstall);
 
         return packsToInstall;
     }
@@ -809,21 +801,21 @@ public class PacksModel extends AbstractTableModel
         try
         {
             FileInputStream fin = new FileInputStream(new File(
-                    idata.getInstallPath() + File.separator + InstallData.INSTALLATION_INFORMATION));
+                    installData.getInstallPath() + File.separator + InstallData.INSTALLATION_INFORMATION));
             oin = new ObjectInputStream(fin);
             List<Pack> packsinstalled = (List<Pack>) oin.readObject();
             for (Pack installedpack : packsinstalled)
             {
                 installedpacks.put(installedpack.getName(), installedpack);
             }
-            this.removeAlreadyInstalledPacks(idata.getSelectedPacks());
+            this.removeAlreadyInstalledPacks(installData.getSelectedPacks());
             logger.fine("Found " + packsinstalled.size() + " installed packs");
 
             Properties variables = (Properties) oin.readObject();
 
             for (Object key : variables.keySet())
             {
-                idata.setVariable((String) key, (String) variables.get(key));
+                installData.setVariable((String) key, (String) variables.get(key));
             }
         }
         catch (FileNotFoundException e)
@@ -859,19 +851,19 @@ public class PacksModel extends AbstractTableModel
     public Map<Pack, Integer> getPacksToRowNumbers()
     {
         Map<Pack, Integer> packsToRowNumbers = new HashMap<Pack, Integer>();
-        for (Map.Entry<String, Integer> entry : namesToRowNumbers.entrySet())
+        for (Map.Entry<String, Integer> entry : nameToRow.entrySet())
         {
             packsToRowNumbers.put(nameToPack.get(entry.getKey()), entry.getValue());
         }
         return packsToRowNumbers;
     }
 
-    public Map<String, Integer> getNamesToRowNumbers()
+    public Map<String, Integer> getNameToRow()
     {
-        return namesToRowNumbers;
+        return nameToRow;
     }
 
-    public int getTotalByteSize(List<Pack> packs)
+    public int getTotalByteSize()
     {
         Map<Pack, Integer> packToRow = getPacksToRowNumbers();
         int row;
@@ -879,13 +871,36 @@ public class PacksModel extends AbstractTableModel
         for (Pack pack : packs)
         {
             row = packToRow.get(pack);
-            if(checkValues[row] == SELECTED
-                    || checkValues[row] == REQUIRED_SELECTED
-                    || checkValues[row] == PARTIAL_SELECTED)
+            if(isChecked(row))
             {
                 bytes += pack.getSize();
             }
         }
         return bytes;
+    }
+
+    /**
+     * Check if the checkbox is selected given its row.
+     *
+     * @param row
+     * @return {@code true} if checkbox is selected else {@code false}
+     */
+    public boolean isChecked(int row)
+    {
+        if(checkValues[row] == SELECTED
+                || checkValues[row] == REQUIRED_SELECTED
+                || checkValues[row] == PARTIAL_SELECTED)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean isCheckBoxSelectable(int row)
+    {
+        return checkValues[row] >= 0;
     }
 }

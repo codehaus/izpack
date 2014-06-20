@@ -51,7 +51,7 @@ public class PacksModelGUI extends PacksModel
         else
         {
             super.setValueAt(aValue, rowIndex, columnIndex);
-            //refreshPacksToInstall();
+            //updatePacksToInstall();
             updateBytes();
             fireTableDataChanged();
             panel.showSpaceRequired();

@@ -75,12 +75,12 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     private Messages messages;
     private static final String LANG_FILE_NAME = "packsLang.xml";
 
-    protected long bytes = 0;
-    protected long freeBytes = 0;
+    private long bytes = 0;
+    private long freeBytes = 0;
 
-    private Map<String, Pack> namesToPacks;
-    private Map<Pack, Integer> packsToRowNumbers;
-    private Map<String, List<String>> treeData;
+    private final Map<String, Pack> namesToPacks;
+    private final Map<Pack, Integer> packsToRowNumbers;
+    private final Map<String, List<String>> treeData;
 
     private CheckTreeController checkTreeController;
     private HashMap<String, CheckBoxNode> idToCheckBoxNode = new HashMap<String, CheckBoxNode>();
@@ -105,7 +105,6 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         namesToPacks = packsModel.getNameToPack();
         packsToRowNumbers = packsModel.getPacksToRowNumbers();
         treeData = createTreeData();
-
         createNormalLayout();
     }
 
@@ -346,14 +345,16 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     @Override
     public boolean isValidated()
     {
-        refreshPacksToInstall(); //TODO: Replace the use within PacksModel instead
+        packsModel.updatePacksToInstall();
+
         if (IoHelper.supported("getFreeSpace") && freeBytes >= 0 && freeBytes <= bytes)
         {
-            JOptionPane.showMessageDialog(this, getString("PacksPanel.notEnoughSpace"), getString("installer.error"),
-                                          JOptionPane.ERROR_MESSAGE);
-            return (false);
+            JOptionPane.showMessageDialog(
+                this, getString("PacksPanel.notEnoughSpace"), getString("installer.error"),
+                                 JOptionPane.ERROR_MESSAGE);
+            return false;
         }
-        return (true);
+        return true;
     }
 
     @Override
@@ -383,21 +384,6 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             return name;
         }
         return getI18NPackName(pack);
-    }
-
-    private void refreshPacksToInstall()
-    {
-        this.installData.getSelectedPacks().clear();
-        CheckBoxNode rootCheckBoxNode = (CheckBoxNode) getTree().getModel().getRoot();
-        Enumeration<CheckBoxNode> cbNodes = rootCheckBoxNode.depthFirstEnumeration();
-        while (cbNodes.hasMoreElements())
-        {
-            CheckBoxNode checkBox = cbNodes.nextElement();
-            if (checkBox.isSelected() || checkBox.isPartial())
-            {
-                this.installData.getSelectedPacks().add(checkBox.getPack());
-            }
-        }
     }
 
     /**
@@ -777,9 +763,6 @@ class CheckTreeController extends MouseAdapter
 
         treePacksPanel.setModelValue(selectedNode);
         treePacksPanel.updateViewFromModel();
-
-
-
         tree.treeDidChange();
     }
 
