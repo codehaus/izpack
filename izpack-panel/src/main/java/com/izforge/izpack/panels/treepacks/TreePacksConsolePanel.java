@@ -22,6 +22,7 @@
 package com.izforge.izpack.panels.treepacks;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.izforge.izpack.api.data.InstallData;
@@ -207,6 +208,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      */
     private String generateRowEntry(int row, Pack pack)
     {
+        Map <String, Pack> nameToPack = packsModel.getNameToPack();
         String extraRow = "";
         String dependencies = "";
         String children = "";
@@ -231,9 +233,10 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         // Generate string from dependencies
         if (pack.hasDependencies())
         {
-            for (String dependentPack : pack.getDependencies())
+            for (String dependentPackName : pack.getDependencies())
             {
-                dependencies += dependentPack + ", ";
+                Pack dependentPack = nameToPack.get(dependentPackName);
+                dependencies += PackHelper.getPackName(dependentPack, messages) + ", ";
             }
             dependencies = dependencies.substring(0, dependencies.length()-2);
             dependencies = messages.get(DEPENDENT) + ": " + dependencies;
@@ -242,9 +245,10 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         // Generate string for children
         if (pack.hasChildren())
         {
-            for (String childPack : pack.getChildren())
+            for (String childPackName : pack.getChildren())
             {
-                children += childPack + ", ";
+                Pack childPack = nameToPack.get(childPackName);
+                children += PackHelper.getPackName(childPack, messages) + ", ";
             }
             children = children.substring(0, children.length()-2);
             children = messages.get(CHILDREN) + ": " + children;
