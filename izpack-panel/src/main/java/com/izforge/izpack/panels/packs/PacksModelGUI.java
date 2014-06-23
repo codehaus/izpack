@@ -42,15 +42,15 @@ public class PacksModelGUI extends PacksModel
     }
 
     @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+    public void setValueAt(Object checkValue, int rowIndex, int columnIndex)
     {
-        if (columnIndex != 0 || !(aValue instanceof Integer))
+        if (columnIndex != 0 || !(checkValue instanceof Integer))
         {
             return;
         }
         else
         {
-            super.setValueAt(aValue, rowIndex, columnIndex);
+            super.setValueAt(checkValue, rowIndex, columnIndex);
             updatePacksToInstall();
             updateBytes();
             fireTableDataChanged();

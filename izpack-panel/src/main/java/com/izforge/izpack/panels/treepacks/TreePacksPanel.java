@@ -795,7 +795,10 @@ class CheckTreeController extends MouseAdapter
         {
             return null;
         }
-
+        if (!selectedNode.isEnabled())
+        {
+            return null;
+        }
         return selectedNode;
     }
 }
