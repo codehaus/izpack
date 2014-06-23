@@ -45,7 +45,9 @@
     <str id="TreePacksPanel.invalid"
          txt="Invalid pack selected"/>
     <str id="TreePacksPanel.dependent"
-         txt="Dependent"/>
+         txt="Dependencies"/>
+    <str id="TreePacksPanel.children"
+         txt="Children"/>
     <str id="TreePacksPanel.no.number"
          txt="Please enter a number from the selection above."/>
     <str id="TreePacksPanel.required"

@@ -56,8 +56,9 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
 
     private static final String REQUIRED = "TreePacksPanel.required";
     private static final String DEPENDENT = "TreePacksPanel.dependent";
-    private static final String DONE = "TreePacksPanel.done";
+    private static final String CHILDREN = "TreePacksPanel.children";
 
+    private static final String DONE = "TreePacksPanel.done";
     private static final String CONFIRM = "TreePacksPanel.confirm";
     private static final String NUMBER = "TreePacksPanel.no.number";
     private static final String PROMPT = "TreePacksPanel.prompt";
@@ -189,18 +190,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
 
         for (Pack pack : packsModel.getVisiblePacks())
         {
-            if (pack.isRequired())
-            {
-                System.out.println(generateRowEntry(row, pack, REQUIRED));
-            }
-            else if(pack.hasDependencies())
-            {
-                System.out.println(generateRowEntry(row, pack, DEPENDENT));
-            }
-            else
-            {
-                System.out.println(generateRowEntry(row, pack, ""));
-            }
+            System.out.println(generateRowEntry(row, pack));
             row++;
         }
 
@@ -213,16 +203,67 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      *
      * @param row row to be displayed (starting from 0)
      * @param pack the associated pack to display
-     * @param extra any extra information to be displayed for the pack
      * @return String to display a row of the packs selection menu
      */
-    private String generateRowEntry(int row, Pack pack, String extra)
+    private String generateRowEntry(int row, Pack pack)
     {
-        return String.format("%-4d [%s] %-15s [%s] (%-4s)",
-                row+1,
-                (packsModel.isChecked(row) ? "x" : " "),
-                messages.get(extra),
-                PackHelper.getPackName(pack, messages),
-                pack.toByteUnitsString(pack.getSize()));
+        String extraRow = "";
+        String dependencies = "";
+        String children = "";
+        String marker = " ";
+        
+        if (packsModel.isChecked(row))
+        {
+            marker = "x";
+        }
+        if (packsModel.isPartiallyChecked(row))
+        {
+            marker = "o";
+        }
+
+        String mainRow =
+                String.format("%-4d [%s] [%s] (%-4s)",
+                        row + 1,
+                        marker,
+                        PackHelper.getPackName(pack, messages),
+                        pack.toByteUnitsString(pack.getSize()));
+
+        // Generate string from dependencies
+        if (pack.hasDependencies())
+        {
+            for (String dependentPack : pack.getDependencies())
+            {
+                dependencies += dependentPack + ", ";
+            }
+            dependencies = dependencies.substring(0, dependencies.length()-2);
+            dependencies = messages.get(DEPENDENT) + ": " + dependencies;
+        }
+
+        // Generate string for children
+        if (pack.hasChildren())
+        {
+            for (String childPack : pack.getChildren())
+            {
+                children += childPack + ", ";
+            }
+            children = children.substring(0, children.length()-2);
+            children = messages.get(CHILDREN) + ": " + children;
+        }
+
+        // Generate string for required pack
+        if (pack.isRequired())
+        {
+            extraRow = extraRow + String.format("\n      >> %s", messages.get(REQUIRED));
+        }
+        if (!dependencies.isEmpty())
+        {
+            extraRow = extraRow + String.format("\n      >> %s", dependencies);
+        }
+        if (!children.isEmpty())
+        {
+            extraRow = extraRow + String.format("\n      >> %s", children);
+        }
+
+        return mainRow + extraRow;
     }
 }
