@@ -264,10 +264,12 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
         if (panel.hasCondition())
         {
             result = installData.getRules().isConditionTrue(panel.getCondition());
+            logger.fine("Panel '" + getPanelId() + "' depending on condition '" + panel.getCondition() + "' " + (result?"can be shown":"will be skipped"));
         }
         else
         {
             result = installData.getRules().canShowPanel(panelId, installData.getVariables());
+            logger.fine("Panel '" + getPanelId() + "' " + (result?"can be shown":"will be skipped"));
         }
         return result;
     }

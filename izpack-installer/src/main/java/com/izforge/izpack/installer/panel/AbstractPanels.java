@@ -170,7 +170,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     public boolean isValid()
     {
         T panel = getPanelView();
-        return panel != null && executeValidationActions(panel, true);
+        return panel == null || executeValidationActions(panel, true);
     }
 
     /**
@@ -240,10 +240,15 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     public boolean next(boolean validate)
     {
         boolean result = false;
-        int newIndex = getNext(index, false);
-        if (newIndex != -1)
+
+        // Evaluate and set variables for current panel before verifying panel conditions
+        if (isValid())
         {
-            result = switchPanel(newIndex, validate);
+            int newIndex = getNext(index, false);
+            if (newIndex != -1)
+            {
+                result = switchPanel(newIndex, validate);
+            }
         }
 
         return result;
@@ -335,7 +340,20 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
                 break;
             }
         }
+
         return result;
+    }
+
+    /**
+     * Determines if there is another panel after the current index.
+     *
+     * @param visibleOnly if {@code true}, only examine visible panels
+     * @return {@code true} if there is another panel
+     */
+    @Override
+    public int getNext(boolean visibleOnly)
+    {
+        return getNext(index, visibleOnly);
     }
 
     /**
@@ -358,6 +376,19 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
             }
         }
         return result;
+    }
+
+    /**
+     * Determines if there is another panel prior to the specified index.
+     *
+     * @param index       the panel index
+     * @param visibleOnly if {@code true}, only examine visible panels
+     * @return the previous panel index, or {@code -1} if there are no more panels
+     */
+    @Override
+    public int getPrevious(boolean visibleOnly)
+    {
+        return getPrevious(index, visibleOnly);
     }
 
     /**
@@ -438,14 +469,12 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      */
     public boolean switchPanel(int newIndex, boolean validate)
     {
-        boolean result;
-
-        T panel = getPanelView();
-        if (!(panel == null || executeValidationActions(panel, validate)))
-            return false;
+       boolean result;
 
         if ((newIndex > index) && !isNextEnabled()) // NOTE: actions may change isNextEnabled() status
+        {
             return false;
+        }
 
 
         // refresh variables prior to switching panels
@@ -479,7 +508,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
             result = false;
         }
 
-        return result;
+       return result;
     }
 
     /**
@@ -537,7 +566,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      */
     private boolean canShow(T panel, boolean visibleOnly)
     {
-        return (!visibleOnly || panel.isVisible()) && panel.canShow();
+        return ((!visibleOnly || panel.isVisible()) && panel.canShow());
     }
 
 }
