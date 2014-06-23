@@ -83,9 +83,9 @@ public class PacksModel extends AbstractTableModel
     {
         this.installData = idata;
         this.rules = idata.getRules();
+        this.messages = idata.getMessages();
         this.variables = idata.getVariables();
         this.packsToInstall = idata.getSelectedPacks();
-        this.messages = idata.getMessages();
 
         this.modifyInstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION));
         this.installedPacks = loadInstallationInformation(modifyInstallation);
@@ -220,6 +220,10 @@ public class PacksModel extends AbstractTableModel
         this.updateConditions(false);
     }
 
+    /**
+     *
+     * @param initial
+     */
     private void updateConditions(boolean initial)
     {
         boolean changes = true;
@@ -230,15 +234,16 @@ public class PacksModel extends AbstractTableModel
             // look for packages,
             for (Pack pack : packs)
             {
-                int pos = getPos(pack.getName());
-                logger.fine("Conditions fulfilled for: " + pack.getName() + "?");
-                if (!rules.canInstallPack(pack.getName(), variables))
+                String packName = pack.getName();
+                int pos = getPos(packName);
+                logger.fine("Conditions fulfilled for: " + packName + "?");
+                if (!rules.canInstallPack(packName, variables))
                 {
                     logger.fine("no");
-                    if (rules.canInstallPackOptional(pack.getName(), variables))
+                    if (rules.canInstallPackOptional(packName, variables))
                     {
                         logger.fine("optional");
-                        logger.fine(pack.getName() + " can be installed optionally.");
+                        logger.fine(packName + " can be installed optionally.");
                         if (initial)
                         {
                             checkValues[pos] = DESELECTED;
@@ -249,7 +254,7 @@ public class PacksModel extends AbstractTableModel
                     }
                     else
                     {
-                        logger.fine("Pack" + pack.getName() + " cannot be installed");
+                        logger.fine("Pack" + packName + " cannot be installed");
                         checkValues[pos] = DEPENDENT_DESELECTED;
                         changes = true;
                         // let the process start from the beginning
@@ -611,13 +616,20 @@ public class PacksModel extends AbstractTableModel
         selectionUpdate(pack, packsData);
     }
 
+    /**
+     * Update packs to installed.
+     * A pack to be installed is:
+     * 1. A visible pack that has its checkbox checked
+     * 2. A hidden pack that condition
+     * @return
+     */
     public List<Pack> updatePacksToInstall()
     {
         packsToInstall.clear();
         for (int i = 0; i < packs.size(); i++)
         {
             Pack pack = packs.get(i);
-            if (isChecked(i) && (!installedPacks.containsKey(pack.getName())))
+            if (isChecked(i) && !installedPacks.containsKey(pack.getName()))
             {
                 packsToInstall.add(pack);
             }
@@ -626,6 +638,7 @@ public class PacksModel extends AbstractTableModel
                 checkValues[i] = -3;
             }
         }
+
         for (Pack hiddenPack : this.hiddenPacks)
         {
             if (this.rules.canInstallPack(hiddenPack.getName(), variables))
@@ -633,8 +646,8 @@ public class PacksModel extends AbstractTableModel
                 packsToInstall.add(hiddenPack);
             }
         }
-        installData.setSelectedPacks(packsToInstall);
 
+        installData.setSelectedPacks(packsToInstall);
         return packsToInstall;
     }
 
@@ -899,8 +912,35 @@ public class PacksModel extends AbstractTableModel
         }
     }
 
+    /**
+     *
+     * @param row
+     * @return {@code true} if checkbox is partially selected else {@code false}
+     */
+    public boolean isPartiallyChecked(int row)
+    {
+        return checkValues[row] == PARTIAL_SELECTED;
+    }
+
     public boolean isCheckBoxSelectable(int row)
     {
         return checkValues[row] >= 0;
+    }
+
+    public boolean dependenciesExist()
+    {
+        for (Pack pack : getVisiblePacks())
+        {
+            if (pack.hasDependencies())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Pack getPack(String packName)
+    {
+        return nameToPack.get(packName);
     }
 }

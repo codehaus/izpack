@@ -40,15 +40,12 @@ import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.installer.data.GUIInstallData;
-import com.izforge.izpack.installer.debugger.Debugger;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.installer.util.PackHelper;
 import com.izforge.izpack.installer.web.WebAccessor;
 import com.izforge.izpack.panels.imgpacks.ImgPacksPanelAutomationHelper;
 import com.izforge.izpack.panels.packs.PacksModel;
-import com.izforge.izpack.panels.packs.PacksModelGUI;
-import com.izforge.izpack.panels.packs.PacksPanelInterface;
 import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.file.FileUtils;
 
@@ -57,33 +54,30 @@ import com.izforge.izpack.util.file.FileUtils;
  *
  * @author Anthonin Bonnefoy
  */
-public class TreePacksPanel extends IzPanel implements PacksPanelInterface
+public class TreePacksPanel extends IzPanel
 {
     private static final long serialVersionUID = 5684716698930628262L;
     private static final transient Logger logger = Logger.getLogger(TreePacksPanel.class.getName());
 
-    protected JLabel spaceLabel;
+    protected JLabel requiredSpaceLabel;
     protected JLabel freeSpaceLabel;
 
     protected JTextArea descriptionArea;
     protected JTextArea dependencyArea;
 
     protected JTree packsTree;
-    protected PacksModelGUI packsModel;
+    protected PacksModel packsModel;
     protected JScrollPane tableScroller;
 
     private Messages messages;
     private static final String LANG_FILE_NAME = "packsLang.xml";
-
-    private long bytes = 0;
-    private long freeBytes = 0;
 
     private final Map<String, Pack> namesToPacks;
     private final Map<Pack, Integer> packsToRowNumbers;
     private final Map<String, List<String>> treeData;
 
     private CheckTreeController checkTreeController;
-    private HashMap<String, CheckBoxNode> idToCheckBoxNode = new HashMap<String, CheckBoxNode>();
+    private HashMap<String, CheckBoxNode> nameToCheckBox = new HashMap<String, CheckBoxNode>();
 
     /**
      * The constructor.
@@ -101,7 +95,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         super(panel, parent, installData, resources);
 
         messages = getAvailableStrings(locales);
-        packsModel = new PacksModelGUI(this, installData, rules);
+        packsModel = new PacksModel(installData);
         namesToPacks = packsModel.getNameToPack();
         packsToRowNumbers = packsModel.getPacksToRowNumbers();
         treeData = createTreeData();
@@ -111,7 +105,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     /**
      * The Implementation of this method should create the layout for the current class.
      */
-    protected void createNormalLayout()
+    private void createNormalLayout()
     {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         createLabel("PacksPanel.info", "preferences", null, null);
@@ -128,8 +122,10 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         {
             dependencyArea = createTextArea("PacksPanel.dependencyList", null, null, null);
         }
+
         descriptionArea = createTextArea("PacksPanel.description", null, null, null);
-        spaceLabel = createPanelWithLabel("PacksPanel.space", null, null);
+        requiredSpaceLabel = createPanelWithLabel("PacksPanel.space", null, null);
+
         if (IoHelper.supported("getFreeSpace"))
         {
             add(Box.createRigidArea(new Dimension(0, 3)));
@@ -149,7 +145,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      * @param constraints constraints to be used
      * @return the created label
      */
-    protected JLabel createLabel(String msgId, String iconId, GridBagLayout layout,
+    private JLabel createLabel(String msgId, String iconId, GridBagLayout layout,
                                  GridBagConstraints constraints)
     {
         JLabel label = LabelFactory.create(getString(msgId), parent.getIcons()
@@ -173,7 +169,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      * @param constraints constraints to be used
      * @return the created (right) label
      */
-    protected JLabel createPanelWithLabel(String msgId, GridBagLayout layout, GridBagConstraints constraints)
+    private JLabel createPanelWithLabel(String msgId, GridBagLayout layout, GridBagConstraints constraints)
     {
         JPanel panel = new JPanel();
         JLabel label = new JLabel();
@@ -203,7 +199,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      * @param constraints constraints to be used
      * @return the created text area
      */
-    protected JTextArea createTextArea(String msgId, JScrollPane scroller, GridBagLayout layout,
+    private JTextArea createTextArea(String msgId, JScrollPane scroller, GridBagLayout layout,
                                        GridBagConstraints constraints)
     {
         JTextArea area = new JTextArea();
@@ -238,11 +234,9 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             add(area);
         }
         return (area);
-
     }
 
     /**
-     * FIXME Creates the JTree component and calls all initialization tasks
      *
      * @param width
      * @param scroller
@@ -250,7 +244,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      * @param constraints
      * @return
      */
-    protected JTree createPacksTree(int width, JScrollPane scroller, GridBagLayout layout,
+    private JTree createPacksTree(int width, JScrollPane scroller, GridBagLayout layout,
                                     GridBagConstraints constraints)
     {
         JTree tree = new JTree(populateTreePacks(null));
@@ -278,47 +272,42 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         return (tree);
     }
 
-    @Override
     public Messages getMessages()
     {
         return messages;
     }
 
-    @Override
     public LocaleDatabase getLangpack()
     {
         return (LocaleDatabase) messages;
     }
 
-    @Override
-    public long getBytes()
+    /**
+     * Show required space necessary to install the selected packs.
+     * Update the required space label to the appropriate value.
+     */
+    private void updateRequiredSpaceLabel()
     {
-        return (bytes);
-    }
-
-    @Override
-    public void setBytes(long bytes)
-    {
-        this.bytes = bytes;
-    }
-
-    @Override
-    public void showSpaceRequired()
-    {
-        if (spaceLabel != null)
+        if (requiredSpaceLabel != null)
         {
-            spaceLabel.setText(Pack.toByteUnitsString(bytes));
+            requiredSpaceLabel.setText(Pack.toByteUnitsString(packsModel.getTotalByteSize()));
         }
     }
 
-    @Override
-    public void showFreeSpace()
+    private long getAvaiableBytes()
+    {
+        return IoHelper.getFreeSpace(IoHelper.existingParent(
+                new File(this.installData.getInstallPath())).getAbsolutePath());
+    }
+    /**
+     * Show the amount of free space available for the installation path.
+     */
+    private void showFreeSpace()
     {
         if (IoHelper.supported("getFreeSpace") && freeSpaceLabel != null)
         {
             String msg = null;
-            freeBytes = IoHelper.getFreeSpace(IoHelper.existingParent(
-                    new File(this.installData.getInstallPath())).getAbsolutePath());
+            long freeBytes = getAvaiableBytes();
             if (freeBytes < 0)
             {
                 msg = getString("PacksPanel.notAscertainable");
@@ -331,14 +320,8 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         }
     }
 
-    @Override
-    public Debugger getDebugger()
-    {
-        return null;
-    }
-
     /**
-     * Indicates wether the panel has been validated or not.
+     * Indicates whether the panel has been validated or not.
      *
      * @return true if the needed space is less than the free space, else false
      */
@@ -346,8 +329,10 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     public boolean isValidated()
     {
         packsModel.updatePacksToInstall();
-
-        if (IoHelper.supported("getFreeSpace") && freeBytes >= 0 && freeBytes <= bytes)
+        long freeBytes = getAvaiableBytes();
+        if (IoHelper.supported("getFreeSpace")
+                && freeBytes >= 0
+                && freeBytes <= packsModel.getTotalByteSize())
         {
             JOptionPane.showMessageDialog(
                 this, getString("PacksPanel.notEnoughSpace"), getString("installer.error"),
@@ -376,7 +361,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         return PackHelper.getPackName(pack, messages);
     }
 
-    public String getI18NPackName(String name)
+    private String getI18NPackName(String name)
     {
         Pack pack = namesToPacks.get(name);
         if (pack == null)
@@ -395,10 +380,9 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         CheckBoxNode root = (CheckBoxNode) model.getRoot();
 
         syncCheckboxesWithModel(root);
-        showSpaceRequired();
+        updateRequiredSpaceLabel();
         showFreeSpace();
-        setBytes(root.getTotalSize());
-        checkTreeController.initTotalSize(root, true);
+        syncPackSizes();
     }
 
     /**
@@ -437,23 +421,9 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             {
                 Integer state = (Integer) packsModel.getValueAt(childRowIndex, 0);
                 node.setEnabled(state >= 0);
-                if (state == packsModel.PARTIAL_SELECTED)
-                {
-                    node.setPartial(true);
-                }
-                else
-                {
-                    node.setPartial(false);
-                }
-                if (state == packsModel.REQUIRED_SELECTED
-                        || state == packsModel.SELECTED)
-                {
-                    node.setSelected(true);
-                }
-                else
-                {
-                    node.setSelected(false);
-                }
+
+                node.setPartial(packsModel.isPartiallyChecked(childRowIndex));
+                node.setSelected(packsModel.isChecked(childRowIndex));
             }
 
             syncCheckboxesWithModel(node);
@@ -461,7 +431,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     }
 
     /**
-     * Updates a value for pack in PacksModel with installDataGUI from a checkbox node
+     * Updates a checkbox from the PackModel.
      *
      * @param checkbox This is the checkbox node which contains model values
      */
@@ -475,12 +445,13 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
 
     /**
      * Initialize tree model structures
+     * TODO: treeData does not need to be a class variable
      */
     private Map<String, List<String>> createTreeData()
     {
         Map<String, List<String>> treeData = new HashMap<String, List<String>>();
 
-        for (Pack pack : getAvailableShowablePacks())
+        for (Pack pack : packsModel.getVisiblePacks())
         {
             if (pack.getParent() != null)
             {
@@ -506,7 +477,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      *
      * @param id
      */
-    public void setDescription(String id)
+    public void updateDescriptionArea(String id)
     {
         if (descriptionArea != null)
         {
@@ -522,7 +493,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
      *
      * @param id
      */
-    public void setDependencies(String id)
+    public void updateDependencyArea(String id)
     {
         if (dependencyArea != null)
         {
@@ -544,54 +515,42 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             }
 
             // add the list of the packs to be excluded
-            String excludeslist = (messages == null) ? "Excludes: " : messages.get("PacksPanel.excludes");
-            int numexcludes = 0;
+            String excludesList = (messages == null) ? "Excludes: " : messages.get("PacksPanel.excludes");
+            int numExcludes = 0;
             int i = getRowIndex(pack);
             if (pack.getExcludeGroup() != null)
             {
-                for (int q = 0; q < getAvailableShowablePacks().size(); q++)
+                for (int q = 0; q < packsModel.getVisiblePacks().size(); q++)
                 {
-                    Pack otherpack = getAvailableShowablePacks().get(q);
-                    String exgroup = otherpack.getExcludeGroup();
-                    if (exgroup != null)
+                    Pack otherPack = packsModel.getVisiblePacks().get(q);
+                    String exGroup = otherPack.getExcludeGroup();
+                    if (exGroup != null)
                     {
-                        if (q != i && pack.getExcludeGroup().equals(exgroup))
+                        if (q != i && pack.getExcludeGroup().equals(exGroup))
                         {
 
-                            excludeslist += getI18NPackName(otherpack) + ", ";
-                            numexcludes++;
+                            excludesList += getI18NPackName(otherPack) + ", ";
+                            numExcludes++;
                         }
                     }
                 }
             }
-            // concatenate
+
             if (dep != null)
             {
-                excludeslist = "    " + excludeslist;
+                excludesList = "    " + excludesList;
             }
-            if (numexcludes > 0)
+            if (numExcludes > 0)
             {
-                list += excludeslist;
+                list += excludesList;
             }
             if (list.endsWith(", "))
             {
                 list = list.substring(0, list.length() - 2);
             }
 
-            // and display the result
             dependencyArea.setText(list);
         }
-    }
-
-    /**
-     * Gives a CheckBoxNode instance from the id
-     *
-     * @param id
-     * @return
-     */
-    public CheckBoxNode getCbnById(String id)
-    {
-        return this.idToCheckBoxNode.get(id);
     }
 
     /**
@@ -606,7 +565,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         if (parent == null) // the root node
         {
             List<TreeNode> rootNodes = new ArrayList<TreeNode>();
-            for (Pack pack : getAvailableShowablePacks())
+            for (Pack pack : packsModel.getVisiblePacks())
             {
                 if (pack.getParent() == null)
                 {
@@ -631,7 +590,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
                 }
 
                 CheckBoxNode checkBoxNode = new CheckBoxNode(parent, translated, links.toArray(), true);
-                idToCheckBoxNode.put(checkBoxNode.getId(), checkBoxNode);
+                nameToCheckBox.put(checkBoxNode.getId(), checkBoxNode);
                 checkBoxNode.setPack(pack);
                 checkBoxNode.setTotalSize(pack.getSize());
                 return checkBoxNode;
@@ -639,7 +598,7 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             else
             {
                 CheckBoxNode checkBoxNode = new CheckBoxNode(parent, translated, true);
-                idToCheckBoxNode.put(checkBoxNode.getId(), checkBoxNode);
+                nameToCheckBox.put(checkBoxNode.getId(), checkBoxNode);
                 checkBoxNode.setPack(pack);
                 checkBoxNode.setTotalSize(pack.getSize());
                 return checkBoxNode;
@@ -655,7 +614,6 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
     public void panelActivate()
     {
         updateViewFromModel();
-
     }
 
     /*
@@ -686,11 +644,12 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
         return packsTree;
     }
 
-    private List<Pack> getAvailableShowablePacks()
-    {
-        return packsModel.getVisiblePacks();
-    }
-
+    /**
+     * Load the regular string from loaclization flies, and optioanlly load strings from LANG_FILE_NAME
+     *
+     * @param locales
+     * @return strings available for this class
+     */
     private Messages getAvailableStrings(Locales locales)
     {
         Messages messages = installData.getMessages();
@@ -729,6 +688,48 @@ public class TreePacksPanel extends IzPanel implements PacksPanelInterface
             logger.log(Level.WARNING, t.toString(), t);
         }
         return messages;
+    }
+
+    /**
+     * Synchronize the sizes of the packs based on what is/isn't selected.
+     * This mainly effects any pack that has children.
+     */
+    private void syncPackSizes()
+    {
+        CheckBoxNode node;
+        long bytes;
+
+        for (Pack pack : packsModel.getVisiblePacks())
+        {
+            bytes = pack.getSize();
+            if(pack.hasChildren())
+            {
+                for(String childPackName : pack.getChildren())
+                {
+                    Pack childPack = packsModel.getPack(childPackName);
+                    int row = packsModel.getNameToRow().get(childPackName);
+
+                    if (packsModel.isCheckBoxSelectable(row))
+                    {
+                        bytes += childPack.getSize();//SOMETHING HERE
+                    }
+                }
+            }
+
+            node = nameToCheckBox.get(pack.getName());
+
+            long old = node.getTotalSize();
+            if (old != bytes)
+            {
+                node.setTotalSizeChanged(true);
+            }
+            else
+            {
+                node.setTotalSizeChanged(false);
+            }
+
+            node.setTotalSize(bytes);
+        }
     }
 }
 
@@ -786,8 +787,8 @@ class CheckTreeController extends MouseAdapter
         // If a checkbox or the checkbox's text was clicked update any descriptions
         // Also update any dependencies and/or excludes
         CheckBoxNode selectedNode = (CheckBoxNode) path.getLastPathComponent();
-        treePacksPanel.setDescription(selectedNode.getId());
-        treePacksPanel.setDependencies(selectedNode.getId());
+        treePacksPanel.updateDescriptionArea(selectedNode.getId());
+        treePacksPanel.updateDependencyArea(selectedNode.getId());
 
         // True is the a checkbox was not clicked
         if ((mouseEvent.getX() > tree.getPathBounds(path).x + checkWidth) || selectedNode.getPack().isRequired())
@@ -796,51 +797,5 @@ class CheckTreeController extends MouseAdapter
         }
 
         return selectedNode;
-    }
-
-    /**
-     * Recursivley initialize the amount of space each pack would take.
-     *
-     * @param rootNode node to start initializing space, generally would use rootNode
-     * @param markChanged
-     * @return
-     */
-    public static long initTotalSize(CheckBoxNode rootNode, boolean markChanged)
-    {
-        if (rootNode.isLeaf())
-        {
-            return rootNode.getPack().getSize();
-        }
-
-        Enumeration<CheckBoxNode> e = rootNode.children();
-        Pack nodePack = rootNode.getPack();
-        long bytes = 0;
-        if (nodePack != null)
-        {
-            bytes = nodePack.getSize();
-        }
-        while (e.hasMoreElements())
-        {
-            CheckBoxNode checkBoxNode = e.nextElement();
-            long size = initTotalSize(checkBoxNode, markChanged);
-            if (checkBoxNode.isSelected() || checkBoxNode.isPartial())
-            {
-                bytes += size;
-            }
-        }
-        if (markChanged)
-        {
-            long old = rootNode.getTotalSize();
-            if (old != bytes)
-            {
-                rootNode.setTotalSizeChanged(true);
-            }
-            else
-            {
-                rootNode.setTotalSizeChanged(false);
-            }
-        }
-        rootNode.setTotalSize(bytes);
-        return bytes;
     }
 }

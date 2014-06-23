@@ -51,7 +51,7 @@ public class PacksModelGUI extends PacksModel
         else
         {
             super.setValueAt(aValue, rowIndex, columnIndex);
-            //updatePacksToInstall();
+            updatePacksToInstall();
             updateBytes();
             fireTableDataChanged();
             panel.showSpaceRequired();
@@ -108,18 +108,6 @@ public class PacksModelGUI extends PacksModel
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex)
     {
-        return false;
-    }
-
-    public boolean dependenciesExist()
-    {
-        for (Pack pack : getVisiblePacks())
-        {
-            if (pack.hasDependencies())
-            {
-                return true;
-            }
-        }
         return false;
     }
 }
