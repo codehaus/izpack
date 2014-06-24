@@ -63,7 +63,7 @@ public class Console
         }
         catch (IOException e)
         {
-            consoleReaderFailed =true;
+            consoleReaderFailed = true;
             logger.log(Level.SEVERE, "Cannot initialize the console reader. Default to regular input stream.");
         }
 
