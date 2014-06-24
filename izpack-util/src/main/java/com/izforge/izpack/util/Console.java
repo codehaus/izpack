@@ -22,6 +22,9 @@ public class Console
      */
     private ConsoleReader consoleReader;
 
+    /**
+     * Check if consoleReader failed to load.
+     */
     private boolean consoleReaderFailed;
 
     /**
@@ -80,7 +83,14 @@ public class Console
      */
     public String readLine() throws IOException
     {
-        return consoleReader.readLine();
+        if (consoleReaderFailed)
+        {
+            return  in.readLine();
+        }
+        else
+        {
+            return consoleReader.readLine();
+        }
     }
 
     /**
@@ -403,4 +413,8 @@ public class Console
         }
     }
 
+    public void useDefaultInput()
+    {
+        consoleReaderFailed = true;
+    }
 }
