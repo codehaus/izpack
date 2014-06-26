@@ -65,6 +65,7 @@ public class UserInputPanel extends IzPanel
     private static final String SUMMARY_KEY = "summaryKey";
     private static final String TOPBUFFER = "topBuffer";
     private static final String RIGID = "rigid";
+    private static final String DISPLAY_HIDDEN = "displayHidden";
 
     /**
      * The parsed result from reading the XML specification from the file
@@ -94,6 +95,12 @@ public class UserInputPanel extends IzPanel
      * The prompt.
      */
     private final Prompt prompt;
+
+    /**
+     * Indicate if allowed to display hidden fields.
+     * When displaying hidden fields show them on the panel but disabled.
+     */
+    private boolean isDisplayingHidden;
 
     /**
      * The delegating prompt. This is used to switch between the above prompt and a no-op prompt when performing
@@ -139,7 +146,16 @@ public class UserInputPanel extends IzPanel
         this.prompt = prompt;
         this.delegatingPrompt = new DelegatingPrompt(prompt);
 
-        spec = readSpec();
+        this.spec = readSpec();
+        try
+        {
+            this.isDisplayingHidden = Boolean.parseBoolean(spec.getAttribute(DISPLAY_HIDDEN));
+        }
+        catch (Exception ignore)
+        {
+            this.isDisplayingHidden = false;
+        }
+
 
         // Prevent activating on certain global conditions
         ElementReader reader = new ElementReader(userInputModel.getConfig());
@@ -298,18 +314,36 @@ public class UserInputPanel extends IzPanel
 
         for (GUIField view : views)
         {
+            boolean enabled = false;
+            boolean addToPanel = false;
+
             Field field = view.getField();
             if (FieldHelper.isRequired(field, installData, matcher) && field.isConditionTrue())
             {
+                enabled = true;
+                addToPanel = true;
                 view.setDisplayed(true);
-                for (Component component : view.getComponents())
-                {
-                    panel.add(component.getComponent(), component.getConstraints());
-                }
+            }
+            else if (FieldHelper.isRequired(field, installData, matcher) && isDisplayingHidden)
+            {
+                enabled = false;
+                addToPanel = true;
+                view.setDisplayed(false);
             }
             else
             {
+                enabled = false;
+                addToPanel = false;
                 view.setDisplayed(false);
+            }
+
+            if (addToPanel)
+            {
+                for (Component component : view.getComponents())
+                {
+                    component.getComponent().setEnabled(enabled);
+                    panel.add(component.getComponent(), component.getConstraints());
+                }
             }
         }
     }
