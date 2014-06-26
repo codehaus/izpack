@@ -324,7 +324,8 @@ public class UserInputPanel extends IzPanel
                 addToPanel = true;
                 view.setDisplayed(true);
             }
-            else if (FieldHelper.isRequired(field, installData, matcher) && isDisplayingHidden)
+            else if (FieldHelper.isRequired(field, installData, matcher) &&
+                    (field.getDisplayHidden() ||isDisplayingHidden ))
             {
                 enabled = false;
                 addToPanel = true;
