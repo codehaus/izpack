@@ -76,6 +76,12 @@ public class GUIRadioField extends GUIField
                 notifyUpdateListener();
             }
         };
+
+        if (getField().getDescription() != null)
+        {
+            addDescription();
+        }
+
         for (Choice choice : field.getChoices())
         {
             JRadioButton button = new JRadioButton();
