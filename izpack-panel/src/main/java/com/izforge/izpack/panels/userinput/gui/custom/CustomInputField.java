@@ -2,6 +2,8 @@ package com.izforge.izpack.panels.userinput.gui.custom;
 
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
+import com.izforge.izpack.panels.userinput.FieldCommand;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
@@ -11,8 +13,20 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
- * The CustomInputField is a JPanel that encapsulates the user defined fields that can be added and removed by a click
- * of a button.
+ * JPanel that contains the possible rows of fields defined by the user,
+ * along with control buttons to add and remove rows.
+ *
+ * GUICustomField
+ * ===============================|
+ * |CustomInputRows               |
+ * |------------------------------|
+ * |          Row 1               |
+ * |          Row 2               |
+ * |------------------------------|
+ * |ControlButtons                |
+ * |------------------------------|
+ * |            |  Add  | Remove  |
+ * |==============================|
  */
 public class CustomInputField extends JPanel implements ActionListener
 {
@@ -20,7 +34,7 @@ public class CustomInputField extends JPanel implements ActionListener
 
     private IzPanel parent;
 
-    private List<GUIField> fields;
+    private List<Field> fields;
 
     private final static String addCommand = "addComponent";
 
@@ -30,12 +44,12 @@ public class CustomInputField extends JPanel implements ActionListener
 
     private CustomInputRows rows;
 
-    public CustomInputField(List<GUIField> fields, IzPanel parent, GUIInstallData installData)
+    public CustomInputField(FieldCommand createField, List<Field> fields, IzPanel parent, GUIInstallData installData)
     {
         this.fields = fields;
         this.parent = parent;
         this.installData = installData;
-        this.rows = new CustomInputRows(fields);
+        this.rows = new CustomInputRows(createField, fields);
         this.controlPanel = initializeControlPanel();
 
         GridBagLayout gridBagLayout = new GridBagLayout();

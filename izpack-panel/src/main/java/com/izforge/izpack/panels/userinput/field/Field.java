@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,7 @@ import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClien
  *
  * @author Tim Anderson
  */
-public abstract class Field
+public abstract class Field implements Serializable
 {
 
     /**

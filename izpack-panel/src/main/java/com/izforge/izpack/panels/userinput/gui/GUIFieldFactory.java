@@ -26,8 +26,8 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
+import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.panels.userinput.field.divider.Divider;
@@ -195,11 +195,21 @@ public class GUIFieldFactory
      */
     public GUIField createCustom(CustomField customField)
     {
-        List<GUIField> fields = new ArrayList<GUIField>();
-        for (Field field : customField.getFields())
+        List<Field> fields = customField.getFields();
+
+        return new GUICustomField(customField, new createFieldCommand(), fields, installData, parent);
+    }
+
+    /**
+     * Private class to wrap the create command.
+     * This allows us to pass the create command for user later on.
+     */
+    private class createFieldCommand implements FieldCommand
+    {
+        public GUIField execute(Field field)
         {
-            fields.add(create(field));
+            return create(field);
         }
-        return new GUICustomField(customField, fields, installData, parent);
     }
 }
+

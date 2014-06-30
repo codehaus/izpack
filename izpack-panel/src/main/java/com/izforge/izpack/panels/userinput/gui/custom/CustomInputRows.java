@@ -1,26 +1,47 @@
 package com.izforge.izpack.panels.userinput.gui.custom;
 
+import com.izforge.izpack.panels.userinput.FieldCommand;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.gui.Component;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
+
+/**
+ * JPanel that contains the possible rows of fields defined by the user.
+ *
+ * GUICustomField
+ * ===============================|
+ * |CustomInputRows               |
+ * |------------------------------|
+ * |          Row 1               |
+ * |          Row 2               |
+ * |------------------------------|
+ * |ControlButtons                |
+ * |------------------------------|
+ * |            |  Add  | Remove  |
+ * |==============================|
+ */
 
 public class CustomInputRows extends JPanel
 {
-    private final List<GUIField> fields;
+    private final List<Field> fields;
+
+    private final FieldCommand createField;
 
     private int numberOfRows = 1;
 
-    public CustomInputRows(List<GUIField> fields)
+    private final int numberOfColumns;
+
+    public CustomInputRows(FieldCommand createField, List<Field> fields)
     {
-        super(new GridLayout(0, 1), true);
+        super();
         this.fields = fields;
+        this.createField = createField;
+        this.numberOfColumns = fields.size();
+        super.setLayout(new GridLayout(0, fields.size()));
         addRow();
     }
 
@@ -29,23 +50,16 @@ public class CustomInputRows extends JPanel
      */
     public void addRow()
     {
-        for (GUIField field : fields)
+        for (Field field : fields)
         {
-            for( Component component : field.getComponents())
+            GUIField guiField = createField.execute(field);
+            for( Component component : guiField.getComponents())
             {
-                try
+                JComponent jComponent = component.getComponent();
+                if (!(jComponent instanceof JLabel))
                 {
-                    JComponent jComponent = (JComponent) cloneJComponent(component.getComponent());
-                    if (!(jComponent instanceof JLabel))
-                    {
-                        this.add(jComponent);
-                    }
+                    this.add(jComponent);
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
             }
         }
 
@@ -63,45 +77,14 @@ public class CustomInputRows extends JPanel
         {
             return;
         }
-        this.remove(this.getComponentCount() - 1);
+
+        for (int colNumber = numberOfColumns; colNumber > 0; colNumber--)
+        {
+            this.remove(this.getComponentCount() - colNumber);
+        }
 
         numberOfRows--;
         revalidate();
         repaint();
-    }
-
-    /**
-     * Make a deep clone of a JComponent
-     *
-     * @param oldObj
-     * @return
-     * @throws Exception
-     */
-    static public JComponent cloneJComponent(JComponent oldObj) throws Exception
-    {
-        ObjectOutputStream objectOutputStream = null;
-        ObjectInputStream objectInputStream = null;
-
-        try
-        {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(oldObj);
-            objectOutputStream.flush();
-
-            ByteArrayInputStream byteArrayInputStream =   new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            return (JComponent) objectInputStream.readObject();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Failed to clone JComponent" + e);
-            throw (e);
-        }
-        finally
-        {
-            objectOutputStream.close();
-            objectInputStream.close();
-        }
     }
 }
