@@ -7,6 +7,7 @@ import com.izforge.izpack.panels.userinput.field.custom.CustomField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 public class GUICustomField extends GUIField
@@ -14,12 +15,6 @@ public class GUICustomField extends GUIField
     public GUICustomField(CustomField customField, List<GUIField> fields,  GUIInstallData installData, IzPanel parent)
     {
         super(customField);
-        addComponent(new JTextField("Test Me"), new TwoColumnConstraints(TwoColumnConstraints.BOTH));
-        init();
-    }
-
-    public void init()
-    {
-
+        addComponent(new CustomInputField(fields, parent, installData), new TwoColumnConstraints(TwoColumnConstraints.BOTH));
     }
 }

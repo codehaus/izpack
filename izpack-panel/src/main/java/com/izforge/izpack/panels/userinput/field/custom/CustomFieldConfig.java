@@ -12,5 +12,8 @@ public interface CustomFieldConfig extends FieldConfig
      */
     List<Column> getColumns();
 
+    /**
+     * @return list of fields
+     */
     List<Field> getFields();
 }
