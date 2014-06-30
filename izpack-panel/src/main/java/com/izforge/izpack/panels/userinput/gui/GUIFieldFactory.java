@@ -27,9 +27,11 @@ import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.panels.userinput.field.divider.Divider;
+import com.izforge.izpack.panels.userinput.field.custom.CustomField;
 import com.izforge.izpack.panels.userinput.field.file.DirField;
 import com.izforge.izpack.panels.userinput.field.file.FileField;
 import com.izforge.izpack.panels.userinput.field.file.MultipleFileField;
@@ -43,6 +45,7 @@ import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.field.title.TitleField;
 import com.izforge.izpack.panels.userinput.gui.check.GUICheckField;
 import com.izforge.izpack.panels.userinput.gui.combo.GUIComboField;
+import com.izforge.izpack.panels.userinput.gui.custom.GUICustomField;
 import com.izforge.izpack.panels.userinput.gui.divider.GUIDivider;
 import com.izforge.izpack.panels.userinput.gui.file.GUIDirField;
 import com.izforge.izpack.panels.userinput.gui.file.GUIFileField;
@@ -55,6 +58,9 @@ import com.izforge.izpack.panels.userinput.gui.space.GUISpacer;
 import com.izforge.izpack.panels.userinput.gui.statictext.GUIStaticText;
 import com.izforge.izpack.panels.userinput.gui.text.GUITextField;
 import com.izforge.izpack.panels.userinput.gui.title.GUITitleField;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -168,10 +174,32 @@ public class GUIFieldFactory
         {
             result = new GUIMultipleFileField((MultipleFileField) field, installData, frame);
         }
+        else if (field instanceof CustomField)
+        {
+            result = createCustom((CustomField) field);
+        }
         else
         {
             throw new IzPackException("Unsupported field type: " + field.getClass().getName());
         }
         return result;
+    }
+
+    /**
+     * Creates a view to display the supplied field.
+     * This field is a container for fields to be placed in columns.
+     *
+     * @param customField field of type CustomField
+     * @return the view to display the field
+     * @throws IzPackException if the view cannot be created
+     */
+    public GUIField createCustom(CustomField customField)
+    {
+        List<GUIField> fields = new ArrayList<GUIField>();
+        for (Field field : customField.getFields())
+        {
+            fields.add(create(field));
+        }
+        return new GUICustomField(customField, fields, installData, parent);
     }
 }
