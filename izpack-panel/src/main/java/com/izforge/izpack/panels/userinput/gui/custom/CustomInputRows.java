@@ -47,14 +47,24 @@ public class CustomInputRows extends JPanel
 
     private Map<Integer, List<GUIField>> guiFields;
 
+    private final CustomField customInfoField;
+
+    private final int maxRow;
+
+    private final int minRow;
+
     public CustomInputRows(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
     {
         super();
         this.spec = spec;
         this.userInputPanelSpec = userInputPanelSpec;
         this.createField = createField;
-        this.numberOfColumns = getNumberOfColumns(userInputPanelSpec, spec);
+        this.customInfoField = createCustomField(userInputPanelSpec, spec);
+        this.numberOfColumns = getNumberOfColumns(customInfoField);
+        this.maxRow = getMaxRow(customInfoField);
+        this.minRow = getMinRow(customInfoField);
         this.guiFields = new HashMap<Integer, List<GUIField>>();
+
         super.setLayout(new GridLayout(0, numberOfColumns));
         addRow(true);
     }
@@ -116,20 +126,26 @@ public class CustomInputRows extends JPanel
      */
     public void removeRow()
     {
-        if (numberOfRows <= 1)
-        {
-            return;
-        }
-
         for (int colNumber = numberOfColumns; colNumber > 0; colNumber--)
         {
             this.remove(this.getComponentCount() - colNumber);
         }
-        guiFields.remove(numberOfRows);
 
+        guiFields.remove(numberOfRows);
         numberOfRows--;
+
         revalidate();
         repaint();
+    }
+
+    public boolean atMax()
+    {
+        return (numberOfRows < maxRow);
+    }
+
+    public boolean atMin()
+    {
+        return (numberOfRows > minRow);
     }
 
     /**
@@ -160,21 +176,12 @@ public class CustomInputRows extends JPanel
     /**
      * Find the number of columns required for this custom field
      *
-     * @param userInputPanelSpec
-     * @param spec
+     * @param customInfoField
      * @return
      */
-    public int getNumberOfColumns(UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
+    public int getNumberOfColumns(CustomField customInfoField)
     {
-       List<Field> fields = userInputPanelSpec.createFields(spec);
-       for (Field field : fields)
-       {
-           if (field instanceof CustomField)
-           {
-               return ((CustomField) field).getFields().size();
-           }
-       }
-       return 0;
+       return customInfoField.getFields().size();
     }
 
     /**
@@ -206,5 +213,25 @@ public class CustomInputRows extends JPanel
         }
 
         return header;
+    }
+
+    /**
+     * Get the minimum amount of rows that must be displayed
+     * @param customFieldInfo
+     * @return
+     */
+    private int getMinRow(CustomField customFieldInfo)
+    {
+        return customFieldInfo.getMinRow();
+    }
+
+    /**
+     * Get the maximum amount of rows that can be displayed
+     * @param customFieldInfo
+     * @return
+     */
+    private int getMaxRow(CustomField customFieldInfo)
+    {
+        return customFieldInfo.getMaxRow();
     }
 }

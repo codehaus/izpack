@@ -65,6 +65,7 @@ public class CustomInputField extends JPanel implements ActionListener
         
         this.setLayout(gridBagLayout);
         this.addComponents(rows, controlPanel);
+        updatePanel();
     }
 
     /**
@@ -131,27 +132,30 @@ public class CustomInputField extends JPanel implements ActionListener
     @Override
     public void actionPerformed(ActionEvent actionEvent)
     {
-        boolean update = false;
         String actionCommand = actionEvent.getActionCommand();
 
         if (actionCommand.equals(addCommand))
         {
             rows.addRow();
-            update = true;
         }
         else if (actionCommand.equals(removeCommand))
         {
             rows.removeRow();
-            update = true;
         }
 
-        if (update)
-        {
-            revalidate();
-            repaint();
-        }
+        updatePanel();
     }
 
+    /**
+     * Update the panel view.
+     */
+    private void updatePanel()
+    {
+        controlPanel.getComponent(0).setEnabled(rows.atMax());
+        controlPanel.getComponent(1).setEnabled(rows.atMin());
+        revalidate();
+        repaint();
+    }
     public boolean updateField(Prompt prompt)
     {
         return rows.updateField(prompt);

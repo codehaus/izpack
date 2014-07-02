@@ -74,4 +74,32 @@ public class CustomFieldReader extends FieldReader implements CustomFieldConfig
         }
         return  result;
     }
+
+    @Override
+    public int getMinRow()
+    {
+        String minRowString = getConfig().getAttribute(getField(), "minRow", true);
+        try
+        {
+            return Integer.parseInt(minRowString);
+        }
+        catch (Exception e)
+        {
+            return 1;
+        }
+    }
+
+    @Override
+    public int getMaxRow()
+    {
+        String maxRowString = getConfig().getAttribute(getField(), "maxRow", true);
+        try
+        {
+            return Integer.parseInt(maxRowString);
+        }
+        catch (Exception e)
+        {
+            return 5;
+        }
+    }
 }

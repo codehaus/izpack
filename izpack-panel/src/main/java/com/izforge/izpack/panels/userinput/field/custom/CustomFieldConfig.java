@@ -16,4 +16,17 @@ public interface CustomFieldConfig extends FieldConfig
      * @return list of fields
      */
     List<Field> getFields();
+
+    /**
+     * Get the minimum amount of rows to show
+     * @return
+     */
+    int getMinRow();
+
+    /**
+     * Get the maximum amount of rows to show
+     *
+     * @return
+     */
+    int getMaxRow();
 }
