@@ -88,7 +88,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      * Constructs an {@code AbstractPanels}.
      *
      * @param panels    the panels
-     * @param variables the variables. These are refreshed prior to each panel switch
+     * @param installData 
      */
     public AbstractPanels(List<T> panels, InstallData installData)
     {

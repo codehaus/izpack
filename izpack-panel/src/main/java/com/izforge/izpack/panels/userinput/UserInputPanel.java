@@ -148,6 +148,13 @@ public class UserInputPanel extends IzPanel
         {
             rules.addPanelCondition(panel, globalConstraint);
         }
+
+        this.init();
+        buildUI();
+        addScrollPane();
+        Dimension size = getMaximumSize();
+        setSize(size.width, size.height);
+        validate();
     }
 
     /**
@@ -168,8 +175,6 @@ public class UserInputPanel extends IzPanel
     @Override
     public void panelActivate()
     {
-        this.init();
-
         if (spec == null)
         {
             // TODO: translate
@@ -181,11 +186,6 @@ public class UserInputPanel extends IzPanel
         {
             // update UI with current values of associated variables
             updateUIElements();
-            buildUI();
-            addScrollPane();
-            Dimension size = getMaximumSize();
-            setSize(size.width, size.height);
-            validate();
         }
         // Focus the first panel component according to the default traversal
         // policy avoiding forcing the user to click into that field first

@@ -12,7 +12,9 @@ import com.izforge.izpack.panels.userinput.gui.GUIField;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JPanel that contains the possible rows of fields defined by the user.
@@ -38,11 +40,11 @@ public class CustomInputRows extends JPanel
 
     private final FieldCommand createField;
 
-    private int numberOfRows = 0;
+    private static int numberOfRows = 0;
 
     private final int numberOfColumns;
 
-    private List<GUIField> guiFields;
+    private Map<Integer, List<GUIField>> guiFields;
 
     public CustomInputRows(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
     {
@@ -51,7 +53,7 @@ public class CustomInputRows extends JPanel
         this.userInputPanelSpec = userInputPanelSpec;
         this.createField = createField;
         this.numberOfColumns = getNumberOfColumns(userInputPanelSpec, spec);
-        this.guiFields = new ArrayList<GUIField>();
+        this.guiFields = new HashMap<Integer, List<GUIField>>();
         super.setLayout(new GridLayout(0, numberOfColumns));
         addRow();
     }
@@ -62,20 +64,33 @@ public class CustomInputRows extends JPanel
     public void addRow()
     {
         numberOfRows++;
+        List<GUIField> fields;
 
-        for (Field field : createCustomField(userInputPanelSpec, spec).getFields())
+        if (guiFields.size() >= numberOfRows)
         {
+            fields = guiFields.get(numberOfRows);
+        }
+        else
+        {
+            fields = new ArrayList<GUIField>();
+            for (Field field : createCustomField(userInputPanelSpec, spec).getFields())
+            {
 
-            GUIField guiField = createField.execute(field);
+                GUIField guiField = createField.execute(field);
+                guiField.setVariable(guiField.getVariable() + "." + numberOfRows);
+                fields.add(guiField);
+            }
+            guiFields.put(numberOfRows, fields);
+        }
+
+        for (GUIField field : fields)
+        {
             //TODO: Check for the always display option to show as disabled
             //TODO: Check for condition
             //if (guiField.getField().isConditionTrue())
+            field.setDisplayed(true);
 
-            guiField.setDisplayed(true);
-            guiField.setVariable(guiField.getVariable() + "." + numberOfRows);
-            guiFields.add(guiField);
-
-            for (Component component : guiField.getComponents())
+            for (Component component : field.getComponents())
             {
                 JComponent jComponent = component.getComponent();
                 Object jConstraints = component.getConstraints();
@@ -84,7 +99,6 @@ public class CustomInputRows extends JPanel
                     this.add(jComponent, jConstraints);
                 }
             }
-
         }
 
         revalidate();
@@ -105,7 +119,7 @@ public class CustomInputRows extends JPanel
         {
             this.remove(this.getComponentCount() - colNumber);
         }
-        guiFields.remove(guiFields.size() -1);
+        guiFields.remove(numberOfRows);
 
         numberOfRows--;
         revalidate();
@@ -120,16 +134,18 @@ public class CustomInputRows extends JPanel
     public boolean updateField(Prompt prompt)
     {
         boolean valid = true;
-        for (GUIField guiField : guiFields)
-        {
-            if (guiField.isDisplayed())
-            {
-                System.out.println("VARAIBLE IS: " + guiField.getVariable());
-                if (!guiField.updateField(prompt))
-                {
-                    valid = false;
-                }
 
+        for (int i = 1; i <= numberOfRows; i++)
+        {
+            for(GUIField guiField :  guiFields.get(i))
+            {
+                if (guiField.isDisplayed())
+                {
+                    if (!guiField.updateField(prompt))
+                    {
+                        valid = false;
+                    }
+                }
             }
         }
         return valid;
