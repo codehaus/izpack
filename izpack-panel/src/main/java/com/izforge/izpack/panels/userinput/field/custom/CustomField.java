@@ -28,4 +28,9 @@ public class CustomField extends Field
     {
         return fields;
     }
+
+    public List<Column> getColumns()
+    {
+        return columns;
+    }
 }

@@ -45,6 +45,8 @@ public class CustomInputField extends JPanel implements ActionListener
 
     private JPanel controlPanel;
 
+    private JPanel header;
+
     private CustomInputRows rows;
 
     public CustomInputField(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, IzPanel parent, GUIInstallData installData)
@@ -53,6 +55,7 @@ public class CustomInputField extends JPanel implements ActionListener
         this.parent = parent;
         this.installData = installData;
         this.rows = new CustomInputRows(createField, userInputPanelSpec, spec);
+        this.header = rows.getHeader();
         this.controlPanel = initializeControlPanel();
 
         GridBagLayout gridBagLayout = new GridBagLayout();
@@ -72,11 +75,19 @@ public class CustomInputField extends JPanel implements ActionListener
      */
     public void addComponents(JPanel rows, JPanel controlPanel)
     {
+        GridBagConstraints headerConstraints = new GridBagConstraints();
+        headerConstraints.fill = GridBagConstraints.BOTH;
+        headerConstraints.anchor = GridBagConstraints.CENTER;
+        headerConstraints.gridx = 0;
+        headerConstraints.gridy = 0;
+
+        add(header, headerConstraints);
+
         GridBagConstraints rowConstraints = new GridBagConstraints();
         rowConstraints.fill = GridBagConstraints.BOTH;
         rowConstraints.anchor = GridBagConstraints.CENTER;
         rowConstraints.gridx = 0;
-        rowConstraints.gridy = 0;
+        rowConstraints.gridy = 1;
 
         add(rows, rowConstraints);
 
@@ -84,7 +95,7 @@ public class CustomInputField extends JPanel implements ActionListener
         controlPanelConstraints.fill = GridBagConstraints.NONE;
         controlPanelConstraints.anchor = GridBagConstraints.EAST;
         controlPanelConstraints.gridx = 0;
-        controlPanelConstraints.gridy = 1;
+        controlPanelConstraints.gridy = 2;
 
         add(controlPanel, controlPanelConstraints);
     }

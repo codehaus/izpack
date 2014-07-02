@@ -5,6 +5,7 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
+import com.izforge.izpack.panels.userinput.field.custom.Column;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
 import com.izforge.izpack.panels.userinput.gui.Component;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
@@ -55,13 +56,13 @@ public class CustomInputRows extends JPanel
         this.numberOfColumns = getNumberOfColumns(userInputPanelSpec, spec);
         this.guiFields = new HashMap<Integer, List<GUIField>>();
         super.setLayout(new GridLayout(0, numberOfColumns));
-        addRow();
+        addRow(true);
     }
 
     /**
      * Add an additional row of fields defined by the user.
      */
-    public void addRow()
+    public void addRow(boolean first)
     {
         numberOfRows++;
         List<GUIField> fields;
@@ -89,11 +90,11 @@ public class CustomInputRows extends JPanel
             //TODO: Check for condition
             //if (guiField.getField().isConditionTrue())
             field.setDisplayed(true);
-
             for (Component component : field.getComponents())
             {
                 JComponent jComponent = component.getComponent();
                 Object jConstraints = component.getConstraints();
+
                 if (!(jComponent instanceof JLabel))
                 {
                     this.add(jComponent, jConstraints);
@@ -104,6 +105,11 @@ public class CustomInputRows extends JPanel
         revalidate();
         repaint();
     }
+    public void addRow()
+    {
+        addRow(false);
+    }
+
 
     /**
      * Remove last added row of fields defined by the user.
@@ -186,5 +192,19 @@ public class CustomInputRows extends JPanel
             }
         }
         return  null;
+    }
+
+    public JPanel getHeader()
+    {
+        JPanel header = new JPanel(new GridLayout(1, numberOfColumns));
+
+        List<Column> columns = createCustomField(userInputPanelSpec, spec).getColumns();
+        for (Column column : columns)
+        {
+            JLabel label = new JLabel(column.getId());
+            header.add(label);
+        }
+
+        return header;
     }
 }
