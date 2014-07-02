@@ -1,9 +1,12 @@
 package com.izforge.izpack.panels.userinput.gui.custom;
 
+import com.izforge.izpack.api.adaptator.IXMLElement;
+import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
@@ -44,12 +47,12 @@ public class CustomInputField extends JPanel implements ActionListener
 
     private CustomInputRows rows;
 
-    public CustomInputField(FieldCommand createField, List<Field> fields, IzPanel parent, GUIInstallData installData)
+    public CustomInputField(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, IzPanel parent, GUIInstallData installData)
     {
         this.fields = fields;
         this.parent = parent;
         this.installData = installData;
-        this.rows = new CustomInputRows(createField, fields);
+        this.rows = new CustomInputRows(createField, userInputPanelSpec, spec);
         this.controlPanel = initializeControlPanel();
 
         GridBagLayout gridBagLayout = new GridBagLayout();
@@ -136,6 +139,11 @@ public class CustomInputField extends JPanel implements ActionListener
             revalidate();
             repaint();
         }
+    }
+
+    public boolean updateField(Prompt prompt)
+    {
+        return rows.updateField(prompt);
     }
 }
 

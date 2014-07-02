@@ -257,7 +257,7 @@ public class UserInputPanel extends IzPanel
         List<Field> fields = userInputModel.createFields(spec);
         for (Field field : fields)
         {
-            GUIField view = viewFactory.create(field);
+            GUIField view = viewFactory.create(field, userInputModel, spec);
             view.setUpdateListener(listener);
             views.add(view);
         }

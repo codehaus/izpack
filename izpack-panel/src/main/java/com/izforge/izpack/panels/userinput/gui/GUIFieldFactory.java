@@ -21,6 +21,7 @@
 
 package com.izforge.izpack.panels.userinput.gui;
 
+import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.installer.data.GUIInstallData;
@@ -28,6 +29,7 @@ import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
+import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.check.CheckField;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.panels.userinput.field.divider.Divider;
@@ -115,7 +117,7 @@ public class GUIFieldFactory
      * @return the view to display the field
      * @throws IzPackException if the view cannot be created
      */
-    public GUIField create(Field field)
+    public GUIField create(Field field, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
     {
         GUIField result;
         if (field instanceof RuleField)
@@ -176,7 +178,7 @@ public class GUIFieldFactory
         }
         else if (field instanceof CustomField)
         {
-            result = createCustom((CustomField) field);
+            result = createCustom((CustomField) field, userInputPanelSpec, spec);
         }
         else
         {
@@ -193,11 +195,11 @@ public class GUIFieldFactory
      * @return the view to display the field
      * @throws IzPackException if the view cannot be created
      */
-    public GUIField createCustom(CustomField customField)
+    public GUIField createCustom(CustomField customField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
     {
         List<Field> fields = customField.getFields();
-
-        return new GUICustomField(customField, new createFieldCommand(), fields, installData, parent);
+        FieldCommand fieldCommand = new createFieldCommand(userInputPanelSpec, spec);
+        return new GUICustomField(customField, fieldCommand, userInputPanelSpec, spec, installData, parent);
     }
 
     /**
@@ -206,9 +208,16 @@ public class GUIFieldFactory
      */
     private class createFieldCommand implements FieldCommand
     {
+        private final UserInputPanelSpec userInputPanelSpec;
+        private final IXMLElement spec;
+        public createFieldCommand(UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
+        {
+            this.userInputPanelSpec = userInputPanelSpec;
+            this.spec = spec;
+        }
         public GUIField execute(Field field)
         {
-            return create(field);
+            return create(field, userInputPanelSpec, spec);
         }
     }
 }

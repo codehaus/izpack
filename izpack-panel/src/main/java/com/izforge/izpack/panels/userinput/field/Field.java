@@ -41,13 +41,13 @@ import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClien
  *
  * @author Tim Anderson
  */
-public abstract class Field implements Serializable
+public abstract class Field
 {
 
     /**
      * The variable. May be {@code null}.
      */
-    private final String variable;
+    private String variable;
 
     /**
      * The variable. May be {@code null}.
@@ -105,6 +105,10 @@ public abstract class Field implements Serializable
     private final InstallData installData;
 
     /**
+     * Field configuration
+     */
+    private final FieldConfig config;
+    /**
      * The logger.
      */
     private static final Logger logger = Logger.getLogger(Field.class.getName());
@@ -118,6 +122,7 @@ public abstract class Field implements Serializable
      */
     public Field(FieldConfig config, InstallData installData)
     {
+        this.config = config;
         variable = config.getVariable();
         summaryKey = config.getSummaryKey();
         set = config.getDefaultValue();
@@ -434,4 +439,10 @@ public abstract class Field implements Serializable
         }
     }
 
+    //TODO: Scary thought to have variable not final
+    //TODO: Need to check that variable doesn't already exist
+    public void setVariable(String newVariableName)
+    {
+        this.variable = newVariableName;
+    }
 }
