@@ -451,6 +451,7 @@ public class DefaultNavigator implements Navigator
         switchPanel = true;
         configureNext = true;
         configurePrevious = true;
+        ButtonFactory.clearPanelButtonMnemonics();
     }
 
     /**
