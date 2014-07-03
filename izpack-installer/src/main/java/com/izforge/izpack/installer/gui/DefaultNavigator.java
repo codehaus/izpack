@@ -21,22 +21,17 @@
 package com.izforge.izpack.installer.gui;
 
 
-import static com.izforge.izpack.api.GuiId.BUTTON_NEXT;
-import static com.izforge.izpack.api.GuiId.BUTTON_PREV;
-import static com.izforge.izpack.api.GuiId.BUTTON_QUIT;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
-
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.panel.Panels;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import static com.izforge.izpack.api.GuiId.*;
 
 /**
  * Default implementation of {@link Navigator}.
@@ -114,7 +109,17 @@ public class DefaultNavigator implements Navigator
                                           installData.buttonsHColor);
         quit.setName(BUTTON_QUIT.id);
         quit.addActionListener(navHandler);
+
+        reserveNavigatorButtonMnemonics();
         configureVisibility();
+    }
+
+    /**
+     * Call to reserve mnemonics for the buttons used by the navigator.
+     */
+    private void reserveNavigatorButtonMnemonics() {
+        String [] buttonTexts = { "installer.quit", "installer.next", "installer.prev" };
+        ButtonFactory.reserveNavigatorMnemonics(buttonTexts);
     }
 
     protected void updateButtonText(Messages messages) {
