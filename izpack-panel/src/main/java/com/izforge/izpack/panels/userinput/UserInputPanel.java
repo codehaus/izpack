@@ -192,6 +192,7 @@ public class UserInputPanel extends IzPanel
         {
             //Here just to update dynamic variables
             updateUIElements();
+            buildUI();
         }
         // Focus the first panel component according to the default traversal
         // policy avoiding forcing the user to click into that field first
