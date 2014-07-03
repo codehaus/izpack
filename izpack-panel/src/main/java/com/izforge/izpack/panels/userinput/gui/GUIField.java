@@ -170,10 +170,12 @@ public abstract class GUIField extends AbstractFieldView
      */
     protected void addTooltip()
     {
-        String tooltip = getInstallData().getMessages().get(getField().getTooltip());
+        String tooltipId = getField().getTooltip();
 
-        if (tooltip != null)
+        if (tooltipId != null)
         {
+            String tooltip = getInstallData().getMessages().get(tooltipId);
+
             for (Component component : components)
             {
                 component.getComponent().setToolTipText(tooltip);
