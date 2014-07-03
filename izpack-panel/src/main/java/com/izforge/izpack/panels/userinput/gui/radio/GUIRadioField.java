@@ -21,20 +21,18 @@
 
 package com.izforge.izpack.panels.userinput.gui.radio;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
-
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.radio.RadioField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -101,6 +99,7 @@ public class GUIRadioField extends GUIField
             choices.add(new RadioChoiceView(choice, button));
             addComponent(button, constraints);
         }
+        addTooltip();
     }
 
     /**

@@ -21,12 +21,12 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Field reader.
@@ -70,6 +70,10 @@ public class FieldReader extends ElementReader implements FieldConfig
      */
     private static final String VALIDATOR = "validator";
 
+    /**
+     * The tooltip attribute name.
+     */
+    private static final String TOOLTIP = "tooltip";
 
     /**
      * Constructs a {@code FieldReader}.
@@ -223,6 +227,16 @@ public class FieldReader extends ElementReader implements FieldConfig
     public String getDescription()
     {
         return getText(field.getFirstChildNamed("description"));
+    }
+
+    /**
+     * Returns the field's tooltip.
+     *
+     * @return the field tooltip. May be @{code null}
+     */
+    @Override
+    public String getTooltip() {
+        return getConfig().getAttribute(field, TOOLTIP, true);
     }
 
     /**

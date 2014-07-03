@@ -21,15 +21,6 @@
 
 package com.izforge.izpack.panels.userinput.gui;
 
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
@@ -37,6 +28,11 @@ import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.panels.userinput.field.AbstractFieldView;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.util.HyperlinkHandler;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -167,6 +163,22 @@ public abstract class GUIField extends AbstractFieldView
     protected void addComponent(JComponent component, Object constraints)
     {
         components.add(new Component(component, constraints));
+    }
+
+    /**
+     * Adds the tooltip to each component in this view.
+     */
+    protected void addTooltip()
+    {
+        String tooltip = getInstallData().getMessages().get(getField().getTooltip());
+
+        if (tooltip != null)
+        {
+            for (Component component : components)
+            {
+                component.getComponent().setToolTipText(tooltip);
+            }
+        }
     }
 
     /**

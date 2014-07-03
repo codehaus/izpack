@@ -21,13 +21,13 @@
 
 package com.izforge.izpack.panels.userinput.gui.rule;
 
-import javax.swing.JTextField;
-
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.rule.RuleField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
+
+import javax.swing.*;
 
 
 /**
@@ -62,6 +62,7 @@ public class GUIRuleField extends GUIField
         }
 
         addField(component);
+        addTooltip();
     }
 
     /**
