@@ -980,7 +980,7 @@ public class InstallerFrame extends JFrame implements InstallerView
     class HelpHandler implements ActionListener
     {
 
-        /**
+        /**Button
          * Actions handler.
          *
          * @param e The event.
