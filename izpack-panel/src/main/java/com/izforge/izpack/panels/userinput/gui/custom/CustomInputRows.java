@@ -2,6 +2,7 @@ package com.izforge.izpack.panels.userinput.gui.custom;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.handler.Prompt;
+import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
@@ -53,7 +54,13 @@ public class CustomInputRows extends JPanel
 
     private final int minRow;
 
-    public CustomInputRows(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
+    private final List<String> labels;
+
+    private final List<String> variables;
+
+    private GUIInstallData installData;
+
+    public CustomInputRows(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, GUIInstallData installData)
     {
         super();
         this.spec = spec;
@@ -63,7 +70,10 @@ public class CustomInputRows extends JPanel
         this.numberOfColumns = getNumberOfColumns(customInfoField);
         this.maxRow = getMaxRow(customInfoField);
         this.minRow = getMinRow(customInfoField);
+        this.labels = getLabels(customInfoField);
+        this.variables = getVariables(customInfoField);
         this.guiFields = new HashMap<Integer, List<GUIField>>();
+        this.installData = installData;
 
         super.setLayout(new GridLayout(0, numberOfColumns));
         addRow(true);
@@ -156,7 +166,7 @@ public class CustomInputRows extends JPanel
     public boolean updateField(Prompt prompt)
     {
         boolean valid = true;
-
+        installData.setVariable(customInfoField.getVariable(), numberOfRows+"");
         for (int i = 1; i <= numberOfRows; i++)
         {
             for(GUIField guiField :  guiFields.get(i))
@@ -171,6 +181,46 @@ public class CustomInputRows extends JPanel
             }
         }
         return valid;
+    }
+
+    /**
+     * Retrive a list of labels
+     * @param customInfoField
+     * @return
+     */
+    public List<String> getLabels(CustomField customInfoField)
+    {
+        List<String> labels = new ArrayList<String>();
+        for (Field field : customInfoField.getFields())
+        {
+            GUIField guiField = createField.execute(field);
+            labels.add(guiField.getSummaryKey());
+        }
+        return  labels;
+    }
+    public List<String> getLabels()
+    {
+        return this.labels;
+    }
+
+    /**
+     * Retrive a list of variables
+     * @param customInfoField
+     * @return
+     */
+    public List<String> getVariables(CustomField customInfoField)
+    {
+        List<String> variables = new ArrayList<String>();
+        for (Field field : customInfoField.getFields())
+        {
+            GUIField guiField = createField.execute(field);
+            variables.add(guiField.getVariable());
+        }
+        return  variables;
+    }
+    public List<String> getVariables()
+    {
+        return this.variables;
     }
 
     /**

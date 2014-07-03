@@ -41,6 +41,16 @@ public class GUICustomField extends GUIField
         addComponent(customInputField, new TwoColumnConstraints(TwoColumnConstraints.BOTH));
     }
 
+    public List<String> getLabels()
+    {
+        return customInputField.getLabels();
+    }
+
+    public List<String> getVariables()
+    {
+        return customInputField.getVariables();
+    }
+
     @Override
     public boolean updateField(Prompt prompt)
     {

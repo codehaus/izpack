@@ -51,10 +51,9 @@ public class CustomInputField extends JPanel implements ActionListener
 
     public CustomInputField(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, IzPanel parent, GUIInstallData installData)
     {
-        this.fields = fields;
         this.parent = parent;
         this.installData = installData;
-        this.rows = new CustomInputRows(createField, userInputPanelSpec, spec);
+        this.rows = new CustomInputRows(createField, userInputPanelSpec, spec, installData);
         this.header = rows.getHeader();
         this.controlPanel = initializeControlPanel();
 
@@ -156,9 +155,20 @@ public class CustomInputField extends JPanel implements ActionListener
         revalidate();
         repaint();
     }
+
     public boolean updateField(Prompt prompt)
     {
         return rows.updateField(prompt);
+    }
+
+    public List<String> getLabels()
+    {
+        return rows.getLabels();
+    }
+
+    public List<String> getVariables()
+    {
+        return rows.getVariables();
     }
 }
 

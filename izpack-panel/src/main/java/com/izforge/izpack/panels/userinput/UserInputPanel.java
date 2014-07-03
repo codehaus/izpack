@@ -53,7 +53,9 @@ import com.izforge.izpack.panels.userinput.gui.Component;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 import com.izforge.izpack.panels.userinput.gui.GUIFieldFactory;
 import com.izforge.izpack.panels.userinput.gui.UpdateListener;
+import com.izforge.izpack.panels.userinput.gui.custom.GUICustomField;
 import com.izforge.izpack.util.PlatformModelMatcher;
+import org.apache.tools.ant.util.StringUtils;
 
 /**
  * User input panel.
@@ -463,6 +465,11 @@ public class UserInputPanel extends IzPanel
         }
         return installData.getMessages().get(associatedLabel);
     }
+
+    /**
+     * Summarize all the visible views in the panel.
+     * @return
+     */
     @Override
     public String getSummaryBody()
     {
@@ -473,26 +480,97 @@ public class UserInputPanel extends IzPanel
         else
         {
             StringBuilder entries = new StringBuilder();
-            String  associatedVariable, associatedLabel, key, value;
 
             for (GUIField view : views)
             {
                 if (view.isDisplayed() && view.getVariable() != null)
                 {
-                    associatedVariable = view.getVariable();
-                    associatedLabel = view.getSummaryKey();
-
-                    if (associatedLabel != null)
+                    if (view instanceof GUICustomField)
                     {
-                        key = installData.getMessages().get(associatedLabel);
-                        value = installData.getVariable(associatedVariable);
-                        entries.append(key + " " + value+ "<br>");
+                        entries.append(getCustomSummary((GUICustomField) view));
                     }
-
+                    else
+                    {
+                        entries.append(getViewSummary(view));
+                    }
                 }
 
             }
             return entries.toString();
         }
+    }
+
+    /**
+     * Extract summary information from regular fields
+     *
+     * @param view
+     * @return summary information for a field
+     */
+    private String getViewSummary(GUIField view)
+    {
+        String  associatedVariable, associatedLabel, key, value;
+        associatedVariable = view.getVariable();
+        associatedLabel = view.getSummaryKey();
+
+        if (associatedLabel != null)
+        {
+            key = installData.getMessages().get(associatedLabel);
+            value = installData.getVariable(associatedVariable);
+            return (key + " " + value + "<br>");
+        }
+        return "";
+    }
+
+    /**
+     * Extract summary information from custom fields.
+     *
+     * @param customField
+     * @return summary information for a custom field
+     */
+    private String getCustomSummary(GUICustomField customField)
+    {
+        String associatedVariable = customField.getVariable();
+
+        int count = Integer.parseInt(installData.getVariable(associatedVariable));
+        List<String> variables = customField.getVariables();
+        List<String> labels = customField.getLabels();
+
+        String tab = "";
+        String entry = "";
+        String key = "";
+        String value = "";
+
+        for(int i=1; i<=count; i++)
+        {
+            boolean first = true;
+            for (int j=0; j<labels.size(); j++)
+            {
+                if(j != 0)
+                {
+                    tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                }
+                else
+                {
+                    tab = "";
+                }
+
+                key = installData.getMessages().get(installData.getMessages().get(labels.get(j)));
+                value = installData.getVariable(variables.get(j) + "." + i);
+
+                if (key != null)
+                {
+                    if (first)
+                    {
+                        entry += String.format("%1$-3s", i + ". ");
+                        first = false;
+                    }
+                    entry += String.format(tab + key);
+                    entry += String.format(" " + value);
+                    entry += "<br>";
+                }
+            }
+        }
+
+        return entry;
     }
 }
