@@ -21,17 +21,16 @@
 
 package com.izforge.izpack.panels.userinput.gui.text;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 
 /**
@@ -65,6 +64,7 @@ public class GUITextField extends GUIField implements FocusListener, DocumentLis
         text.getDocument().addDocumentListener(this);
         text.addFocusListener(this);
         addField(text);
+        addTooltip();
     }
 
     /**

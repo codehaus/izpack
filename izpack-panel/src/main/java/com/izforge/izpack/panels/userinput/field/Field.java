@@ -21,19 +21,19 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
 import com.izforge.izpack.api.rules.RulesEngine;
 import com.izforge.izpack.core.rules.process.ExistsCondition;
 import com.izforge.izpack.panels.userinput.processorclient.ValuesProcessingClient;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Describes a user input field.
@@ -94,6 +94,11 @@ public abstract class Field
     private final String description;
 
     /**
+     * The field's tooltip. May be {@code null}
+     */
+    private final String tooltip;
+
+    /**
      * Condition that determines if the field is displayed or not.
      */
     private final String condition;
@@ -127,6 +132,7 @@ public abstract class Field
         processor = config.getProcessor();
         label = config.getLabel();
         description = config.getDescription();
+        tooltip = config.getTooltip();
         this.condition = config.getCondition();
         this.installData = installData;
 
@@ -351,6 +357,13 @@ public abstract class Field
     {
         return description;
     }
+
+    /**
+     * Returns the field tooltip.
+     *
+     * @return the field tooltip. May be {@code null}
+     */
+    public String getTooltip() { return tooltip; }
 
     /**
      * Determines if the condition associated with the field is true.
