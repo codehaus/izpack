@@ -43,9 +43,9 @@ public class ButtonFactory
     private static HashMap<String,String> panelButtonMnemonics = new HashMap<String, String>();
 
     /**
-     * Used to reserve unique button mnemonics for the buttons in the installer frame.
+     * Used to reserve unique button mnemonics for buttons external to a given panel. Ie. navigation buttons.
      */
-    private static HashMap<String,String> navigatorMnemonics = new HashMap<String, String>();
+    private static HashMap<String,String> reservedButtonMnemonics = new HashMap<String, String>();
 
     /**
      * Enable icons for buttons This setting has no effect on OSX
@@ -130,7 +130,7 @@ public class ButtonFactory
         {
             result = new JButton(text);
         }
-        setButtonMnemonic(result, text);
+        setButtonMnemonic(result, panelButtonMnemonics);
         return result;
     }
 
@@ -159,7 +159,7 @@ public class ButtonFactory
                 result = new JButton(text);
             }
         }
-        setButtonMnemonic(result, text);
+        setButtonMnemonic(result, panelButtonMnemonics);
         return addEnterKeyAction(result);
     }
 
@@ -209,10 +209,12 @@ public class ButtonFactory
      * the given button caption text.
      *
      * @param button the JButton.
-     * @param text the JButton's caption text.
+     * @param map the HashMap to add the mnemonic to.
      */
-    private static void setButtonMnemonic(JButton button, String text)
+    private static void setButtonMnemonic(JButton button, HashMap<String, String> map)
     {
+        String text = button.getText();
+
         if (text != null)
         {
             String key = findMnemonic(text);
@@ -220,7 +222,7 @@ public class ButtonFactory
             if (key != null)
             {
                 button.setMnemonic(key.charAt(0));
-                panelButtonMnemonics.put(key, text);
+                map.put(key, text);
             }
         }
     }
@@ -247,7 +249,7 @@ public class ButtonFactory
             key = String.valueOf(caption.charAt(0));
 
             // If key is already in use by other buttons or by installer frame:
-            if (panelButtonMnemonics.containsKey(key) || navigatorMnemonics.containsKey(key))
+            if (panelButtonMnemonics.containsKey(key) || reservedButtonMnemonics.containsKey(key))
             {
                 caption = caption.substring(1);
                 continue;
@@ -262,21 +264,40 @@ public class ButtonFactory
     }
 
     /**
-     * Adds the given mnemonics to the navigatorMnemonics map, thereby
+     * Adds the given mnemonics to the reservedButtonMnemonics map, thereby
      * reserving the use of these mnemonics to only the navigator buttons.
-     * @param buttonText an array of button texts used by the navigator.
+     * @param buttons an array of buttons used by the navigator.
      */
-    public static void reserveNavigatorMnemonics(String [] buttonText) {
-        for (String text : buttonText) {
-            navigatorMnemonics.put(findMnemonic(text),text);
+    public static void reserveButtonMnemonics(JButton[] buttons)
+    {
+        for (JButton button : buttons) {
+            setButtonMnemonic(button, reservedButtonMnemonics);
         }
     }
 
     /**
      * Clears the current map of panel button mnemonics.
      */
-    public static void clearPanelButtonMnemonics() {
+    public static void clearPanelButtonMnemonics()
+    {
         panelButtonMnemonics.clear();
+    }
+
+    /**
+     * Clears the current map of navigator button mnemonics.
+     */
+    public static void clearReservedButtonMnemonics()
+    {
+        reservedButtonMnemonics.clear();
+    }
+
+    /**
+     * Clears all button mnemonics from their respective maps.
+     */
+    public static void clearAllMnemonics()
+    {
+        clearPanelButtonMnemonics();
+        clearReservedButtonMnemonics();
     }
 
 }
