@@ -251,6 +251,14 @@ public abstract class AbstractPanelView<T> implements PanelView<T>
     }
 
     /**
+     * Save the contents of the panel into install data.
+     */
+    @Override
+    public void saveData()
+    {
+        //Panel specific should be overwritten my the panel
+    }
+    /**
      * Determines if the panel can be shown.
      *
      * @return {@code true} if the panel can be shown

@@ -75,6 +75,13 @@ public class TargetPanel extends PathInputPanel
     }
 
     @Override
+    public void saveData()
+    {
+        String path = pathSelectionPanel.getPath();
+        installData.setInstallPath(path);
+    }
+
+    @Override
     public boolean isValidated()
     {
         boolean result = false;

@@ -87,6 +87,11 @@ public interface PanelView<T>
     boolean isValid();
 
     /**
+     * Save the contents of the panel into install data.
+     */
+    void saveData();
+
+    /**
      * Determines if the panel can be shown.
      *
      * @return {@code true} if the panel can be shown
