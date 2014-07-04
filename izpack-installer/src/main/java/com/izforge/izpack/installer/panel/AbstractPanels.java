@@ -468,7 +468,15 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      */
     public boolean switchPanel(int newIndex, boolean validate)
     {
-       boolean result;
+        boolean result;
+
+        T panel = getPanelView();
+
+        //Save data on every panel switch
+        if(panel != null)
+        {
+            panel.saveData();
+        }
 
         if ((newIndex > index) && !isNextEnabled()) // NOTE: actions may change isNextEnabled() status
         {
