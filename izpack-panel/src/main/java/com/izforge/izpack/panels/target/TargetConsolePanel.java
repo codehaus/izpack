@@ -97,15 +97,9 @@ public class TargetConsolePanel extends AbstractConsolePanel implements ConsoleP
             defaultPath = "";
         }
 
-        String path = console.prompt("Select target path [" + defaultPath + "] ", null);
+        String path = console.promptLocation("Select target path [" + defaultPath + "] ", defaultPath, null);
         if (path != null)
         {
-            path = path.trim();
-            if (path.isEmpty())
-            {
-                path = defaultPath;
-            }
-
             path = installData.getVariables().replace(path);
             normalizedPath = PathInputBase.normalizePath(path);
             pathFile = new File(normalizedPath);

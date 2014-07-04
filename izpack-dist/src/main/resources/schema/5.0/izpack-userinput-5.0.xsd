@@ -235,6 +235,14 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="tooltip" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    The tooltip attribute allows a UserInputPanel field to add the specified tooltip to its
+                    component children. The value of tooltip must be the id of the string in langpacks.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <!--                                                                                                        -->

@@ -21,7 +21,6 @@
 
 package com.izforge.izpack.panels.userinput.field;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,6 +94,11 @@ public abstract class Field
     private final String description;
 
     /**
+     * The field's tooltip. May be {@code null}
+     */
+    private final String tooltip;
+
+    /**
      * Condition that determines if the field is displayed or not.
      */
     private final String condition;
@@ -133,6 +137,7 @@ public abstract class Field
         processor = config.getProcessor();
         label = config.getLabel();
         description = config.getDescription();
+        tooltip = config.getTooltip();
         this.condition = config.getCondition();
         this.installData = installData;
 
@@ -357,6 +362,13 @@ public abstract class Field
     {
         return description;
     }
+
+    /**
+     * Returns the field tooltip.
+     *
+     * @return the field tooltip. May be {@code null}
+     */
+    public String getTooltip() { return tooltip; }
 
     /**
      * Determines if the condition associated with the field is true.

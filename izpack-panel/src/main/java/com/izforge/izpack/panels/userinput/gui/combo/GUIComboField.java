@@ -21,15 +21,14 @@
 
 package com.izforge.izpack.panels.userinput.gui.combo;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JComboBox;
-
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.panels.userinput.field.Choice;
 import com.izforge.izpack.panels.userinput.field.combo.ComboField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
+
+import javax.swing.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 
 /**
@@ -69,6 +68,7 @@ public class GUIComboField extends GUIField
         });
 
         addField(combo);
+        addTooltip();
     }
 
     /**
