@@ -109,6 +109,10 @@ public abstract class AbstractGUIFileField extends GUIField
     protected void init(FileInputField inputField)
     {
         this.fileInput = inputField;
+        if(getField().getDescription() != null)
+        {
+            addDescription();
+        }
         if (getField().getLabel() != null)
         {
             addLabel();
