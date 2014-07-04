@@ -110,25 +110,32 @@ public class DefaultNavigator implements Navigator
         quit.setName(BUTTON_QUIT.id);
         quit.addActionListener(navHandler);
 
-        reserveNavigatorButtonMnemonics();
         configureVisibility();
     }
 
-    /**
-     * Call to reserve mnemonics for the buttons used by the navigator.
-     */
-    private void reserveNavigatorButtonMnemonics() {
-        String [] buttonTexts = { "installer.quit", "installer.next", "installer.prev" };
-        ButtonFactory.reserveNavigatorMnemonics(buttonTexts);
-    }
-
-    protected void updateButtonText(Messages messages) {
+    protected void updateButtonText(Messages messages)
+    {
 
         previous.setText(messages.get("installer.prev"));
         next.setText(messages.get("installer.next"));
         quit.setText(messages.get("installer.quit"));
 
     }
+
+    /**
+     * Call to reserve mnemonics for the buttons used by the navigator.
+     */
+    public void reserveNavigatorButtonMnemonics()
+    {
+        JButton [] buttons = {
+                quit,
+                next,
+                previous
+        };
+
+        ButtonFactory.reserveButtonMnemonics(buttons);
+    }
+
     /**
      * Registers the parent installer frame.
      * <p/>
