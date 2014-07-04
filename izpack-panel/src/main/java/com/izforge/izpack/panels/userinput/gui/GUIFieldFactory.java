@@ -206,7 +206,7 @@ public class GUIFieldFactory
      * Private class to wrap the create command.
      * This allows us to pass the create command for user later on.
      */
-    private class createFieldCommand implements FieldCommand
+    private class createFieldCommand extends FieldCommand
     {
         private final UserInputPanelSpec userInputPanelSpec;
         private final IXMLElement spec;
@@ -215,7 +215,7 @@ public class GUIFieldFactory
             this.userInputPanelSpec = userInputPanelSpec;
             this.spec = spec;
         }
-        public GUIField execute(Field field)
+        public GUIField createGuiField(Field field)
         {
             return create(field, userInputPanelSpec, spec);
         }

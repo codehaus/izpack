@@ -213,7 +213,7 @@ public class UserInputConsolePanel extends AbstractConsolePanel
         ConsoleFieldFactory factory = new ConsoleFieldFactory(console, prompt);
         for (Field field : model.createFields(spec))
         {
-            fields.add(factory.create(field));
+            fields.add(factory.create(field, model, spec));
         }
         return true;
     }

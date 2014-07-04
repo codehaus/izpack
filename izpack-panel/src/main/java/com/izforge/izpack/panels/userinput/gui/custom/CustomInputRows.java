@@ -97,7 +97,7 @@ public class CustomInputRows extends JPanel
             for (Field field : createCustomField(userInputPanelSpec, spec).getFields())
             {
 
-                GUIField guiField = createField.execute(field);
+                GUIField guiField = createField.createGuiField(field);
                 guiField.setVariable(guiField.getVariable() + "." + numberOfRows);
                 fields.add(guiField);
             }
@@ -193,7 +193,7 @@ public class CustomInputRows extends JPanel
         List<String> labels = new ArrayList<String>();
         for (Field field : customInfoField.getFields())
         {
-            GUIField guiField = createField.execute(field);
+            GUIField guiField = createField.createGuiField(field);
             labels.add(guiField.getSummaryKey());
         }
         return  labels;
@@ -213,7 +213,7 @@ public class CustomInputRows extends JPanel
         List<String> variables = new ArrayList<String>();
         for (Field field : customInfoField.getFields())
         {
-            GUIField guiField = createField.execute(field);
+            GUIField guiField = createField.createGuiField(field);
             variables.add(guiField.getVariable());
         }
         return  variables;
