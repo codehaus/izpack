@@ -1003,7 +1003,8 @@ public class PacksModel extends AbstractTableModel
     {
         if(checkValues[row] == SELECTED
                 || checkValues[row] == REQUIRED_SELECTED
-                || checkValues[row] == PARTIAL_SELECTED)
+                || checkValues[row] == PARTIAL_SELECTED
+                || checkValues[row] == REQUIRED_PARTIAL_SELECTED)
         {
             return true;
         }
