@@ -62,22 +62,25 @@ public class ConsoleCustomField extends ConsoleField
         for (Field field : createCustomField(userInputPanelSpec, spec).getFields())
         {
             field.setVariable(field.getVariable() + "." + numberOfRows);
-            ConsoleField consoleField = createField.createConsoleField(field);
+            ConsoleField consoleField = createField.createConsoleField(field);;
             fields.add(consoleField);
         }
 
         for(ConsoleField field: fields)
         {
             field.setDisplayed(true);
-            field.display();
+            while(!field.display())
+            {
+                //Continue to ask for input if it was invalid
+            }
         }
         int value = -1;
         while(value == -1)
         {
-            value = prompt("Enter 1 to add another module, 2 to continue", 1, 2, -1, -1);
+            value = prompt("Enter 1 continue, or 2 to add another module", 1, 2, -1, -1);
         }
 
-        if(value == 1)
+        if(value == 2)
         {
             return true;
         }

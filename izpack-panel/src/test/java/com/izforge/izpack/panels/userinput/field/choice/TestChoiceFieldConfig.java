@@ -60,25 +60,15 @@ public class TestChoiceFieldConfig<T extends Choice> extends TestFieldConfig imp
         this.selected = selected;
     }
 
-    /**
-     * Returns the choices.
-     *
-     * @return the choices
-     */
     @Override
-    public List<Choice> getChoices(RulesEngine rules)
+    public List<Choice> getChoices()
     {
-        return choices;
+        return null;
     }
 
-    /**
-     * Returns the index of the selected choice.
-     *
-     * @return the selected index or {@code -1} if no choice is selected
-     */
     @Override
-    public int getSelectedIndex()
+    public int getSelectedIndex(String variable)
     {
-        return selected;
+        return 0;
     }
 }
