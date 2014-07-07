@@ -42,7 +42,7 @@ public class CustomInputRows extends JPanel
 
     private final FieldCommand createField;
 
-    private static int numberOfRows = 0;
+    private int numberOfRows = 0;
 
     private final int numberOfColumns;
 
@@ -60,13 +60,13 @@ public class CustomInputRows extends JPanel
 
     private GUIInstallData installData;
 
-    public CustomInputRows(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, GUIInstallData installData)
+    public CustomInputRows(CustomField customField, FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, GUIInstallData installData)
     {
         super();
         this.spec = spec;
         this.userInputPanelSpec = userInputPanelSpec;
         this.createField = createField;
-        this.customInfoField = createCustomField(userInputPanelSpec, spec);
+        this.customInfoField = customField;
         this.numberOfColumns = getNumberOfColumns(customInfoField);
         this.maxRow = getMaxRow(customInfoField);
         this.minRow = getMinRow(customInfoField);
@@ -260,7 +260,10 @@ public class CustomInputRows extends JPanel
         {
             if (field instanceof CustomField)
             {
-                return (CustomField) field;
+                if(field.getVariable().equals(customInfoField.getVariable()))
+                {
+                    return (CustomField) field;
+                }
             }
         }
         return  null;

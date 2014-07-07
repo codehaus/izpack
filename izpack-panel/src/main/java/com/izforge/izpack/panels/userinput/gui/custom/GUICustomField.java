@@ -34,10 +34,10 @@ import java.util.List;
 public class GUICustomField extends GUIField
 {
     private final CustomInputField customInputField;
-    public GUICustomField(CustomField customField,FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec,  GUIInstallData installData, IzPanel parent)
+    public GUICustomField(CustomField customField, FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec,  GUIInstallData installData, IzPanel parent)
     {
         super(customField);
-        customInputField = new CustomInputField(createField, userInputPanelSpec, spec, parent, installData);
+        customInputField = new CustomInputField(customField, createField, userInputPanelSpec, spec, parent, installData);
         addComponent(customInputField, new TwoColumnConstraints(TwoColumnConstraints.BOTH));
     }
 

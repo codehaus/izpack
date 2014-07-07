@@ -7,6 +7,7 @@ import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
+import com.izforge.izpack.panels.userinput.field.custom.CustomField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
@@ -49,11 +50,11 @@ public class CustomInputField extends JPanel implements ActionListener
 
     private CustomInputRows rows;
 
-    public CustomInputField(FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, IzPanel parent, GUIInstallData installData)
+    public CustomInputField(CustomField customField, FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, IzPanel parent, GUIInstallData installData)
     {
         this.parent = parent;
         this.installData = installData;
-        this.rows = new CustomInputRows(createField, userInputPanelSpec, spec, installData);
+        this.rows = new CustomInputRows(customField, createField, userInputPanelSpec, spec, installData);
         this.header = rows.getHeader();
         this.controlPanel = initializeControlPanel();
 
