@@ -652,7 +652,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
 
         try
         {
-            packsModel = new PacksModel(this, installData, rules)
+            packsModel = new PacksModelGUI(this, installData, rules)
             {
                 /**
                  *
@@ -726,9 +726,9 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
             first = false;
             retval.append(getI18NPackName(pack));
         }
-        if (packsModel.isModifyinstallation())
+        if (packsModel.isModifyInstallation())
         {
-            Map<String, Pack> installedpacks = packsModel.getInstalledpacks();
+            Map<String, Pack> installedpacks = packsModel.getInstalledPacks();
             retval.append("<br><b>");
             retval.append(messages.get("PacksPanel.installedpacks.summarycaption"));
             retval.append("</b>");

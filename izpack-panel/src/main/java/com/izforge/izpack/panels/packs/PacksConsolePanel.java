@@ -205,7 +205,7 @@ public class PacksConsolePanel extends AbstractConsolePanel implements ConsolePa
             names.put(pack.getName(), pack);
 //            if (pack.getDependencies() != null || pack.getExcludeGroup() != null)
 //            {
-//                dependenciesExist = true;
+//                dependenciesExist2 = true;
 //            }
         }
     }

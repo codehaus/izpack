@@ -346,6 +346,11 @@ public class InstallerFrame extends JFrame implements InstallerView
         this.helpButton.setName(BUTTON_HELP.id);
         this.helpButton.addActionListener(new HelpHandler());
 
+        // update navigation panel and help button mnemonic shortcuts for selected language.
+        ButtonFactory.clearAllMnemonics();
+        ButtonFactory.reserveButtonMnemonics(new JButton [] { helpButton });
+        navigator.reserveNavigatorButtonMnemonics();
+
         navPanel.add(Box.createHorizontalGlue());
         navPanel.add(navigator.getPrevious());
         navPanel.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -980,7 +985,7 @@ public class InstallerFrame extends JFrame implements InstallerView
     class HelpHandler implements ActionListener
     {
 
-        /**
+        /**Button
          * Actions handler.
          *
          * @param e The event.
