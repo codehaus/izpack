@@ -44,8 +44,8 @@ import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.installer.util.PackHelper;
 import com.izforge.izpack.installer.web.WebAccessor;
-import com.izforge.izpack.panels.imgpacks.ImgPacksPanelAutomationHelper;
 import com.izforge.izpack.panels.packs.PacksModel;
+import com.izforge.izpack.panels.packs.PacksPanelAutomationHelper;
 import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.file.FileUtils;
 
@@ -345,7 +345,7 @@ public class TreePacksPanel extends IzPanel
     @Override
     public void createInstallationRecord(IXMLElement panelRoot)
     {
-        new ImgPacksPanelAutomationHelper().createInstallationRecord(this.installData, panelRoot);
+        new PacksPanelAutomationHelper().createInstallationRecord(this.installData, panelRoot);
     }
 
 
