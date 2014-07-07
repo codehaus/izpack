@@ -169,7 +169,7 @@ public class CustomInputRows extends JPanel
         installData.setVariable(customInfoField.getVariable(), numberOfRows+"");
         for (int i = 1; i <= numberOfRows; i++)
         {
-            for(GUIField guiField :  guiFields.get(i))
+            for(GUIField guiField : guiFields.get(i))
             {
                 if (guiField.isDisplayed())
                 {
@@ -220,7 +220,22 @@ public class CustomInputRows extends JPanel
     }
     public List<String> getVariables()
     {
-        return this.variables;
+        List<String> countedVariables = new ArrayList<String>();
+        for (int i=1; i<= numberOfRows; i++)
+        {
+
+        }
+        for (int i = 1; i <= numberOfRows; i++)
+        {
+            for(GUIField guiField : guiFields.get(i))
+            {
+                if (guiField.isDisplayed())
+                {
+                   countedVariables.add(guiField.getVariable());
+                }
+            }
+        }
+        return countedVariables;
     }
 
     /**

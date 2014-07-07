@@ -207,9 +207,23 @@ public class UserInputPanel extends IzPanel
         for (FieldView view : views)
         {
             String variable = view.getField().getVariable();
+
             if (variable != null)
             {
                 entryMap.put(variable, installData.getVariable(variable));
+            }
+
+            // Grab all the variables contained within the custom field
+            if (view instanceof GUICustomField)
+            {
+                GUICustomField guiCustomField = (GUICustomField) view;
+                List<String> variables = guiCustomField.getVariables();
+
+                for(String numberedVariable : variables)
+                {
+                    entryMap.put(numberedVariable, installData.getVariable(numberedVariable));
+                }
+
             }
         }
 
@@ -534,46 +548,46 @@ public class UserInputPanel extends IzPanel
      */
     private String getCustomSummary(GUICustomField customField)
     {
-        String associatedVariable = customField.getVariable();
-
-        int count = Integer.parseInt(installData.getVariable(associatedVariable));
-        List<String> variables = customField.getVariables();
         List<String> labels = customField.getLabels();
+        List<String> variables = customField.getVariables();
+        int numberOfColumns = labels.size();
 
+        int column = 0;
         String tab = "";
         String entry = "";
         String key = "";
         String value = "";
 
-        for(int i=1; i<=count; i++)
+
+        for(String variable : variables)
         {
-            boolean first = true;
-            for (int j=0; j<labels.size(); j++)
+            boolean firstColumn = (column % numberOfColumns == 0);
+            
+            if(!firstColumn)
             {
-                if(j != 0)
-                {
-                    tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
-                }
-                else
-                {
-                    tab = "";
-                }
-
-                key = installData.getMessages().get(installData.getMessages().get(labels.get(j)));
-                value = installData.getVariable(variables.get(j) + "." + i);
-
-                if (key != null)
-                {
-                    if (first)
-                    {
-                        entry += String.format("%1$-3s", i + ". ");
-                        first = false;
-                    }
-                    entry += String.format(tab + key);
-                    entry += String.format(" " + value);
-                    entry += "<br>";
-                }
+                tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                column++;
             }
+            else
+            {
+                tab = "";
+                column=1; //Reset to first column
+            }
+
+            key = installData.getMessages().get(installData.getMessages().get(labels.get(column-1)));
+            value = installData.getVariable(variable);
+
+            if (key != null)
+            {
+                if (firstColumn)
+                {
+                    entry += String.format("%1$-3s", column + ". ");
+                }
+                entry += String.format(tab + key);
+                entry += String.format(" " + value);
+                entry += "<br>";
+            }
+
         }
 
         return entry;
