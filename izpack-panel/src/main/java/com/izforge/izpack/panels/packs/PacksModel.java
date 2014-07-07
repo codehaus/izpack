@@ -607,10 +607,18 @@ public class PacksModel extends AbstractTableModel
      */
     private void selectionUpdate(Map<String, String> packsData)
     {
+        RulesEngine rules = installData.getRules();
         for (Map.Entry<String, String> packData : packsData.entrySet())
         {
             int value, packPos;
             String packName = packData.getKey();
+            String condition = packData.getValue();
+
+            if(condition != null && !rules.isConditionTrue(condition))
+            {
+                return; //Do nothing if condition is false
+            }
+
             Pack pack;
 
             if (packName.startsWith("!"))
