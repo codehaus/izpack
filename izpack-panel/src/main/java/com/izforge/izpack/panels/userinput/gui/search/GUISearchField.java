@@ -21,10 +21,6 @@
 
 package com.izforge.izpack.panels.userinput.gui.search;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Messages;
 import com.izforge.izpack.gui.ButtonFactory;
@@ -34,6 +30,8 @@ import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.panels.userinput.field.search.SearchField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
+
+import javax.swing.*;
 
 
 /**
@@ -117,6 +115,7 @@ public class GUISearchField extends GUIField
 
         addComponent(buttonPanel, new TwoColumnConstraints(TwoColumnConstraints.EASTONLY));
         searchInputField = new SearchInputField(field, frame, combo, autoDetect, browse, installData);
+        addTooltip();
     }
 
     /**

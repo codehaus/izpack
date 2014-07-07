@@ -20,10 +20,10 @@
  */
 package com.izforge.izpack.panels.userinput.field;
 
-import java.util.List;
-
 import com.izforge.izpack.api.data.binding.OsModel;
 import com.izforge.izpack.api.exception.IzPackException;
+
+import java.util.List;
 
 /**
  * User-input field configuration.
@@ -105,6 +105,13 @@ public interface FieldConfig
      * @return the field description. May be @{code null}
      */
     String getDescription();
+
+    /**
+     * Returns the field's tooltip.
+     *
+     * @return the field tooltip. May be @{code null}
+     */
+    String getTooltip();
 
     /**
      * Returns the field label.

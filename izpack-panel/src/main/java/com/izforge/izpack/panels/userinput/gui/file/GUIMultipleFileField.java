@@ -55,6 +55,7 @@ public class GUIMultipleFileField extends GUIField
         super(field);
         fileInput = new MultipleFileInputField(field, parent, installData, false);
         addComponent(fileInput, new TwoColumnConstraints(TwoColumnConstraints.EAST));
+        addTooltip();
     }
 
     /**

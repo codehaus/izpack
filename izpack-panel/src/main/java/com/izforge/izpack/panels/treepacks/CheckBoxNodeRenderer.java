@@ -66,7 +66,7 @@ class CheckBoxNodeRenderer implements TreeCellRenderer
                                                   boolean selected, boolean expanded, boolean leaf, int row,
                                                   boolean hasFocus)
     {
-        treePacksPanel.fromModel();
+        treePacksPanel.updateViewFromModel();
 
         if (selected)
         {

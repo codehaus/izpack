@@ -18,20 +18,6 @@
  */
 package com.izforge.izpack.panels.userinput;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.Border;
-
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.data.Panel;
 import com.izforge.izpack.api.exception.IzPackException;
@@ -40,20 +26,23 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.api.resource.Resources;
 import com.izforge.izpack.api.rules.Condition;
 import com.izforge.izpack.api.rules.RulesEngine;
+import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.TwoColumnLayout;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
 import com.izforge.izpack.installer.gui.IzPanel;
-import com.izforge.izpack.panels.userinput.field.ElementReader;
-import com.izforge.izpack.panels.userinput.field.Field;
-import com.izforge.izpack.panels.userinput.field.FieldHelper;
-import com.izforge.izpack.panels.userinput.field.FieldView;
-import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
+import com.izforge.izpack.panels.userinput.field.*;
 import com.izforge.izpack.panels.userinput.gui.Component;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 import com.izforge.izpack.panels.userinput.gui.GUIFieldFactory;
 import com.izforge.izpack.panels.userinput.gui.UpdateListener;
 import com.izforge.izpack.util.PlatformModelMatcher;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * User input panel.
@@ -164,6 +153,14 @@ public class UserInputPanel extends IzPanel
         {
             rules.addPanelCondition(panel, globalConstraint);
         }
+
+        init();
+        addScrollPane();
+        Dimension size = getMaximumSize();
+        setSize(size.width, size.height);
+        buildUI();
+        updateUIElements();
+        validate();
     }
 
     /**
@@ -179,13 +176,16 @@ public class UserInputPanel extends IzPanel
     }
 
     /**
+     * Save visible contents of the this panel into install data.
+     */
+    @Override
+    public void saveData() { readInput(prompt, true); }
+    /**
      * This method is called when the panel becomes active.
      */
     @Override
     public void panelActivate()
     {
-        this.init();
-
         if (spec == null)
         {
             // TODO: translate
@@ -195,13 +195,9 @@ public class UserInputPanel extends IzPanel
         }
         else
         {
-            // update UI with current values of associated variables
+            //Here just to update dynamic variables
             updateUIElements();
             buildUI();
-            addScrollPane();
-            Dimension size = getMaximumSize();
-            setSize(size.width, size.height);
-            validate();
         }
         // Focus the first panel component according to the default traversal
         // policy avoiding forcing the user to click into that field first
@@ -234,6 +230,9 @@ public class UserInputPanel extends IzPanel
         new UserInputPanelAutomationHelper(entryMap).createInstallationRecord(installData, rootElement);
     }
 
+    /**
+     * Initialize the panel.
+     */
     private void init()
     {
         eventsActivated = false;
@@ -254,6 +253,9 @@ public class UserInputPanel extends IzPanel
 
         // refresh variables specified in spec
         updateVariables();
+
+        // clear button mnemonics map
+        ButtonFactory.clearPanelButtonMnemonics();
 
         // ----------------------------------------------------
         // process all field nodes. Each field node is analyzed
@@ -280,6 +282,9 @@ public class UserInputPanel extends IzPanel
         eventsActivated = true;
     }
 
+    /**
+     * Set elements to be visible or not.
+     */
     protected void updateUIElements()
     {
         boolean updated = false;

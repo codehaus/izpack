@@ -76,6 +76,7 @@ public class AntAction extends ActionBase
     private List<String> uninstallTargets = null;
 
     private File logFile = null;
+    private boolean logFileAppend = false;
 
     private File buildDir = null;
 
@@ -267,10 +268,12 @@ public class AntAction extends ActionBase
      * Sets the logfile path to the given string.
      *
      * @param logFile to be set
+     * @append if true, then append new log entries to existing files
      */
-    public void setLogFile(File logFile)
+    public void setLogFile(File logFile, boolean append)
     {
         this.logFile = logFile;
+        this.logFileAppend = append;
     }
 
     /**
@@ -484,7 +487,7 @@ public class AntAction extends ActionBase
             try
             {
                 logFile.getParentFile().mkdirs();
-                printStream = new PrintStream(new FileOutputStream(logFile));
+                printStream = new PrintStream(new FileOutputStream(logFile, logFileAppend));
                 logger.setOutputPrintStream(printStream);
                 logger.setErrorPrintStream(printStream);
             }
