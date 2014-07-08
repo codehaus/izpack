@@ -6,6 +6,7 @@ import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.panels.userinput.FieldCommand;
 import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
+import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.custom.Column;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
 import com.izforge.izpack.panels.userinput.gui.Component;
@@ -56,8 +57,6 @@ public class CustomInputRows extends JPanel
 
     private final List<String> labels;
 
-    private final List<String> variables;
-
     private GUIInstallData installData;
 
     public CustomInputRows(CustomField customField, FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec, GUIInstallData installData)
@@ -71,7 +70,6 @@ public class CustomInputRows extends JPanel
         this.maxRow = getMaxRow(customInfoField);
         this.minRow = getMinRow(customInfoField);
         this.labels = getLabels(customInfoField);
-        this.variables = getVariables(customInfoField);
         this.guiFields = new HashMap<Integer, List<GUIField>>();
         this.installData = installData;
 
@@ -165,7 +163,6 @@ public class CustomInputRows extends JPanel
      */
     public boolean updateField(Prompt prompt)
     {
-        boolean valid = true;
         installData.setVariable(customInfoField.getVariable(), numberOfRows+"");
         for (int i = 1; i <= numberOfRows; i++)
         {
@@ -175,12 +172,24 @@ public class CustomInputRows extends JPanel
                 {
                     if (!guiField.updateField(prompt))
                     {
-                        valid = false;
+                        return false;
                     }
                 }
             }
         }
-        return valid;
+        List<Column> columns = customInfoField.getColumns();
+        String [] columnVariables = getVariablesByColumn();
+        for (int i = 0; i < columnVariables.length; i++)
+        {
+            ValidationStatus status = columns.get(i).validate(columnVariables[i]);
+            if (!status.isValid())
+            {
+                prompt.warn(status.getMessage());
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -205,26 +214,12 @@ public class CustomInputRows extends JPanel
 
     /**
      * Retrive a list of variables
-     * @param customInfoField
      * @return
      */
-    public List<String> getVariables(CustomField customInfoField)
-    {
-        List<String> variables = new ArrayList<String>();
-        for (Field field : customInfoField.getFields())
-        {
-            GUIField guiField = createField.createGuiField(field);
-            variables.add(guiField.getVariable());
-        }
-        return  variables;
-    }
     public List<String> getVariables()
     {
         List<String> countedVariables = new ArrayList<String>();
-        for (int i=1; i<= numberOfRows; i++)
-        {
 
-        }
         for (int i = 1; i <= numberOfRows; i++)
         {
             for(GUIField guiField : guiFields.get(i))
@@ -236,6 +231,30 @@ public class CustomInputRows extends JPanel
             }
         }
         return countedVariables;
+    }
+
+    private String[] getVariablesByColumn()
+    {
+        String[] columnVariables = new String[numberOfColumns];
+
+        for(int col=0; col < numberOfColumns; col++)
+        {
+            columnVariables[col] = "";
+            for (int row=1; row <= numberOfRows; row++)
+            {
+                GUIField guiField = guiFields.get(row).get(col);
+                if (guiField.isDisplayed())
+                {
+                    columnVariables[col] += installData.getVariable(guiField.getVariable()) + ",";
+                }
+            }
+        }
+        for (int i=0; i < columnVariables.length; i++)
+        {
+            String v = columnVariables[i];
+            columnVariables[i] = v.substring(0, v.length()-1);
+        }
+        return columnVariables;
     }
 
     /**

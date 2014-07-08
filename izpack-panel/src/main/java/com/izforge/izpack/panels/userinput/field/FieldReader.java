@@ -193,7 +193,7 @@ public class FieldReader extends ElementReader implements FieldConfig
      * @return the validators for the field
      */
     @Override
-    public List<FieldValidator> getValidators()
+    public List<FieldValidator> getValidators(IXMLElement field)
     {
         List<FieldValidator> result = new ArrayList<FieldValidator>();
         Config config = getConfig();
@@ -206,6 +206,11 @@ public class FieldReader extends ElementReader implements FieldConfig
         return result;
     }
 
+    @Override
+    public List<FieldValidator> getValidators()
+    {
+        return getValidators(this.field);
+    }
     /**
      * Returns the processor the field.
      *

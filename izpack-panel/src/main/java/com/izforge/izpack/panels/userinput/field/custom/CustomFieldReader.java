@@ -40,16 +40,11 @@ public class CustomFieldReader extends FieldReader implements CustomFieldConfig
     public List<Column> getColumns()
     {
         List<Column> result = new ArrayList<Column>();
-        Config config = getConfig();
-
-        String variable;
-        List<IXMLElement> field;
 
         for (IXMLElement column : getSpec().getChildrenNamed("col"))
         {
-            field = column.getChildrenNamed("field");
-            variable = config.getAttribute(column, "variable");
-            result.add(new Column(field, variable, getText(column)));
+
+            result.add(new Column(getText(column), getValidators(column)));
         }
 
         return result;
