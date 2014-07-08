@@ -134,7 +134,7 @@ class CheckBoxNodeRenderer implements TreeCellRenderer
 
             if (node.isPartial())
             {
-                checkbox.setIcon(new PartialIcon());
+                checkbox.setIcon(new PartialIcon(node.isEnabled()));
             }
             else
             {

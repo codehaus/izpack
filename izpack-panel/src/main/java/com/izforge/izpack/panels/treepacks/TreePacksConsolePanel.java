@@ -112,7 +112,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
             messages = installData.getMessages();
         }
 
-        displayPackMenu(installData);
+        displayPackMenu(installData, console);
         out(Type.INFORMATION, installData.getMessages().get(DONE));
         selectedPacks = packsModel.updatePacksToInstall();
 
@@ -141,9 +141,9 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
      *
      * @param installData       - Database of izpack
      */
-    private void displayPackMenu(final InstallData installData)
+    private void displayPackMenu(final InstallData installData,Console console)
     {
-        java.io.Console console = System.console();
+
 
         printPackMenu();
         List<Pack> visiblePacks = packsModel.getVisiblePacks();
@@ -153,7 +153,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
             int choice = -1;
             try
             {
-                choice = (Integer.parseInt(console.readLine())) -1;
+                choice = console.prompt(messages.get(PROMPT), 0, maxRow, -1) - 1;
             }
             catch(NumberFormatException e)
             {
@@ -197,7 +197,6 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
 
         System.out.println(messages.get(REQUIRED_SPACE) + " " + Pack.toByteUnitsString(totalSize));
         System.out.println(messages.get(CONFIRM));
-        System.out.println(messages.get(PROMPT));
     }
 
     /**
