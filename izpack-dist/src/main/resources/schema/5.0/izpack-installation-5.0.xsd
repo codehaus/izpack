@@ -390,6 +390,18 @@
     <xs:complexType name="packType">
         <xs:sequence>
             <xs:element name="description" type="xs:string" maxOccurs="1"/>
+            <xs:element name="onSelect" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                    <xs:attribute name="condition" type="xs:string" use="optional"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="onDeselect" maxOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                    <xs:attribute name="condition" type="xs:string" use="optional"/>
+                </xs:complexType>
+            </xs:element>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element name="fileset" type="fileSetTypeDisk"/>
                 <xs:element name="file" type="fileType"/>

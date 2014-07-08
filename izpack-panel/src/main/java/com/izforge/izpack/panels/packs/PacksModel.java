@@ -75,7 +75,8 @@ public class PacksModel extends AbstractTableModel
     public final int DESELECTED = 0;
     public final int REQUIRED_SELECTED = -1;
     public final int DEPENDENT_DESELECTED = -2;
-    public final int REQUIRED_DESELECTED = -3;
+    public final int REQUIRED_PARTIAL_SELECTED = -3;
+    public final int REQUIRED_DESELECTED = -4;
 
     public PacksModel(InstallData idata)
     {
@@ -544,15 +545,37 @@ public class PacksModel extends AbstractTableModel
 
         if (parentPack.getChildren().size() == childrenSelected)
         {
-            checkValues[parentPosition] = SELECTED;
+            if (checkValues[parentPosition] < 0)
+            {
+                checkValues[parentPosition] = REQUIRED_SELECTED;
+            }
+            else
+            {
+                checkValues[parentPosition] = SELECTED;
+            }
         }
         else if (childrenSelected > 0)
         {
-            checkValues[parentPosition] = PARTIAL_SELECTED;
+
+            if (checkValues[parentPosition] < 0)
+            {
+                checkValues[parentPosition] = REQUIRED_PARTIAL_SELECTED;
+            }
+            else
+            {
+                checkValues[parentPosition] = PARTIAL_SELECTED;
+            }
         }
         else
         {
-            checkValues[parentPosition] = DESELECTED;
+            if (checkValues[parentPosition] < 0)
+            {
+                checkValues[parentPosition] = REQUIRED_DESELECTED;
+            }
+            else
+            {
+                checkValues[parentPosition] = DESELECTED;
+            }
         }
     }
 
@@ -584,10 +607,18 @@ public class PacksModel extends AbstractTableModel
      */
     private void selectionUpdate(Map<String, String> packsData)
     {
+        RulesEngine rules = installData.getRules();
         for (Map.Entry<String, String> packData : packsData.entrySet())
         {
             int value, packPos;
             String packName = packData.getKey();
+            String condition = packData.getValue();
+
+            if(condition != null && !rules.isConditionTrue(condition))
+            {
+                return; //Do nothing if condition is false
+            }
+
             Pack pack;
 
             if (packName.startsWith("!"))
@@ -972,7 +1003,8 @@ public class PacksModel extends AbstractTableModel
     {
         if(checkValues[row] == SELECTED
                 || checkValues[row] == REQUIRED_SELECTED
-                || checkValues[row] == PARTIAL_SELECTED)
+                || checkValues[row] == PARTIAL_SELECTED
+                || checkValues[row] == REQUIRED_PARTIAL_SELECTED)
         {
             return true;
         }
@@ -988,7 +1020,12 @@ public class PacksModel extends AbstractTableModel
      */
     public boolean isPartiallyChecked(int row)
     {
-        return checkValues[row] == PARTIAL_SELECTED;
+        if(checkValues[row] == PARTIAL_SELECTED
+                || checkValues[row] == REQUIRED_PARTIAL_SELECTED)
+        {
+            return true;
+        }
+        return  false;
     }
 
     /**
