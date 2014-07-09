@@ -588,6 +588,7 @@ public class UserInputPanel extends IzPanel
         int numberOfColumns = labels.size();
 
         int column = 0;
+        int row = 0;
         String tab = "";
         String entry = "";
         String key = "";
@@ -616,7 +617,8 @@ public class UserInputPanel extends IzPanel
             {
                 if (firstColumn)
                 {
-                    entry += String.format("%1$-3s", column + ". ");
+                    row++;
+                    entry += String.format("%1$-3s", row + ". ");
                 }
                 entry += String.format(tab + key);
                 entry += String.format(" " + value);
