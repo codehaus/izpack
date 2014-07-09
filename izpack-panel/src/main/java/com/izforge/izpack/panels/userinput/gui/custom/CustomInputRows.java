@@ -311,4 +311,12 @@ public class CustomInputRows extends JPanel
         }
         return header;
     }
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        for (java.awt.Component component : this.getComponents())
+        {
+            component.setEnabled(enabled);
+        }
+    }
 }

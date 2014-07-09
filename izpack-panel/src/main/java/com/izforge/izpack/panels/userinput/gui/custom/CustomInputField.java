@@ -171,5 +171,24 @@ public class CustomInputField extends JPanel implements ActionListener
     {
         return rows.getVariables();
     }
+
+    @Override
+    public void setEnabled(boolean enabled)
+    {
+        for( Component component : header.getComponents())
+        {
+            component.setEnabled(enabled);
+        }
+        for( Component component : controlPanel.getComponents())
+        {
+            component.setEnabled(enabled);
+        }
+        for (Component component : rows.getComponents())
+        {
+            component.setEnabled(enabled);
+        }
+        rows.setEnabled(enabled);
+    }
+
 }
 
