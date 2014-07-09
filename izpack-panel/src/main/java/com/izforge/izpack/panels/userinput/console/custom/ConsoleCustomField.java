@@ -115,9 +115,7 @@ public class ConsoleCustomField extends ConsoleField
             value = INVALID;
             for (ConsoleField field : fields)
             {
-
                 field.setDisplayed(true);
-
                 while (!field.display())
                 {
                     //Continue to ask for input if it was invalid

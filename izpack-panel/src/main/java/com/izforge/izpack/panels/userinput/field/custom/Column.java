@@ -12,23 +12,11 @@ import java.util.List;
  */
 public class Column
 {
-    private final String id;
-
     private final List<FieldValidator> validators;
 
-    public Column(String id, List<FieldValidator> validators)
+    public Column(List<FieldValidator> validators)
     {
-        this.id = id;
         this.validators = validators;
-    }
-
-    /**
-     * Label to represent a column.
-     * @return
-     */
-    public String getId()
-    {
-        return id;
     }
 
     /**

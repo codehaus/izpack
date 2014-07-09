@@ -43,8 +43,7 @@ public class CustomFieldReader extends FieldReader implements CustomFieldConfig
 
         for (IXMLElement column : getSpec().getChildrenNamed("col"))
         {
-
-            result.add(new Column(getText(column), getValidators(column)));
+            result.add(new Column(getValidators(column)));
         }
 
         return result;

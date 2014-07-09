@@ -125,7 +125,7 @@ public class CustomInputRows extends JPanel
                 JComponent jComponent = component.getComponent();
                 Object jConstraints = component.getConstraints();
 
-                if (!(jComponent instanceof JLabel))
+                if (!(jComponent instanceof JLabel) && !(jComponent instanceof JTextPane))
                 {
                     this.add(jComponent, jConstraints);
                 }
@@ -299,13 +299,16 @@ public class CustomInputRows extends JPanel
     {
         JPanel header = new JPanel(new GridLayout(1, numberOfColumns));
 
-        List<Column> columns = createCustomField(userInputPanelSpec, spec).getColumns();
-        for (Column column : columns)
+        for (Field field: customInfoField.getFields())
         {
-            JLabel label = new JLabel(column.getId());
+            String heading = field.getDescription();
+            if (heading == null)
+            {
+                heading = field.getLabel();
+            }
+            JLabel label = new JLabel(heading);
             header.add(label);
         }
-
         return header;
     }
 }
