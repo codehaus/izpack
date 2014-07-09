@@ -9,7 +9,6 @@ import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.custom.Column;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
-import com.izforge.izpack.panels.userinput.gui.GUIField;
 import com.izforge.izpack.util.Console;
 
 import java.util.ArrayList;
@@ -29,7 +28,11 @@ public class ConsoleCustomField extends ConsoleField
 
     private int numberOfColumns = 0;
 
-    private final CustomField customField;
+    private final CustomField customInfoField;
+
+    private final int maxRow;
+
+    private final int minRow;
 
     private final static int INVALID = -1;
 
@@ -55,7 +58,9 @@ public class ConsoleCustomField extends ConsoleField
         this.spec = spec;
         this.userInputPanelSpec = userInputPanelSpec;
         this.createField = createField;
-        this.customField = customField;
+        this.customInfoField = customField;
+        this.maxRow = customField.getMaxRow();
+        this.minRow = customField.getMinRow();
         this.numberOfColumns = customField.getFields().size();
     }
 
@@ -70,7 +75,26 @@ public class ConsoleCustomField extends ConsoleField
         return (CustomField) super.getField();
     }
 
-    public boolean addRow()
+    /**
+     * Ensure to display the minimum amount of rows required.
+     */
+    private void addInitialRows()
+    {
+        for(int count = minRow; count > 1; count--)
+        {
+            addRow(true);
+        }
+    }
+
+    /**
+     * Display the fields within the row to the console.
+     * At the end prompt to add another module, redisplay the module, or continue with the installation.
+     *
+     * @param initial If it is part of the initial rows then do no prompt to add another module
+     *                As there must be at least one more module to follow.
+     * @return true if the user requested another row, false if the user wants to continue with the installation
+     */
+    public boolean addRow(boolean initial)
     {
         numberOfRows++;
         boolean onModule = true;
@@ -91,16 +115,32 @@ public class ConsoleCustomField extends ConsoleField
             value = INVALID;
             for (ConsoleField field : fields)
             {
+
                 field.setDisplayed(true);
+
                 while (!field.display())
                 {
                     //Continue to ask for input if it was invalid
                 }
             }
 
+
             while (value == INVALID)
             {
-                value = prompt("Enter 1 continue, or 2 to add another module, 3 to redisplay", 1, 3, -1, -1);
+                // Only give options to continue or redisplay when you need to meet the minimum amount of rows
+                // or you are at the max amount of rows
+                if (initial || numberOfRows == maxRow)
+                {
+                    value = prompt("Enter 1 continue, or 2 to redisplay", 1, 2, -1, -1);
+                    if (value == 2)
+                    {
+                        value = REDISPLAY;
+                    }
+                }
+                else
+                {
+                    value = prompt("Enter 1 continue, or 2 to add another module, 3 to redisplay", 1, 3, -1, -1);
+                }
             }
             if(value != REDISPLAY)
             {
@@ -115,18 +155,28 @@ public class ConsoleCustomField extends ConsoleField
         
         return false;
     }
+    public boolean addRow()
+    {
+        return addRow(false);
+    }
 
+    /**
+     * Display the custom field.
+     *
+     * @return
+     */
     @Override
     public boolean display()
     {
         numberOfRows = 0;
         consoleFields = new HashMap<Integer, List<ConsoleField>>();
 
+        addInitialRows();
         while(addRow())
         {
             //Keep adding rows until the user is done or max limit is reached
         }
-        customField.setValue(numberOfRows + "");
+        customInfoField.setValue(numberOfRows + "");
 
         if(!columnsAreValid())
         {
@@ -138,7 +188,7 @@ public class ConsoleCustomField extends ConsoleField
 
     private boolean columnsAreValid()
     {
-        List<Column> columns = customField.getColumns();
+        List<Column> columns = customInfoField.getColumns();
         String [] columnVariables = getVariablesByColumn();
         for (int i = 0; i < columnVariables.length; i++)
         {

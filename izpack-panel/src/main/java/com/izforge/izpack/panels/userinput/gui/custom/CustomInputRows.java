@@ -67,20 +67,32 @@ public class CustomInputRows extends JPanel
         this.createField = createField;
         this.customInfoField = customField;
         this.numberOfColumns = getNumberOfColumns(customInfoField);
-        this.maxRow = getMaxRow(customInfoField);
-        this.minRow = getMinRow(customInfoField);
+        this.maxRow = customField.getMaxRow();
+        this.minRow = customField.getMinRow();
         this.labels = getLabels(customInfoField);
         this.guiFields = new HashMap<Integer, List<GUIField>>();
         this.installData = installData;
 
         super.setLayout(new GridLayout(0, numberOfColumns));
-        addRow(true);
+        addInitialRows();
+    }
+
+    /**
+     * Add the minimum amount of rows specified.
+     * The default minimum amount of rows is one.
+     */
+    private void addInitialRows()
+    {
+        for(int count = minRow; count > 0; count--)
+        {
+            addRow();
+        }
     }
 
     /**
      * Add an additional row of fields defined by the user.
      */
-    public void addRow(boolean first)
+    public void addRow()
     {
         numberOfRows++;
         List<GUIField> fields;
@@ -123,11 +135,6 @@ public class CustomInputRows extends JPanel
         revalidate();
         repaint();
     }
-    public void addRow()
-    {
-        addRow(false);
-    }
-
 
     /**
      * Remove last added row of fields defined by the user.
@@ -300,25 +307,5 @@ public class CustomInputRows extends JPanel
         }
 
         return header;
-    }
-
-    /**
-     * Get the minimum amount of rows that must be displayed
-     * @param customFieldInfo
-     * @return
-     */
-    private int getMinRow(CustomField customFieldInfo)
-    {
-        return customFieldInfo.getMinRow();
-    }
-
-    /**
-     * Get the maximum amount of rows that can be displayed
-     * @param customFieldInfo
-     * @return
-     */
-    private int getMaxRow(CustomField customFieldInfo)
-    {
-        return customFieldInfo.getMaxRow();
     }
 }
