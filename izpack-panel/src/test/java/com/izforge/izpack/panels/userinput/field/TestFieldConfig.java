@@ -90,6 +90,12 @@ public class TestFieldConfig implements FieldConfig
         return null;
     }
 
+    @Override
+    public boolean getDisplayHidden()
+    {
+        return false;
+    }
+
     /**
      * Returns the packs that this field applies to.
      *

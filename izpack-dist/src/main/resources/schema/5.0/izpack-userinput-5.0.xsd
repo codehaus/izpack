@@ -61,6 +61,15 @@
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:attribute>
+                        <xs:attribute name="displayHidden" type="xs:boolean" use="optional" default="false">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    When set to true, fields on this panel will be shown as disabled when the field's
+                                    conditionid evaluates to false. When set to false or not specified, fields will be
+                                    hidden if its conditionid evaluates to false.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
                         <xs:attribute name="rigid" type="xs:boolean" use="optional" default="false">
                             <xs:annotation>
                                 <xs:documentation>
@@ -232,6 +241,15 @@
                     the label/key that will be shown in the SummaryPanel. The value represents the
                     key of your string defined in your langpacks. On the SummaryPanel the label/key will be followed by
                     a space and the value of the variable you are summarizing.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="displayHidden" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                    When set to true, this field will be shown as disabled when its
+                    conditionid evaluates to false. When set to false or not specified, this field will be
+                    hidden if its conditionid evaluates to false.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>

@@ -49,6 +49,15 @@ public interface FieldConfig
     String getSummaryKey();
 
     /**
+     * Returns if the field should always be displayed on the panel regardless if its conditionid is true or false.
+     * If the conditionid is false, display the field but disable it.
+     * <p/>
+     *
+     * @return the 'displayHidden' attribute, or {@code null}
+     */
+    boolean getDisplayHidden();
+
+    /**
      * Returns the packs that this field applies to.
      *
      * @return the list of pack names

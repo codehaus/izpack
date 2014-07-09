@@ -55,6 +55,13 @@ public class FieldReader extends ElementReader implements FieldConfig
      */
     protected static final String SUMMARY_KEY = "summaryKey";
 
+
+    /**
+     * Variable attribute name.
+     */
+    protected static final String DISPLAY_HIDDEN = "displayHidden";
+
+
     /**
      * Text size attribute name.
      */
@@ -134,6 +141,30 @@ public class FieldReader extends ElementReader implements FieldConfig
     {
         boolean optional = true;
         return getConfig().getAttribute(getField(), SUMMARY_KEY, optional);
+    }
+
+    /**
+     * Returns if the field should always be displayed on the panel regardless if its conditionid is true or false.
+     * If the conditionid is false, display the field but disable it.
+     * <p/>
+     *
+     * @return the 'displayHidden' attribute, or {@code null}
+     */
+    @Override
+    public boolean getDisplayHidden()
+    {
+        boolean displayHidden = false;
+        boolean optional = true;
+        String displayHiddenValue = getConfig().getAttribute(getField(), DISPLAY_HIDDEN, optional);
+        try
+        {
+            displayHidden = Boolean.parseBoolean(displayHiddenValue);
+            return displayHidden;
+        }
+        catch(Exception ignore)
+        {
+            return false;
+        }
     }
 
     /**
