@@ -104,6 +104,11 @@ public abstract class Field
     private final String condition;
 
     /**
+     * Determines if the field should always be displayed on the panel regardless if its conditionid is true or false.
+     * If the conditionid is false, display the field but disable it.
+     */
+    private boolean displayHidden;
+    /**
      * The installation data.
      */
     private final InstallData installData;
@@ -137,9 +142,11 @@ public abstract class Field
         processor = config.getProcessor();
         label = config.getLabel();
         description = config.getDescription();
+        displayHidden = config.getDisplayHidden();
         tooltip = config.getTooltip();
         this.condition = config.getCondition();
         this.installData = installData;
+
 
         if (variable != null)
         {
@@ -175,6 +182,17 @@ public abstract class Field
     public String getSummaryKey()
     {
         return summaryKey;
+    }
+
+    /**
+     * Determines if the field should always be displayed on the panel regardless if its conditionid is true or false.
+     * If the conditionid is false, display the field but disable it.
+     *
+     * @return {@code true} if displaying hidden otherwise {@code false}
+     */
+    public boolean getDisplayHidden()
+    {
+        return displayHidden;
     }
 
     /**
