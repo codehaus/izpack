@@ -41,7 +41,7 @@ import com.izforge.izpack.api.data.Variables;
  *
  * @author Tim Anderson
  */
-public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implements Panels, PanelViews<T, V>
+public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implements PanelViews<T, V>
 {
 
     /**
