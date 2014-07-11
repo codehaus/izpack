@@ -448,7 +448,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
                 Panel panel = panelView.getPanel();
                 if (panel.isVisited())
                 {
-                    IXMLElement panelRoot = panelView.createPanelRootRecord();
+                    IXMLElement panelRoot = panelView.createPanelRootRecord(); //AbstractPanelView
                     panelView.createInstallationRecord(panelRoot);
                     panelsRoot.addChild(panelRoot);
                 }
