@@ -52,6 +52,8 @@
          txt="Please enter a number from the selection above."/>
     <str id="TreePacksPanel.required"
          txt="Required"/>
+    <str id="TreePacksPanel.unselectable"
+         txt="Unselectable"/>
     <str id="TreePacksPanel.done"
          txt="Done!"/>
 
