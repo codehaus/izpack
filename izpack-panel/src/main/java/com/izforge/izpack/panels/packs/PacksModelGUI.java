@@ -57,12 +57,6 @@ public class PacksModelGUI extends PacksModel
             panel.showSpaceRequired();
 
         }
-        System.out.println("====================== CHECK VALUES ============================");
-        for (int i=0; i<packs.size(); i++)
-        {
-            System.out.println(packs.get(i).getName() + ": " + checkValues[i]);
-        }
-        System.out.println("====================== CHECK VALUES ============================");
     }
 
     private void updateBytes()

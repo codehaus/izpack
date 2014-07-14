@@ -243,19 +243,37 @@ public class PacksModel extends AbstractTableModel
                         logger.fine(packName + " can be installed optionally.");
                         if (initial)
                         {
-                            checkValues[pos] = DESELECTED;
-                            changes = true;
+                            if (checkValues[pos] != DESELECTED)
+                            {
+                                checkValues[pos] = DESELECTED;
+                                changes = true;
+                            }
                         }
                     }
                     else
                     {
-                        logger.fine("Pack" + packName + " cannot be installed");
-                        checkValues[pos] = DEPENDENT_DESELECTED;
-                        changes = true;
+                        if (checkValues[pos] != DEPENDENT_DESELECTED)
+                        {
+                            logger.fine("Pack" + packName + " cannot be installed");
+                            checkValues[pos] = DEPENDENT_DESELECTED;
+                            changes = true;
+                        }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Ensure that the table is up to date.
+     * Order does matter
+     */
+    public void updateTable()
+    {
+        updateDeps();
+        updateConditions();
+        updatePacksToInstall();
+        fireTableDataChanged();
     }
 
     /**
@@ -682,7 +700,7 @@ public class PacksModel extends AbstractTableModel
             }
             else if (installedPacks.containsKey(pack.getName()))
             {
-                checkValues[i] = -3;
+                checkValues[i] = REQUIRED_PARTIAL_SELECTED;
             }
         }
 
@@ -718,11 +736,11 @@ public class PacksModel extends AbstractTableModel
         {
             if (statusArray[i] == 0 && checkValues[i] < 0)
             {
-                checkValues[i] += 2;
+                checkValues[i] += PARTIAL_SELECTED;
             }
             if (statusArray[i] == 1 && checkValues[i] >= 0)
             {
-                checkValues[i] = -2;
+                checkValues[i] = DEPENDENT_DESELECTED;
             }
 
         }

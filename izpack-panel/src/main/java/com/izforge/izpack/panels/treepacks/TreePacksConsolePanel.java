@@ -56,6 +56,7 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
 
 
     private static final String REQUIRED = "TreePacksPanel.required";
+    private static final String UNSELECTABLE = "TreePacksPanel.unselectable";
     private static final String DEPENDENT = "TreePacksPanel.dependent";
     private static final String CHILDREN = "TreePacksPanel.children";
 
@@ -258,6 +259,11 @@ public class TreePacksConsolePanel extends AbstractConsolePanel implements Conso
         {
             extraRow = extraRow + String.format("\n      >> %s", messages.get(REQUIRED));
         }
+        else if(!packsModel.isCheckBoxSelectable(row))
+        {
+            extraRow = extraRow + String.format("\n      >> %s", messages.get(UNSELECTABLE));
+        }
+
         if (!dependencies.isEmpty())
         {
             extraRow = extraRow + String.format("\n      >> %s", dependencies);
