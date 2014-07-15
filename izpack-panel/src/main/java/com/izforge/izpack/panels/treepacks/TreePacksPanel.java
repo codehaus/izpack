@@ -374,7 +374,7 @@ public class TreePacksPanel extends IzPanel
     /**
      * Synchronize the view with the PacksModel data.
      */
-    public void updateViewFromModel()
+    public void updateViewFromModel(JTree tree)
     {
         TreeModel model = this.packsTree.getModel();
         CheckBoxNode root = (CheckBoxNode) model.getRoot();
@@ -383,6 +383,7 @@ public class TreePacksPanel extends IzPanel
         updateRequiredSpaceLabel();
         showFreeSpace();
         syncPackSizes();
+        tree.treeDidChange();
     }
 
     /**
@@ -613,7 +614,8 @@ public class TreePacksPanel extends IzPanel
     @Override
     public void panelActivate()
     {
-        updateViewFromModel();
+        packsModel.updateTable();
+        updateViewFromModel(getTree());
     }
 
     /*
@@ -763,8 +765,7 @@ class CheckTreeController extends MouseAdapter
         }
 
         treePacksPanel.setModelValue(selectedNode);
-        treePacksPanel.updateViewFromModel();
-        tree.treeDidChange();
+        treePacksPanel.updateViewFromModel(tree);
     }
 
     /**
