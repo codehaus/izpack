@@ -127,11 +127,7 @@ public class UserPathConsolePanel extends AbstractConsolePanel
             defaultUserPathPanel = vs.substitute(defaultUserPathPanel, null);
         }
 
-        out(EMPTY);
-        out(pathMessage + " [" + defaultUserPathPanel + "]");
-
-        userPathPanel = console.promptLocation("", null);
-        out(EMPTY);
+        userPathPanel = console.promptLocation(pathMessage + " [" + defaultUserPathPanel + "]",defaultUserPathPanel,  null);
 
         // check what the userPathPanel value should be
         if (userPathPanel == null)
