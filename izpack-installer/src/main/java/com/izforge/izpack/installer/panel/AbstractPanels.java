@@ -492,6 +492,8 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
         T newPanelView = getPanelView(newIndex);
         int oldIndex = index;
         index = newIndex;
+
+        newPanelView.getPanel().setVisited(true);
         if (switchPanel(newPanelView, oldPanelView))
         {
 
@@ -506,7 +508,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
                       futurePanelView.getPanel().setVisited(false);
                   }
             }
-            newPanelView.getPanel().setVisited(true);
+
             logger.fine("Switched panel index: " + oldIndex + " -> " + index);
             result = true;
         }
@@ -514,6 +516,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
         {
             index = oldIndex;
             result = false;
+            newPanelView.getPanel().setVisited(false);
         }
 
        return result;
