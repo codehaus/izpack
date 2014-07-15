@@ -58,7 +58,7 @@ import com.izforge.izpack.util.file.FileUtils;
 public class FinishConsolePanel extends AbstractConsolePanel
 {
     private static final Logger LOGGER = Logger.getLogger(FinishConsolePanel.class.getName());
-    private static final String AUTO_INSTALL_SCRIPT_NAME = "autoInstall.xml";
+    private static final String AUTO_INSTALL_SCRIPT_NAME = "auto-install.xml";
 
     private final Prompt prompt;
     private final ObjectFactory factory;
