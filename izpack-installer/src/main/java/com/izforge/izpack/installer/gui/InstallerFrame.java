@@ -1406,11 +1406,11 @@ public class InstallerFrame extends JFrame implements InstallerBase, InstallerVi
             String message = String.format(
                     "%s %d %s %d",
                     messages.get("installer.step"), curPanelNo + 1,
-                    messages.get("installer.of"), visPanelsCount + 1
+                    messages.get("installer.of"), visPanelsCount
             );
             if (headingCounterComponent instanceof JProgressBar)
             {
-                updateProgressBar(visPanelsCount + 1, curPanelNo + 1, message);
+                updateProgressBar(visPanelsCount, curPanelNo + 1, message);
             }
             else
             {
