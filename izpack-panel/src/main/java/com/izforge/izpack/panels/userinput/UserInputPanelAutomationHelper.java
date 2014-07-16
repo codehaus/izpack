@@ -35,6 +35,7 @@ import com.izforge.izpack.panels.userinput.console.custom.ConsoleCustomField;
 import com.izforge.izpack.panels.userinput.field.AbstractFieldView;
 import com.izforge.izpack.panels.userinput.field.FieldView;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
+import com.izforge.izpack.panels.userinput.field.custom.CustomFieldType;
 import com.izforge.izpack.panels.userinput.gui.custom.GUICustomField;
 
 /**
@@ -126,16 +127,10 @@ public class UserInputPanelAutomationHelper implements PanelAutomation
 
             // Grab all the variables contained within the custom field
             List <String> namedVariables = new ArrayList<String>();
-            if (view instanceof GUICustomField)
+            if(view instanceof CustomFieldType)
             {
-                GUICustomField guiCustomField = (GUICustomField) view;
-                namedVariables = guiCustomField.getVariables();
-
-            }
-            if(view instanceof ConsoleCustomField)
-            {
-                ConsoleCustomField consoleCustomField = (ConsoleCustomField) view;
-                namedVariables = consoleCustomField.getVariables();
+                CustomFieldType customField = (CustomFieldType) view;
+                namedVariables = customField.getVariables();
             }
 
             for(String numberedVariable : namedVariables)

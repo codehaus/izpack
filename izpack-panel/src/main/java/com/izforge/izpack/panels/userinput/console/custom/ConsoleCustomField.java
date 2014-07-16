@@ -9,6 +9,7 @@ import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.custom.Column;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
+import com.izforge.izpack.panels.userinput.field.custom.CustomFieldType;
 import com.izforge.izpack.util.Console;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConsoleCustomField extends ConsoleField
+public class ConsoleCustomField extends ConsoleField implements CustomFieldType
 {
     private final UserInputPanelSpec userInputPanelSpec;
 
@@ -225,6 +226,10 @@ public class ConsoleCustomField extends ConsoleField
         return columnVariables;
     }
 
+    /**
+     * Get the variables associated with this custom field.
+     * @return
+     */
     public List<String> getVariables()
     {
         List<String> countedVariables = new ArrayList<String>();

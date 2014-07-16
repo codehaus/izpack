@@ -6,13 +6,11 @@ import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.panels.userinput.FieldCommand;
-import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.UserInputPanelSpec;
 import com.izforge.izpack.panels.userinput.field.custom.CustomField;
+import com.izforge.izpack.panels.userinput.field.custom.CustomFieldType;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -31,7 +29,7 @@ import java.util.List;
  * |            |  Add  | Remove  |
  * |==============================|
  */
-public class GUICustomField extends GUIField
+public class GUICustomField extends GUIField implements CustomFieldType
 {
     private final CustomInputField customInputField;
     public GUICustomField(CustomField customField, FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec,  GUIInstallData installData, IzPanel parent)
