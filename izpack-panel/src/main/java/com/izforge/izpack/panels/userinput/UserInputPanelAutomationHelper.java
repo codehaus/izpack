@@ -22,8 +22,7 @@
 
 package com.izforge.izpack.panels.userinput;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
@@ -32,6 +31,11 @@ import com.izforge.izpack.api.data.InstallData;
 import com.izforge.izpack.api.data.Variables;
 import com.izforge.izpack.api.exception.InstallerException;
 import com.izforge.izpack.installer.automation.PanelAutomation;
+import com.izforge.izpack.panels.userinput.console.custom.ConsoleCustomField;
+import com.izforge.izpack.panels.userinput.field.AbstractFieldView;
+import com.izforge.izpack.panels.userinput.field.FieldView;
+import com.izforge.izpack.panels.userinput.field.custom.CustomField;
+import com.izforge.izpack.panels.userinput.gui.custom.GUICustomField;
 
 /**
  * Functions to support automated usage of the UserInputPanel
@@ -55,25 +59,27 @@ public class UserInputPanelAutomationHelper implements PanelAutomation
 
     private static final String AUTO_ATTRIBUTE_VALUE = "value";
 
-    // ------------------------------------------------------
-    // String-String key-value pairs
-    // ------------------------------------------------------
-    private Map<String, String> entries;
+    private Set<String> variables;
+
+    private List<? extends AbstractFieldView> views;
 
     /**
      * Default constructor, used during automated installation.
      */
     public UserInputPanelAutomationHelper()
     {
-        this.entries = null;
+
     }
 
     /**
-     * @param entries String-String key-value pairs representing the state of the Panel
+     *
+     * @param variables
+     * @param views
      */
-    public UserInputPanelAutomationHelper(Map<String, String> entries)
+    public UserInputPanelAutomationHelper(Set<String> variables, List<? extends AbstractFieldView> views)
     {
-        this.entries = entries;
+        this.variables = variables;
+        this.views = views;
     }
 
     /**
@@ -85,20 +91,60 @@ public class UserInputPanelAutomationHelper implements PanelAutomation
     @Override
     public void createInstallationRecord(InstallData installData, IXMLElement rootElement)
     {
+        Map<String, String> entries = generateEntries(installData, variables, views);
+
         IXMLElement dataElement;
 
-        // ----------------------------------------------------
-        // add all entries
-        // ----------------------------------------------------
-        for (String key : this.entries.keySet())
+        for (String key : entries.keySet())
         {
-            String value = this.entries.get(key);
+            String value = entries.get(key);
             dataElement = new XMLElementImpl(AUTO_KEY_ENTRY, rootElement);
             dataElement.setAttribute(AUTO_ATTRIBUTE_KEY, key);
             dataElement.setAttribute(AUTO_ATTRIBUTE_VALUE, value);
 
             rootElement.addChild(dataElement);
         }
+    }
+
+    private Map<String, String> generateEntries(InstallData installData,
+                                                Set<String> variables, List<? extends AbstractFieldView> views)
+    {
+        Map<String, String> entries = new HashMap<String, String>();
+
+        for (String variable : variables)
+        {
+            entries.put(variable, installData.getVariable(variable));
+        }
+        for (FieldView view : views)
+        {
+            String variable = view.getField().getVariable();
+
+            if (variable != null)
+            {
+                entries.put(variable, installData.getVariable(variable));
+            }
+
+            // Grab all the variables contained within the custom field
+            List <String> namedVariables = new ArrayList<String>();
+            if (view instanceof GUICustomField)
+            {
+                GUICustomField guiCustomField = (GUICustomField) view;
+                namedVariables = guiCustomField.getVariables();
+
+            }
+            if(view instanceof ConsoleCustomField)
+            {
+                ConsoleCustomField consoleCustomField = (ConsoleCustomField) view;
+                namedVariables = consoleCustomField.getVariables();
+            }
+
+            for(String numberedVariable : namedVariables)
+            {
+                entries.put(numberedVariable, installData.getVariable(numberedVariable));
+            }
+
+        }
+        return entries;
     }
 
     /**

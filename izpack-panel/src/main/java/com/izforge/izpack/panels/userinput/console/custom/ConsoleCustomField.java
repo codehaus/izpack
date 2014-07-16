@@ -47,9 +47,9 @@ public class ConsoleCustomField extends ConsoleField
     /**
      * Constructs a {@code ConsoleField}.
      *
-     * @param customField   the field
-     * @param console the console
-     * @param prompt  the prompt
+     * @param customField the field
+     * @param console     the console
+     * @param prompt      the prompt
      */
     public ConsoleCustomField(CustomField customField, Console console, Prompt prompt,
                               FieldCommand createField, UserInputPanelSpec userInputPanelSpec, IXMLElement spec)
@@ -80,7 +80,7 @@ public class ConsoleCustomField extends ConsoleField
      */
     private void addInitialRows()
     {
-        for(int count = minRow; count > 1; count--)
+        for (int count = minRow; count > 1; count--)
         {
             addRow(true);
         }
@@ -99,7 +99,7 @@ public class ConsoleCustomField extends ConsoleField
         numberOfRows++;
         boolean onModule = true;
         List<ConsoleField> fields = new ArrayList<ConsoleField>();
-        
+
         for (Field field : createCustomField(userInputPanelSpec, spec).getFields())
         {
             field.setVariable(field.getVariable() + "." + numberOfRows);
@@ -134,25 +134,25 @@ public class ConsoleCustomField extends ConsoleField
                     {
                         value = REDISPLAY;
                     }
-                }
-                else
+                } else
                 {
                     value = prompt("Enter 1 continue, or 2 to add another module, 3 to redisplay", 1, 3, -1, -1);
                 }
             }
-            if(value != REDISPLAY)
+            if (value != REDISPLAY)
             {
                 onModule = false;
             }
         }
 
-        if(value == ADD_MODULE)
+        if (value == ADD_MODULE)
         {
             return true;
         }
-        
+
         return false;
     }
+
     public boolean addRow()
     {
         return addRow(false);
@@ -170,13 +170,13 @@ public class ConsoleCustomField extends ConsoleField
         consoleFields = new HashMap<Integer, List<ConsoleField>>();
 
         addInitialRows();
-        while(addRow())
+        while (addRow())
         {
             //Keep adding rows until the user is done or max limit is reached
         }
         customInfoField.setValue(numberOfRows + "");
 
-        if(!columnsAreValid())
+        if (!columnsAreValid())
         {
             this.display();
         }
@@ -187,7 +187,7 @@ public class ConsoleCustomField extends ConsoleField
     private boolean columnsAreValid()
     {
         List<Column> columns = customInfoField.getColumns();
-        String [] columnVariables = getVariablesByColumn();
+        String[] columnVariables = getVariablesByColumn();
         for (int i = 0; i < columnVariables.length; i++)
         {
             ValidationStatus status = columns.get(i).validate(columnVariables[i]);
@@ -205,10 +205,10 @@ public class ConsoleCustomField extends ConsoleField
     {
         String[] columnVariables = new String[numberOfColumns];
 
-        for(int col=0; col < numberOfColumns; col++)
+        for (int col = 0; col < numberOfColumns; col++)
         {
             columnVariables[col] = "";
-            for (int row=1; row <= numberOfRows; row++)
+            for (int row = 1; row <= numberOfRows; row++)
             {
                 ConsoleField consoleField = consoleFields.get(row).get(col);
                 if (consoleField.isDisplayed())
@@ -217,12 +217,29 @@ public class ConsoleCustomField extends ConsoleField
                 }
             }
         }
-        for (int i=0; i < columnVariables.length; i++)
+        for (int i = 0; i < columnVariables.length; i++)
         {
             String v = columnVariables[i];
-            columnVariables[i] = v.substring(0, v.length()-1);
+            columnVariables[i] = v.substring(0, v.length() - 1);
         }
         return columnVariables;
+    }
+
+    public List<String> getVariables()
+    {
+        List<String> countedVariables = new ArrayList<String>();
+
+        for (int i = 1; i <= numberOfRows; i++)
+        {
+            for(ConsoleField consoleField : consoleFields.get(i))
+            {
+                if (consoleField.isDisplayed())
+                {
+                    countedVariables.add(consoleField.getVariable());
+                }
+            }
+        }
+        return countedVariables;
     }
 
     /**
