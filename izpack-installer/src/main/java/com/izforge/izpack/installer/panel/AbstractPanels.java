@@ -88,7 +88,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
      * Constructs an {@code AbstractPanels}.
      *
      * @param panels    the panels
-     * @param variables the variables. These are refreshed prior to each panel switch
+     * @param installData 
      */
     public AbstractPanels(List<T> panels, InstallData installData)
     {
@@ -381,7 +381,6 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
     /**
      * Determines if there is another panel prior to the specified index.
      *
-     * @param index       the panel index
      * @param visibleOnly if {@code true}, only examine visible panels
      * @return the previous panel index, or {@code -1} if there are no more panels
      */
