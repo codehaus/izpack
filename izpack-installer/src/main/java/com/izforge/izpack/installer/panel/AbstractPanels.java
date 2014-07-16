@@ -41,7 +41,7 @@ import com.izforge.izpack.api.data.Variables;
  *
  * @author Tim Anderson
  */
-public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implements Panels, PanelViews<T, V>
+public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implements PanelViews<T, V>
 {
 
     /**
@@ -448,7 +448,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
                 Panel panel = panelView.getPanel();
                 if (panel.isVisited())
                 {
-                    IXMLElement panelRoot = panelView.createPanelRootRecord();
+                    IXMLElement panelRoot = panelView.createPanelRootRecord(); //AbstractPanelView
                     panelView.createInstallationRecord(panelRoot);
                     panelsRoot.addChild(panelRoot);
                 }
@@ -492,6 +492,8 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
         T newPanelView = getPanelView(newIndex);
         int oldIndex = index;
         index = newIndex;
+
+        newPanelView.getPanel().setVisited(true);
         if (switchPanel(newPanelView, oldPanelView))
         {
 
@@ -506,7 +508,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
                       futurePanelView.getPanel().setVisited(false);
                   }
             }
-            newPanelView.getPanel().setVisited(true);
+
             logger.fine("Switched panel index: " + oldIndex + " -> " + index);
             result = true;
         }
@@ -514,6 +516,7 @@ public abstract class AbstractPanels<T extends AbstractPanelView<V>, V> implemen
         {
             index = oldIndex;
             result = false;
+            newPanelView.getPanel().setVisited(false);
         }
 
        return result;
