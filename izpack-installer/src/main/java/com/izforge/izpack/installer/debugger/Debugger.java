@@ -66,7 +66,6 @@ public class Debugger
 
     private Properties lasttimevariables;
 
-    private JTextPane debugtxt;
     private IconsDatabase icons;
     private Map<String, VariableHistory> variableshistory;
     private Map<String, ConditionHistory> conditionhistory;
@@ -168,7 +167,8 @@ public class Debugger
             if ((oldvalue == null))
             {
                 VariableHistory variableHistory = new VariableHistory(key);
-                variableHistory.addValue(currentvalue, "new after panel " + lastpanelmetadata.getPanelId());
+                variableHistory.addValue(currentvalue,
+                        (lastpanelmetadata!=null?"new after panel " + lastpanelmetadata.getPanelId():"new on first panel "));
                 variableshistory.put(key, variableHistory);
                 changes = true;
                 changedvariables.put(key, currentvalue);
@@ -179,7 +179,7 @@ public class Debugger
                 {
                     VariableHistory variableHistory = variableshistory.get(key);
                     variableHistory.addValue(currentvalue,
-                                             "changed value after panel " + lastpanelmetadata.getPanelId());
+                            (lastpanelmetadata!=null?"changed value after panel " + lastpanelmetadata.getPanelId():"changed value on first panel "));
                     changes = true;
                     changedvariables.put(key, currentvalue);
                 }
