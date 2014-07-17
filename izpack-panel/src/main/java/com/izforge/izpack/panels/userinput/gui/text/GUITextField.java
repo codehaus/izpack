@@ -22,6 +22,7 @@
 package com.izforge.izpack.panels.userinput.gui.text;
 
 import com.izforge.izpack.api.handler.Prompt;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.ValidationStatus;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
@@ -29,6 +30,7 @@ import com.izforge.izpack.panels.userinput.gui.GUIField;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -110,15 +112,30 @@ public class GUITextField extends GUIField implements FocusListener, DocumentLis
 
         if (value != null)
         {
-            text.getDocument().removeDocumentListener(this);
-            text.setText(replaceVariables(value));
-            text.getDocument().addDocumentListener(this);
-            setChanged(false);
+            replaceValue(value);
             result = true;
         }
+        else
+        {
+            // Set default value here for getting current variable values replaced
+            Field f = getField();
+            String defaultValue = f.getDefaultValue();
+            if (defaultValue != null)
+            {
+                replaceValue(defaultValue);
+            }
+        }
+
         return result;
     }
 
+    private void replaceValue(String value)
+    {
+        text.getDocument().removeDocumentListener(this);
+        text.setText(replaceVariables(value));
+        text.getDocument().addDocumentListener(this);
+        setChanged(false);
+    }
 
     public synchronized void setChanged(boolean changed)
     {

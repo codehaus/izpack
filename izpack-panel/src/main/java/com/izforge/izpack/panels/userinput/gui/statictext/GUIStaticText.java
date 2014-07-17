@@ -32,7 +32,6 @@ import com.izforge.izpack.panels.userinput.gui.GUIField;
  */
 public class GUIStaticText extends GUIField
 {
-
     /**
      * Constructs a {@code GUIStaticText}.
      *
@@ -45,4 +44,10 @@ public class GUIStaticText extends GUIField
         addTooltip();
     }
 
+    @Override
+    public boolean updateView()
+    {
+        refreshStaticText();
+        return false;
+    }
 }

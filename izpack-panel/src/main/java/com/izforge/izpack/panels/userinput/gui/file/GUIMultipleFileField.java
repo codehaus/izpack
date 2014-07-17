@@ -25,6 +25,7 @@ import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.gui.InstallerFrame;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.file.MultipleFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
@@ -102,38 +103,53 @@ public class GUIMultipleFileField extends GUIField
 
         if (value != null)
         {
-            fileInput.clearFiles();
-            if (fileInput.isCreateMultipleVariables())
-            {
-                fileInput.addFile(value);
-                // try to read more files
-                String basevariable = getVariable();
-                int index = 1;
-
-                while (value != null)
-                {
-                    StringBuilder builder = new StringBuilder(basevariable);
-                    builder.append("_");
-                    builder.append(index++);
-                    value = getInstallData().getVariable(builder.toString());
-                    if (value != null)
-                    {
-                        fileInput.addFile(value);
-                    }
-                }
-            }
-            else
-            {
-                // split file string
-                String[] files = value.split(";");
-                for (String file : files)
-                {
-                    fileInput.addFile(file);
-                }
-            }
+            splitValue(value);
             result = true;
         }
+        else
+        {
+            // Set default value here for getting current variable values replaced
+            Field field = getField();
+            String defaultValue = field.getDefaultValue();
+            if (defaultValue != null)
+            {
+                splitValue(defaultValue);
+            }
+        }
         return result;
+    }
+
+    private void splitValue(String value)
+    {
+        fileInput.clearFiles();
+        if (fileInput.isCreateMultipleVariables())
+        {
+            fileInput.addFile(value);
+            // try to read more files
+            String basevariable = getVariable();
+            int index = 1;
+
+            while (value != null)
+            {
+                StringBuilder builder = new StringBuilder(basevariable);
+                builder.append("_");
+                builder.append(index++);
+                value = getInstallData().getVariable(builder.toString());
+                if (value != null)
+                {
+                    fileInput.addFile(value);
+                }
+            }
+        }
+        else
+        {
+            // split file string
+            String[] files = value.split(";");
+            for (String file : files)
+            {
+                fileInput.addFile(file);
+            }
+        }
     }
 
 }
