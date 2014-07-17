@@ -61,13 +61,13 @@ public class Console
     {
         try
         {
-            this.consoleReader = new ConsoleReader("IzPack", in, out, null);
             Log.setOutput(new PrintStream(new OutputStream() {
                 @Override
                 public void write(int b) throws IOException
                 {
                 }
             }));
+            this.consoleReader = new ConsoleReader("IzPack", in, out, null);
             this.out = new PrintWriter(consoleReader.getOutput(), true);
         }
         catch (Throwable t)
