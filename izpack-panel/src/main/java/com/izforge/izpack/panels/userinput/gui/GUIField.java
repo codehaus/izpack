@@ -30,6 +30,7 @@ import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.util.HyperlinkHandler;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,6 +164,22 @@ public abstract class GUIField extends AbstractFieldView
     protected void addComponent(JComponent component, Object constraints)
     {
         components.add(new Component(component, constraints));
+    }
+
+    /**
+     * Refresh JLabel texts to replace variables
+     */
+    protected void refreshStaticText()
+    {
+        for (Component c : components)
+        {
+            JComponent jc = c.getComponent();
+            if (jc instanceof JTextPane)
+            {
+                JTextPane pane = (JTextPane)jc;
+                pane.setText(replaceVariables(pane.getText()));
+            }
+        }
     }
 
     /**

@@ -30,6 +30,7 @@ import com.izforge.izpack.panels.userinput.field.title.TitleField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +48,8 @@ public class GUITitleField extends GUIField
      */
     private static final Logger logger = Logger.getLogger(GUITitleField.class.getName());
 
+    private JLabel label = null;
+
     /**
      * Constructs a {@code GUITitleField}.
      *
@@ -61,7 +64,6 @@ public class GUITitleField extends GUIField
 
         if (title != null)
         {
-            JLabel label = null;
             ImageIcon icon;
             String iconName = field.getIconName(installData.getMessages());
             if (iconName != null)
@@ -103,6 +105,20 @@ public class GUITitleField extends GUIField
             addComponent(label, constraints);
         }
         addTooltip();
+    }
+
+    @Override
+    public boolean updateView()
+    {
+        String value = getField().getLabel();
+
+        if (value != null)
+        {
+            // Set value here for getting current variable values replaced
+            label.setText(replaceVariables(value));
+        }
+
+        return false;
     }
 
     /**

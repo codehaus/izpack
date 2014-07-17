@@ -30,6 +30,7 @@ import com.izforge.izpack.panels.userinput.field.password.PasswordGroupField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
 import javax.swing.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +123,17 @@ public class GUIPasswordGroupField extends GUIField
             passwords.get(0).setText(replaceVariables(value));
             result = true;
         }
+        else
+        {
+            // Set default value here for getting current variable values replaced
+            Field field = getField();
+            String defaultValue = field.getDefaultValue();
+            if (defaultValue != null)
+            {
+                passwords.get(0).setText(defaultValue);
+            }
+        }
+
         return result;
     }
 

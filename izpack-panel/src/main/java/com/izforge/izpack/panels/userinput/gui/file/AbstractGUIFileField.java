@@ -25,6 +25,7 @@ import java.io.File;
 
 import com.izforge.izpack.api.handler.Prompt;
 import com.izforge.izpack.gui.TwoColumnConstraints;
+import com.izforge.izpack.panels.userinput.field.Field;
 import com.izforge.izpack.panels.userinput.field.file.AbstractFileField;
 import com.izforge.izpack.panels.userinput.gui.GUIField;
 
@@ -98,6 +99,16 @@ public abstract class AbstractGUIFileField extends GUIField
         {
             fileInput.setFile(value);
             result = true;
+        }
+        else
+        {
+            // Set default value here for getting current variable values replaced
+            Field field = getField();
+            String defaultValue = field.getDefaultValue();
+            if (defaultValue != null)
+            {
+                fileInput.setFile(defaultValue);
+            }
         }
 
         return result;
