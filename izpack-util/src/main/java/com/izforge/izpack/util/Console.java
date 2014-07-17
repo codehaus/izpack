@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import jline.console.ConsoleReader;
 import jline.console.completer.FileNameCompleter;
+import jline.internal.Log;
 
 /**
  * I/O streams to support prompting and keyboard input from the console.
@@ -25,7 +26,7 @@ public class Console
     /**
      * Check if consoleReader failed to load.
      */
-    private boolean consoleReaderFailed;
+    private boolean consoleReaderFailed = false;
 
     /**
      * File name completer allows for tab completion on files and directories.
@@ -35,12 +36,12 @@ public class Console
     /**
      * Input stream.
      */
-    private final BufferedReader in;
+    private BufferedReader in;
 
     /**
      * Output stream.
      */
-    private final PrintWriter out;
+    private PrintWriter out;
 
     /**
      * Constructs a <tt>Console</tt> with <tt>System.in</tt> and <tt>System.out</tt> as the I/O streams.
@@ -58,16 +59,23 @@ public class Console
      */
     public Console(InputStream in, OutputStream out)
     {
-        this.in = new BufferedReader(new InputStreamReader(in));
-        this.out = new PrintWriter(out, true);
         try
         {
-            this.consoleReader = new ConsoleReader();
+            this.consoleReader = new ConsoleReader("IzPack", in, out, null);
+            Log.setOutput(new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException
+                {
+                }
+            }));
+            this.out = new PrintWriter(consoleReader.getOutput(), true);
         }
-        catch (IOException e)
+        catch (Throwable t)
         {
             consoleReaderFailed = true;
-            logger.log(Level.SEVERE, "Cannot initialize the console reader. Default to regular input stream.");
+            this.out = new PrintWriter(out, true);
+            this.in = new BufferedReader(new InputStreamReader(in));
+            logger.log(Level.SEVERE, "Cannot initialize the console reader. Default to regular input stream.", t);
         }
 
     }
@@ -85,7 +93,7 @@ public class Console
     {
         if (consoleReaderFailed)
         {
-            return  in.readLine();
+            return in.readLine();
         }
         else
         {
@@ -197,7 +205,7 @@ public class Console
      * Except a path to a file or directory.
      * Ensure to expand the tilde character to the user's home directory.
      * If the input ends with a file separator we will trim it to keep consistency.
-     * 
+     *
      * @param prompt the prompt to display
      * @param eof the value to return if end of stream is reached
      * @return the input value or <tt>eof</tt> if the end of stream is reached
