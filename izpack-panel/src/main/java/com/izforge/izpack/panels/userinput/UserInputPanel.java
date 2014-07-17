@@ -214,36 +214,7 @@ public class UserInputPanel extends IzPanel
     @Override
     public void createInstallationRecord(IXMLElement rootElement)
     {
-        Map<String, String> entryMap = new HashMap<String, String>();
-
-        for (String variable : variables)
-        {
-            entryMap.put(variable, installData.getVariable(variable));
-        }
-        for (FieldView view : views)
-        {
-            String variable = view.getField().getVariable();
-
-            if (variable != null)
-            {
-                entryMap.put(variable, installData.getVariable(variable));
-            }
-
-            // Grab all the variables contained within the custom field
-            if (view instanceof GUICustomField)
-            {
-                GUICustomField guiCustomField = (GUICustomField) view;
-                List<String> variables = guiCustomField.getVariables();
-
-                for(String numberedVariable : variables)
-                {
-                    entryMap.put(numberedVariable, installData.getVariable(numberedVariable));
-                }
-
-            }
-        }
-
-        new UserInputPanelAutomationHelper(entryMap).createInstallationRecord(installData, rootElement);
+        new UserInputPanelAutomationHelper(variables, views).createInstallationRecord(installData, rootElement);
     }
 
     /**

@@ -225,21 +225,6 @@ public class UserInputConsolePanel extends AbstractConsolePanel
     @Override
     public void createInstallationRecord(IXMLElement rootElement)
     {
-        Map<String, String> entryMap = new HashMap<String, String>();
-
-        for (String variable : variables)
-        {
-            entryMap.put(variable, installData.getVariable(variable));
-        }
-        for (FieldView field : fields)
-        {
-            String variable = field.getField().getVariable();
-            if (variable != null)
-            {
-                entryMap.put(variable, installData.getVariable(variable));
-            }
-        }
-
-        new UserInputPanelAutomationHelper(entryMap).createInstallationRecord(installData, rootElement);
+        new UserInputPanelAutomationHelper(variables, fields).createInstallationRecord(installData, rootElement);
     }
 }
