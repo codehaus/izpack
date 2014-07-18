@@ -1,10 +1,17 @@
 package com.izforge.izpack.util;
 
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jline.Terminal;
+import jline.UnsupportedTerminal;
 import jline.console.ConsoleReader;
 import jline.console.completer.FileNameCompleter;
 import jline.internal.Log;
@@ -17,6 +24,8 @@ import jline.internal.Log;
 public class Console
 {
     private static final Logger logger = Logger.getLogger(Console.class.getName());
+
+    private  static final java.io.Console console = System.console();
 
     /**
      * Console reader.
@@ -34,30 +43,9 @@ public class Console
     private final FileNameCompleter fileNameCompleter = new FileNameCompleter();
 
     /**
-     * Input stream.
-     */
-    private BufferedReader in;
-
-    /**
-     * Output stream.
-     */
-    private PrintWriter out;
-
-    /**
      * Constructs a <tt>Console</tt> with <tt>System.in</tt> and <tt>System.out</tt> as the I/O streams.
      */
     public Console()
-    {
-        this(System.in, System.out);
-    }
-
-    /**
-     * Constructs a <tt>Console</tt>.
-     *
-     * @param in  the input stream
-     * @param out the output stream
-     */
-    public Console(InputStream in, OutputStream out)
     {
         try
         {
@@ -67,15 +55,18 @@ public class Console
                 {
                 }
             }));
-            this.consoleReader = new ConsoleReader("IzPack", in, out, null);
-            this.out = new PrintWriter(consoleReader.getOutput(), true);
+            this.consoleReader = new ConsoleReader("IzPack", new FileInputStream(FileDescriptor.in), System.out, null);
+            Terminal terminal = consoleReader.getTerminal();
+            if (terminal == null || terminal instanceof UnsupportedTerminal)
+            {
+                consoleReader.shutdown();
+                throw new Throwable("Terminal not initialized");
+            }
         }
         catch (Throwable t)
         {
             consoleReaderFailed = true;
-            this.out = new PrintWriter(out, true);
-            this.in = new BufferedReader(new InputStreamReader(in));
-            logger.log(Level.SEVERE, "Cannot initialize the console reader. Default to regular input stream.", t);
+            logger.log(Level.WARNING, "Cannot initialize the console reader. Default to regular input stream.", t);
         }
 
     }
@@ -93,7 +84,7 @@ public class Console
     {
         if (consoleReaderFailed)
         {
-            return in.readLine();
+            return readLineDefaultInput();
         }
         else
         {
@@ -108,8 +99,16 @@ public class Console
      */
     public void print(String message)
     {
-        out.print(message);
-        out.flush();
+        if (console != null)
+        {
+            console.printf("%s", message);
+            console.flush();
+        }
+        else
+        {
+            // Fix tests
+            System.out.print(message);
+        }
     }
 
     /**
@@ -117,7 +116,15 @@ public class Console
      */
     public void println()
     {
-        out.println();
+        if (console != null)
+        {
+            console.printf("\n");
+        }
+        else
+        {
+            // Fix UserInputConsoleTest
+            System.out.println();
+        }
     }
 
     /**
@@ -127,7 +134,15 @@ public class Console
      */
     public void println(String message)
     {
-        out.println(message);
+        if (console != null)
+        {
+            console.printf("%s\n", message);
+        }
+        else
+        {
+            // Fix tests
+            System.out.println(message);
+        }
     }
 
     /**
@@ -295,7 +310,16 @@ public class Console
     {
         if (consoleReaderFailed)
         {
-            return prompt(prompt, defaultValue, eof);
+            char[] passwd;
+            try
+            {
+                passwd = readPasswordDefaultInput(defaultValue, "%s\n", prompt);
+                return new String(passwd);
+            }
+            catch (IOException e)
+            {
+                return defaultValue;
+            }
         }
 
         int ch;
@@ -419,6 +443,29 @@ public class Console
                 }
             }
         }
+    }
+
+    private String readLineDefaultInput() throws IOException {
+        return console.readLine();
+    }
+
+    private char[] readPasswordDefaultInput(String defaultValue, String format, Object... args)
+            throws IOException {
+        char[] result;
+        if (console != null)
+        {
+           result = console.readPassword(format, args);
+           if (result.length == 0)
+           {
+               result = defaultValue.toCharArray();
+           }
+        }
+        else
+        {
+            // Fix ConsolePasswordGroupFieldTest
+            result = readLine().toCharArray();
+        }
+        return result;
     }
 
     public void useDefaultInput()
