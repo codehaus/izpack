@@ -55,7 +55,6 @@ import com.izforge.izpack.panels.userinput.field.space.Spacer;
 import com.izforge.izpack.panels.userinput.field.statictext.StaticText;
 import com.izforge.izpack.panels.userinput.field.text.TextField;
 import com.izforge.izpack.panels.userinput.field.title.TitleField;
-import com.izforge.izpack.panels.userinput.gui.GUIField;
 import com.izforge.izpack.util.Console;
 
 
