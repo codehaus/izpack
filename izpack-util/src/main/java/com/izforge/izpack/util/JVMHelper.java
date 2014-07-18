@@ -56,7 +56,7 @@ class JVMHelper
         for (String arg : inputArguments)
         {
             if (!arg.startsWith("-Dself.mod.") && !arg.equals("-Xdebug") && !arg.startsWith("-Xrunjdwp")
-                    && !arg.startsWith("-Dizpack.mode") && !arg.startsWith("-agentlib")
+                    && !arg.startsWith("-Dizpack.mode") && !arg.startsWith("-agentlib") && !arg.startsWith("-agentpath")
                     && !arg.startsWith("-javaagent"))
             {
                 result.add(arg);
