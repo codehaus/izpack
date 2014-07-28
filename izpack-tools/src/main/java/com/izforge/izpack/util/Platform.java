@@ -18,6 +18,8 @@
 
 package com.izforge.izpack.util;
 
+import java.io.File;
+
 /**
  * Encapsulates details of the operating system platform.
  *
@@ -25,6 +27,15 @@ package com.izforge.izpack.util;
  */
 public class Platform
 {
+
+    /** Invalid Windows Characters
+     *  http://msdn.microsoft.com/en-us/library/aa365247.aspx
+     *  Forward slash not included because installer will end up creating directory with backslash
+     *
+     *  NOTE: We choose double backslash to be invalid rather than just backslash, because we are checking against paths
+     *        A normal backslash would just represent another folder
+     */
+    public static final String [] invalidWindowsDirectoryChars = {"<", ">", ":", "\"", "/", "\\\\", "|", "?", "*", "\\ "};
 
     /**
      * Platform family name.
@@ -354,6 +365,50 @@ public class Platform
         return this.arch == arch;
     }
 
+    /**
+     * Determine invalid directory character for the given OS.
+     * Expects the the driver name has already been trimmed of.
+     * @return
+     */
+    public boolean isValidDirectorySyntax(String directoryPath)
+    {
+        String[] invalidDirectoryCharacters = new String[0];
+        if (name == Name.WINDOWS)
+        {
+            invalidDirectoryCharacters = invalidWindowsDirectoryChars;
+        }
+        for (String invalidChar : invalidDirectoryCharacters)
+        {
+            if (directoryPath.contains(invalidChar))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if a fully qualified directory path contains valid syntax.
+     * @param directory
+     * @return
+     */
+    public boolean isValidDirectoryPath(File directory)
+    {
+        return isValidDirectoryPath(directory.getAbsolutePath());
+    }
+    public boolean isValidDirectoryPath(String directoryPath)
+    {
+        String filteredPath = directoryPath;
+        if (name == Name.WINDOWS)
+        {
+            if (!directoryPath.matches("^[A-Z]:.*"))
+            {
+                return false;
+            }
+            filteredPath = directoryPath.substring(2, directoryPath.length());
+        }
+        return isValidDirectorySyntax(filteredPath);
+    }
     /**
      * Determines if this platform equals another.
      *
