@@ -21,15 +21,14 @@
 
 package com.izforge.izpack.util;
 
+import com.izforge.izpack.api.data.Info;
+import com.izforge.izpack.api.rules.RulesEngine;
+
 import static com.izforge.izpack.util.Platform.Name.MAC_OSX;
 import static com.izforge.izpack.util.Platform.Name.UNIX;
 import static com.izforge.izpack.util.Platform.Name.WINDOWS;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +65,7 @@ public class PrivilegedRunner
     {
         this.platform = platform;
     }
+
 
     /**
      * Checks if the current platform is supported.
@@ -124,17 +124,89 @@ public class PrivilegedRunner
     }
 
     /**
+     * Determine if user has administrative privileges.
+     *
+     * @return
+     */
+    public boolean isAdminUser()
+    {
+        if (platform.isA(WINDOWS))
+        {
+            try
+            {
+                String NTAuthority = "HKU\\S-1-5-19";
+                String command = "reg query \""+ NTAuthority + "\"";
+                Process p = Runtime.getRuntime().exec(command);
+                p.waitFor();
+                return (p.exitValue() == 0);
+            }
+            catch (Exception e)
+            {
+                return canWrite(getProgramFiles());
+            }
+        }
+        try
+        {
+            String command = "id -u";
+            Process p = Runtime.getRuntime().exec(command);
+            p.waitFor();
+
+            InputStream stdIn = p.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdIn));
+            String value = bufferedReader.readLine();
+            return value.equals("0");
+        }
+        catch (Exception e)
+        {
+            return System.getProperty("user.name").equals("root");
+        }
+    }
+
+    /**
+     * Check if user has correct permissions to use the installer.
+     *
+     * @param info
+     * @param rules
+     * @return
+     */
+    public boolean hasCorrectPermissions(Info info, RulesEngine rules)
+    {
+        if (info.isPrivilegedExecutionRequired())
+        {
+            boolean shouldElevate = true;
+            String conditionId = info.getPrivilegedExecutionConditionID();
+            if (conditionId != null)
+            {
+                shouldElevate = rules.getCondition(conditionId).isTrue();
+            }
+            if (shouldElevate)
+            {
+               return isAdminUser();
+            }
+        }
+        return true;
+    }
+
+    /**
      * Relaunches the installer with elevated rights.
      *
      * @return the status code returned by the launched process (by convention, 0 means a success).
      * @throws IOException          if an I/O error occurs
      * @throws InterruptedException if the launch was interrupted
      */
-    public int relaunchWithElevatedRights() throws IOException, InterruptedException
+    public int relaunchWithElevatedRights() throws Exception
     {
-        String javaCommand = getJavaCommand();
+        return relaunchWithElevatedRights(new String[0]);
+    }
+    public int relaunchWithElevatedRights(String ... args) throws Exception
+    {
+        if(!platform.isA(WINDOWS))
+        {
+            throw new Exception("Installer should be run as admin");
+        }
+        String javaCommand = getJavaCommand(args);
         String installer = getInstallerJar();
-        ProcessBuilder builder = new ProcessBuilder(getElevator(javaCommand, installer));
+        ProcessBuilder builder = new ProcessBuilder(getElevator(javaCommand, installer, args));
 
         if (logger.isLoggable(Level.INFO))
         {
@@ -152,7 +224,7 @@ public class PrivilegedRunner
                 System.getProperty("izpack.mode"));
     }
 
-    protected List<String> getElevator(String javaCommand, String installer) throws IOException
+    protected List<String> getElevator(String javaCommand, String installer, String[] args) throws IOException
     {
         List<String> jvmArgs = new JVMHelper().getJVMArguments();
         List<String> elevator = new ArrayList<String>();
@@ -186,6 +258,10 @@ public class PrivilegedRunner
             elevator.add("-Dizpack.mode=privileged");
             elevator.add("-jar");
             elevator.add(installer);
+        }
+        for(String arg : args)
+        {
+            elevator.add(arg);
         }
 
         return elevator;
@@ -254,21 +330,30 @@ public class PrivilegedRunner
         return null;
     }
 
-    private String getJavaCommand()
+    private String getJavaCommand(String[] args)
     {
-        return System.getProperty("java.home") + File.separator + "bin" + File.separator + getJavaExecutable();
-    }
-
-    private String getJavaExecutable()
-    {
+        String java;
+        boolean console = false;
+        if(args.length > 0)
+        {
+            console = true;
+        }
         if (platform.isA(WINDOWS))
         {
-            return "javaw.exe";
+            if (console)
+            {
+                java = "java.exe";
+            }
+            else
+            {
+                java = "javaw.exe";
+            }
         }
         else
         {
-            return "java";
+            java = "java";
         }
+        return System.getProperty("java.home") + File.separator + "bin" + File.separator + java;
     }
 
     /**

@@ -21,9 +21,7 @@
 
 package com.izforge.izpack.installer.console;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -39,6 +37,7 @@ import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.installer.requirement.RequirementsChecker;
 import com.izforge.izpack.util.Console;
 import com.izforge.izpack.util.Housekeeper;
+import com.izforge.izpack.util.PrivilegedRunner;
 import com.izforge.izpack.util.file.FileUtils;
 
 /**
@@ -146,8 +145,22 @@ public class ConsoleInstaller implements InstallerBase
      * @param type the type of the action to perform
      * @param path the path to use for the action. May be <tt>null</tt>
      */
-    public void run(int type, String path)
+    public void run(int type, String path, String[] args)
     {
+        PrivilegedRunner runner = new PrivilegedRunner(installData.getPlatform());
+        if (!runner.hasCorrectPermissions(installData.getInfo(), installData.getRules()))
+        {
+            try
+            {
+                runner.relaunchWithElevatedRights(args);
+            }
+            catch (Exception e)
+            {
+                console.println(installData.getMessages().get("ConsoleInstaller.permissionError"));
+            }
+            System.exit(0);
+        }
+
         boolean success = false;
         ConsoleAction action = null;
         if (!canInstall())

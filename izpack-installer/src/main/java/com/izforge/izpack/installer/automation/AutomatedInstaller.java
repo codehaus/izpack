@@ -36,6 +36,7 @@ import com.izforge.izpack.installer.base.InstallerBase;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.installer.requirement.RequirementsChecker;
 import com.izforge.izpack.util.Housekeeper;
+import com.izforge.izpack.util.PrivilegedRunner;
 
 /**
  * Runs the install process in text only (no GUI) mode.
@@ -106,8 +107,21 @@ public class AutomatedInstaller implements InstallerBase
      * @param mediaPath     the multi-volume media directory. May be <tt>null</tt>
      * @throws Exception
      */
-    public void init(String inputFilename, String mediaPath) throws Exception
+    public void init(String inputFilename, String mediaPath, String[] args) throws Exception
     {
+        PrivilegedRunner runner = new PrivilegedRunner(installData.getPlatform());
+        if (!runner.hasCorrectPermissions(installData.getInfo(), installData.getRules()))
+        {
+            try
+            {
+                runner.relaunchWithElevatedRights(args);
+            }
+            catch (Exception e)
+            {
+                System.out.println(installData.getMessages().get("AutomatedInstaller.permissionError"));
+            }
+            System.exit(0);
+        }
         File input = new File(inputFilename);
         IXMLElement installRecord = getXMLData(input);
         installData.setInstallationRecord(installRecord);
@@ -126,7 +140,6 @@ public class AutomatedInstaller implements InstallerBase
     public void doInstall() throws Exception
     {
         boolean success = false;
-
         // check installer conditions
         if (!requirements.check())
         {
