@@ -87,7 +87,13 @@ public class TargetPanelTest extends AbstractPanelTest
     }
 
     /**
-     * Verifies that if no path is entered, it will default to that of the <em>user.dir</em> system property.
+     * Situation: Empty path is entered during target panel
+     *   This is very similar to the testDirectoryExists test, since the current user directory (where JVM was started)
+     *   is most likley to exist. How would you start the JVM from a non-existential location?
+     *
+     * 1. Emit a warning in the form of a question
+     * 2. Ensure target panel warning is shown in the warning question prompt
+     * 3. Ensure that the installation path is set to the 'user.dir' system property.
      *
      * @throws Exception for any error
      */
@@ -105,9 +111,7 @@ public class TargetPanelTest extends AbstractPanelTest
         // attempt to navigate to the next panel
         fixture.button(GuiId.BUTTON_NEXT.id).click();
         Thread.sleep(1000);
-        checkWarning(fixture, installData.getMessages().get("TargetPanel.empty_target"));
-        Thread.sleep(1000);
-        checkQuestionMessage(fixture, installData.getMessages().get("TargetPanel.warn"));
+        checkWarningQuestion(fixture, installData.getMessages().get("TargetPanel.warn"));
 
         Thread.sleep(1000);
         assertEquals(userDir.getAbsolutePath(), installData.getInstallPath());
@@ -164,7 +168,7 @@ public class TargetPanelTest extends AbstractPanelTest
         // attempt to navigate to the next panel
         fixture.button(GuiId.BUTTON_NEXT.id).click();
         Thread.sleep(1000);
-        checkQuestionMessage(fixture, installData.getMessages().get("TargetPanel.warn"));
+        checkWarningQuestion(fixture, installData.getMessages().get("TargetPanel.warn"));
 
         Thread.sleep(1000);
         assertEquals(dir.getAbsolutePath(), installData.getInstallPath());
@@ -179,7 +183,7 @@ public class TargetPanelTest extends AbstractPanelTest
     @Test
     public void testNotWritable() throws Exception
     {
-        File root = temporaryFolder.getRoot();
+        File root = File.listRoots()[0];
         File dir = new File(root, "install");
 
         GUIInstallData installData = getInstallData();
@@ -347,6 +351,13 @@ public class TargetPanelTest extends AbstractPanelTest
         JOptionPaneFixture warning = frame.optionPane().requireWarningMessage();
         warning.requireMessage(expected);
         warning.okButton().click();
+    }
+
+    private void checkWarningQuestion(FrameFixture frame, String expected)
+    {
+        JOptionPaneFixture warningQuestion = frame.optionPane().requireWarningMessage();
+        warningQuestion.requireMessage(expected);
+        warningQuestion.yesButton().click();
     }
 
     /**
