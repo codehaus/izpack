@@ -189,6 +189,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         InstallData installData = getInstallData();
 
         installData.setVariable("combo2", "value3"); // should select the 3rd value
+        installData.setVariable("combo4", "value4"); // should select the 4rd value
 
         // show the panel
         FrameFixture frame = showUserInputPanel("comboinput");
@@ -199,22 +200,21 @@ public class UserInputPanelTest extends AbstractPanelTest
         // for combo2, the initial selection is determined by the "combo2" variable
         checkCombo("combo2", "value3", frame);
 
-        // for combo3, there is no initial selection
-        checkCombo("combo3", null, frame);
+        // for combo3, there is no initial selection, so default to first value
+        checkCombo("combo3", "value1", frame);
 
-        // for combo4, the initial selection is determined by the 'set' attribute
+        // for combo4,  the initial selection is determined by the "combo4" variable and override the set attribute
         checkCombo("combo4", "value4", frame);
 
         frame.comboBox("combo1").component().setSelectedIndex(0);
-        frame.comboBox("combo2").clearSelection();
         frame.comboBox("combo3").component().setSelectedIndex(1);
-
+        frame.comboBox("combo4").clearSelection();
         checkNavigateNext(frame);
 
         assertEquals("value1", installData.getVariable("combo1"));
-        assertNull(installData.getVariable("combo2"));
+        assertEquals("value3", installData.getVariable("combo2"));
         assertEquals("value2", installData.getVariable("combo3"));
-        assertEquals("value4", installData.getVariable("combo4"));
+        assertNull(installData.getVariable("combo4"));
     }
 
     /**
@@ -238,8 +238,8 @@ public class UserInputPanelTest extends AbstractPanelTest
         checkRadioButton("radioA.2", true, frame);
         checkRadioButton("radioA.3", false, frame);
 
-        // for radioB, there is no initial selection
-        checkRadioButton("radioB.1", false, frame);
+        // for radioB, there is no initial selection so default to first choice
+        checkRadioButton("radioB.1", true, frame);
         checkRadioButton("radioB.2", false, frame);
         checkRadioButton("radioB.3", false, frame);
 
@@ -254,7 +254,7 @@ public class UserInputPanelTest extends AbstractPanelTest
         checkNavigateNext(frame);
 
         assertEquals("value2", installData.getVariable("radioA"));
-        assertNull(installData.getVariable("radioB"));
+        assertEquals("valueX", installData.getVariable("radioB"));
         assertEquals("valueQ", installData.getVariable("radioC"));
     }
 
