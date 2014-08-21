@@ -95,4 +95,9 @@ public class TestFileFieldConfig extends TestFieldConfig implements FileFieldCon
     {
         allowEmptyInput = allow;
     }
+
+    @Override
+    public boolean getOmitFromAuto() {
+        return false;
+    }
 }

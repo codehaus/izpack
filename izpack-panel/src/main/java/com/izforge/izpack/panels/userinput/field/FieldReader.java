@@ -82,6 +82,8 @@ public class FieldReader extends ElementReader implements FieldConfig
      */
     private static final String TOOLTIP = "tooltip";
 
+    private boolean omitFromAuto;
+
     /**
      * Constructs a {@code FieldReader}.
      *
@@ -113,6 +115,15 @@ public class FieldReader extends ElementReader implements FieldConfig
     public IXMLElement getSpec()
     {
         return spec;
+    }
+
+    /**
+     * Returns the value of 'omitFromAuto' from fields spec
+     *
+     * @return the 'omitFromAuto' attribute
+     */
+    public boolean getOmitFromAuto() {
+        return getConfig().getBoolean(getSpec(), "omitFromAuto", false);
     }
 
     /**
