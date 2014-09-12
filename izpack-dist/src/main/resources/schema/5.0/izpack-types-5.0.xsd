@@ -80,6 +80,7 @@
                     <xs:enumeration value="packselection"/>
                     <xs:enumeration value="user"/>
                     <xs:enumeration value="variable"/>
+                    <xs:enumeration value="contains"/>
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
