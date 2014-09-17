@@ -173,7 +173,7 @@ public class RulesEngineImplTest
     }
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testSimpleAnd() throws Exception
     {
         Condition condition;
@@ -192,7 +192,7 @@ public class RulesEngineImplTest
     }
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testSimpleOr() throws Exception
     {
         Condition condition;
@@ -231,7 +231,7 @@ public class RulesEngineImplTest
 
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testComplexNot() throws Exception
     {
         Condition condition;
@@ -257,7 +257,7 @@ public class RulesEngineImplTest
     }
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testComplexAnd() throws Exception
     {
         Condition condition;
@@ -319,7 +319,7 @@ public class RulesEngineImplTest
     }
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testComplexOr() throws Exception
     {
         Condition condition;
@@ -380,7 +380,7 @@ public class RulesEngineImplTest
     }
 
     @Test
-    @SuppressWarnings({ "PointlessBooleanExpression", "unused"})
+    @SuppressWarnings("PointlessBooleanExpression")
     public void testComplexXor() throws Exception
     {
         Condition condition;
