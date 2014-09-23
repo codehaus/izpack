@@ -155,7 +155,7 @@ public class SimpleUninstallerListener implements UninstallerListener
      * com.izforge.izpack.api.handler.AbstractUIProgressHandler)
      */
 
-    public void beforeDeletion(List files, AbstractUIProgressHandler handler) throws Exception
+    public void beforeDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception
     {
         // Do nothing
     }
@@ -191,7 +191,7 @@ public class SimpleUninstallerListener implements UninstallerListener
      * com.izforge.izpack.api.handler.AbstractUIProgressHandler)
      */
 
-    public void afterDeletion(List files, AbstractUIProgressHandler handler) throws Exception
+    public void afterDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception
     {
         // Do nothing
     }
