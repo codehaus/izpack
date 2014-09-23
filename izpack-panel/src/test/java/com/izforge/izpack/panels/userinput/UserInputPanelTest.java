@@ -56,6 +56,7 @@ import com.izforge.izpack.core.rules.process.VariableCondition;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.installer.data.GUIInstallData;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
+import com.izforge.izpack.installer.gui.IzPanel;
 import com.izforge.izpack.installer.gui.IzPanelView;
 import com.izforge.izpack.panels.simplefinish.SimpleFinishPanel;
 import com.izforge.izpack.panels.test.AbstractPanelTest;
@@ -659,12 +660,12 @@ public class UserInputPanelTest extends AbstractPanelTest
         return show(panelViews);
     }
 
-    private Panel createPanel(Class panelClass)
+    private Panel createPanel(Class<? extends IzPanel> panelClass)
     {
         return createPanel(panelClass, null);
     }
 
-    private Panel createPanel(Class panelClass, String id)
+    private Panel createPanel(Class<? extends IzPanel> panelClass, String id)
     {
         Panel panel = new Panel();
         panel.setPanelId(id);
