@@ -64,4 +64,12 @@ public class SimpleFieldReader extends FieldReader
         return null;
     }
 
+    /**
+     * Returns the value of 'omitFromAuto' from fields spec.
+     *
+     * @return the 'omitFromAuto' attribute
+     */
+    @Override
+    public boolean getOmitFromAuto(){ return false; }
+
 }

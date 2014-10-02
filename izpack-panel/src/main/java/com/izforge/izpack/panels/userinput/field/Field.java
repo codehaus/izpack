@@ -114,6 +114,11 @@ public abstract class Field
     private final InstallData installData;
 
     /**
+     * Determines if the 'value' of an entry will be included in the user input panel
+     */
+    private boolean omitFromAuto;
+
+    /**
      * The logger.
      */
     private static final Logger logger = Logger.getLogger(Field.class.getName());
@@ -139,6 +144,7 @@ public abstract class Field
         description = config.getDescription();
         displayHidden = config.getDisplayHidden();
         tooltip = config.getTooltip();
+        omitFromAuto = config.getOmitFromAuto();
         this.condition = config.getCondition();
         this.installData = installData;
 
@@ -157,6 +163,16 @@ public abstract class Field
     public String getVariable()
     {
         return variable;
+    }
+
+    /**
+     * Returns the value of 'omitFromAuto' from fields spec
+     *
+     * @return the 'omitFromAuto' attribute
+     */
+    public boolean getOmitFromAuto()
+    {
+        return omitFromAuto;
     }
 
     /**

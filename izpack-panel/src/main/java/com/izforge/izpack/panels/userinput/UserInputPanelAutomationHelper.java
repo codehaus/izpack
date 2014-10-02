@@ -24,6 +24,7 @@ package com.izforge.izpack.panels.userinput;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -93,23 +94,23 @@ public class UserInputPanelAutomationHelper implements PanelAutomation
     @Override
     public void createInstallationRecord(InstallData installData, IXMLElement rootElement)
     {
-        Map<String, String> entries = generateEntries(installData, variables, views);
-
+        HashSet<String> omitFromAutoSet = new HashSet<String>();
+        Map<String, String> entries = generateEntries(installData, variables, views, omitFromAutoSet);
         IXMLElement dataElement;
 
         for (String key : entries.keySet())
         {
-            String value = entries.get(key);
             dataElement = new XMLElementImpl(AUTO_KEY_ENTRY, rootElement);
             dataElement.setAttribute(AUTO_ATTRIBUTE_KEY, key);
+            String value = (omitFromAutoSet.contains(key) ? "" : entries.get(key));
             dataElement.setAttribute(AUTO_ATTRIBUTE_VALUE, value);
-
             rootElement.addChild(dataElement);
         }
     }
 
     private Map<String, String> generateEntries(InstallData installData,
-                                                Set<String> variables, List<? extends AbstractFieldView> views)
+                                                Set<String> variables, List<? extends AbstractFieldView> views,
+                                                HashSet<String> omitFromAutoSet)
     {
         Map<String, String> entries = new HashMap<String, String>();
 
@@ -123,7 +124,11 @@ public class UserInputPanelAutomationHelper implements PanelAutomation
 
             if (variable != null)
             {
-                entries.put(variable, installData.getVariable(variable));
+                String entry = installData.getVariable(variable);
+                if (view.getField().getOmitFromAuto()){
+                    omitFromAutoSet.add(variable);
+                }
+                entries.put(variable, entry);
             }
 
             // Grab all the variables contained within the custom field

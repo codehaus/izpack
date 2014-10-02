@@ -137,4 +137,12 @@ public interface FieldConfig
      */
     String getCondition();
 
+    /**
+     * Returns the value of 'omitFromAuto' from fields spec
+     *
+     * @return the 'omitFromAuto' attribute
+     */
+    public boolean getOmitFromAuto();
+
+
 }

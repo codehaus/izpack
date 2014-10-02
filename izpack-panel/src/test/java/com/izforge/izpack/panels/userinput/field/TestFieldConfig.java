@@ -234,4 +234,9 @@ public class TestFieldConfig implements FieldConfig
     {
         return null;
     }
+
+    @Override
+    public boolean getOmitFromAuto() {
+        return false;
+    }
 }
