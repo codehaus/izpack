@@ -60,4 +60,9 @@ public class TestPasswordGroupFieldConfig extends TestFieldConfig implements Pas
     {
         return fields;
     }
+
+    @Override
+    public boolean getOmitFromAuto() {
+        return false;
+    }
 }

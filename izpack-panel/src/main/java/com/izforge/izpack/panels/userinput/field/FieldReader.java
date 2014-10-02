@@ -65,7 +65,7 @@ public class FieldReader extends ElementReader implements FieldConfig
     /**
      * Text size attribute name.
      */
-    private static final String TEXT_SIZE = "size";
+    protected static final String TEXT_SIZE = "size";
 
     /**
      * The field specification element name.
@@ -75,12 +75,19 @@ public class FieldReader extends ElementReader implements FieldConfig
     /**
      * The validator element name.
      */
-    private static final String VALIDATOR = "validator";
+    protected static final String VALIDATOR = "validator";
 
     /**
      * The tooltip attribute name.
      */
-    private static final String TOOLTIP = "tooltip";
+    protected static final String TOOLTIP = "tooltip";
+
+    /**
+     * The omitFromAuto attribute name.
+     */
+    protected static final String OMIT_FROM_AUTO = "omitFromAuto";
+
+    private boolean omitFromAuto;
 
     /**
      * Constructs a {@code FieldReader}.
@@ -113,6 +120,15 @@ public class FieldReader extends ElementReader implements FieldConfig
     public IXMLElement getSpec()
     {
         return spec;
+    }
+
+    /**
+     * Returns the value of 'omitFromAuto' from fields spec
+     *
+     * @return the 'omitFromAuto' attribute
+     */
+    public boolean getOmitFromAuto() {
+        return getConfig().getBoolean(getSpec(), OMIT_FROM_AUTO, false);
     }
 
     /**

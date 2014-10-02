@@ -66,4 +66,9 @@ public class PasswordGroupFieldReader extends FieldReader implements PasswordGro
         }
         return result;
     }
+
+    @Override
+    public boolean getOmitFromAuto() {
+        return getConfig().getBoolean(getSpec(), OMIT_FROM_AUTO, true);
+    }
 }
