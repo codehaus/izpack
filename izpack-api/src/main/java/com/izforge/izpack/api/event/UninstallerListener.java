@@ -113,7 +113,7 @@ public interface UninstallerListener
      * @deprecated use {@link #beforeDelete(List)}
      */
     @Deprecated
-    void beforeDeletion(List files, AbstractUIProgressHandler handler) throws Exception;
+    void beforeDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception;
 
     /**
      * Invoked before a file is deleted.
@@ -146,6 +146,6 @@ public interface UninstallerListener
      * @deprecated use {@link #afterDelete(List, ProgressListener)}
      */
     @Deprecated
-    void afterDeletion(List files, AbstractUIProgressHandler handler) throws Exception;
+    void afterDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception;
 
 }

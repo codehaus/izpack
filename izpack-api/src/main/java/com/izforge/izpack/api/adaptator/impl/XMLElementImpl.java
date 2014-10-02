@@ -23,13 +23,16 @@
 package com.izforge.izpack.api.adaptator.impl;
 
 import com.izforge.izpack.api.adaptator.IXMLElement;
+
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -257,10 +260,10 @@ public class XMLElementImpl implements IXMLElement
     }
 
     @Override
-    public Enumeration enumerateAttributeNames()
+    public Enumeration<String> enumerateAttributeNames()
     {
         NamedNodeMap namedNodeMap = element.getAttributes();
-        Properties properties = new Properties();
+        Hashtable<String,String> properties = new Hashtable<String, String>();
         for (int i = 0; i < namedNodeMap.getLength(); i++)
         {
             Node node = namedNodeMap.item(i);

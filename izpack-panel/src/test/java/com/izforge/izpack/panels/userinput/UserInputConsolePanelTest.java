@@ -204,7 +204,7 @@ public class UserInputConsolePanelTest
      * @param id         the panel identifier
      * @return a new {@code ConsolePanels}
      */
-    private ConsolePanels createPanels(Class panelClass, String id)
+    private ConsolePanels createPanels(Class<UserInputPanel> panelClass, String id)
     {
         Panel panel = new Panel();
         panel.setClassName(panelClass.getName());

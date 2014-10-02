@@ -272,10 +272,10 @@ public class PropertyManager
         Properties props = new Properties();
         packagerListener.packagerMsg("Loading Environment " + prefix,
                 PackagerListener.MSG_VERBOSE);
-        Vector osEnv = Execute.getProcEnvironment();
-        for (Enumeration e = osEnv.elements(); e.hasMoreElements();)
+        Vector<String> osEnv = Execute.getProcEnvironment();
+        for (Enumeration<String> e = osEnv.elements(); e.hasMoreElements();)
         {
-            String entry = (String) e.nextElement();
+            String entry = e.nextElement();
             int pos = entry.indexOf('=');
             if (pos == -1)
             {

@@ -149,7 +149,7 @@ public interface IXMLElement extends Serializable
      *
      * @return the non-null enumeration.
      */
-    Enumeration enumerateAttributeNames();
+    Enumeration<String> enumerateAttributeNames();
 
     /**
      * Returns whether an attribute exists.

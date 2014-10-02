@@ -103,7 +103,7 @@ public abstract class AbstractUninstallerListener implements UninstallerListener
      * @throws Exception for any error
      */
     @Override
-    public void beforeDeletion(List files, AbstractUIProgressHandler handler) throws Exception
+    public void beforeDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception
     {
     }
 
@@ -152,7 +152,7 @@ public abstract class AbstractUninstallerListener implements UninstallerListener
      * @throws Exception for any error
      */
     @Override
-    public void afterDeletion(List files, AbstractUIProgressHandler handler) throws Exception
+    public void afterDeletion(List<File> files, AbstractUIProgressHandler handler) throws Exception
     {
     }
 }

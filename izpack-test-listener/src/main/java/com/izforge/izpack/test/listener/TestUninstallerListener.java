@@ -202,7 +202,7 @@ public class TestUninstallerListener implements UninstallerListener
      * @param files   all files which should be deleted
      * @param handler the UI progress handler
      */
-    public void beforeDeletion(List files, AbstractUIProgressHandler handler)
+    public void beforeDeletion(List<File> files, AbstractUIProgressHandler handler)
     {
         throw new IllegalStateException("Deprecated method should not be invoked.");
     }
@@ -213,7 +213,7 @@ public class TestUninstallerListener implements UninstallerListener
      * @param files   all files which where deleted
      * @param handler the UI progress handler
      */
-    public void afterDeletion(List files, AbstractUIProgressHandler handler)
+    public void afterDeletion(List<File> files, AbstractUIProgressHandler handler)
     {
         throw new IllegalStateException("Deprecated method should not be invoked.");
     }
