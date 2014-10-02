@@ -59,7 +59,7 @@
             <!-- Used during PicoContainer instantiation -->
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
