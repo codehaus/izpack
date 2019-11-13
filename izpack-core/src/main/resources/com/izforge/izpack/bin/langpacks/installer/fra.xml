@@ -86,7 +86,7 @@
     <!-- TargetPanel strings -->
     <str id="TargetPanel.info" txt="Choisissez le chemin d'installation :"/>
     <str id="TargetPanel.browse" txt="Parcourir ..."/>
-    <str id="TargetPanel.warn" txt="Le répertoire existe déjà ! Etes-vous sur de vouloir installer dans celui-ci ?"/>
+    <str id="TargetPanel.warn" txt="Le répertoire existe déjà ! Etes-vous sûr de vouloir installer dans celui-ci ?"/>
     <str id="TargetPanel.empty_target" txt="Vous avez spécifié un nom de répertoire vide ! Etes-vous sûr(e) ?"/>
     <str id="TargetPanel.createdir" txt="Le répertoire de destination sera créé :"/>
     <str id="TargetPanel.nodir"
